@@ -141,8 +141,8 @@ services::Status updateDenseCrossProductAndSums(bool isNormalized, size_t nFeatu
     {
         services::Status status;
 
-        algorithmFPType nVectorsInv = algorithmFPType(1.0) / algorithmFPType(nVectors);
-        algorithmFPType beta        = (isNormalized == true) ? algorithmFPType(0.0) : -nVectorsInv;
+        algorithmFPType nVectorsInv = double(1.0) / double(nVectors);
+        algorithmFPType beta        = (isNormalized == true) ? double(0.0f) : -double(nVectorsInv);
 
         if (!isNormalized)
         {

@@ -103,6 +103,15 @@ public:
     virtual services::Status compute() DAAL_C11_OVERRIDE;
 };
 
+template <CpuType cpu>
+class BatchContainer<float16, defaultDense, cpu> : public BatchContainerIface
+{
+public:
+    BatchContainer(daal::services::Environment::env * daalEnv);
+    virtual ~BatchContainer();
+    virtual services::Status compute() DAAL_C11_OVERRIDE;
+};
+
 /**
  * <a name="DAAL-CLASS-ALGORITHMS__COVARIANCE__BATCHCONTAINER_ALGORITHMFPTYPE_SINGLEPASSDENSE_CPU"></a>
  * \brief Provides methods to run implementations of the correlation or variance-covariance matrix algorithm

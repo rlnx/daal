@@ -27,6 +27,9 @@
  * \example cor_dense_batch.cpp
  */
 
+
+#define DAAL_EXECUTION_CONTEXT_VERBOSE
+
 #include "daal_sycl.h"
 #include "service.h"
 #include "service_sycl.h"
@@ -35,39 +38,102 @@ using namespace std;
 using namespace daal;
 using namespace daal::algorithms;
 
-/* Input data set parameters */
-const string datasetFileName = "../data/batch/covcormoments_dense.csv";
+using float16_t = daal::float16;
+
+struct TablePrinter
+{
+    explicit TablePrinter(const NumericTablePtr &table)
+        : table(table) { }
+    NumericTablePtr table;
+};
+
+
+std::ostream &operator <<(std::ostream &stream, const TablePrinter &p)
+{
+    auto t = SyclHomogenNumericTable<float16_t>::cast(p.table);
+    BlockDescriptor<float16_t> bd;
+    t->getBlockOfRows(0, t->getNumberOfRows(), readOnly, bd);
+
+    const size_t rows = t->getNumberOfRows();
+    const size_t cols = t->getNumberOfColumns();
+
+    auto buff = bd.getBuffer().toSycl();
+    auto buf_acc = buff.get_access<cl::sycl::access::mode::read>();
+
+    std::cout << std::setiosflags(std::ios::left);
+    for (size_t i = 0; i < rows; i++)
+    {
+        for (size_t j = 0; j < cols; j++)
+        {
+            std::cout << std::setw(10) << std::setiosflags(std::ios::fixed) << std::setprecision(3);
+            std::cout << buf_acc[i * cols + j];
+        }
+        std::cout << std::endl;
+    }
+
+    t->releaseBlockOfRows(bd);
+    return stream;
+}
+
+uint32_t generateMinStd(uint32_t x)
+{
+    constexpr uint32_t a = 16807;
+    constexpr uint32_t c = 0;
+    constexpr uint32_t m = 2147483647;
+    return (a * x + c) % m;
+}
+
+cl::sycl::event generateData(cl::sycl::queue &q, cl::sycl::half *deviceData,
+                             size_t nRows, size_t nCols)
+{
+    using namespace cl::sycl;
+    return q.submit([&](handler &cgh)
+    {
+        cgh.parallel_for<class FillTable>(range<1>(nRows), [=](id<1> idx)
+        {
+            constexpr float genMax = 2147483647.0f;
+            uint32_t genState = 7777 + idx[0] * idx[0];
+            genState = generateMinStd(genState);
+            genState = generateMinStd(genState);
+            for (size_t j = 0; j < nCols; j++)
+            {
+                deviceData[idx[0] * nCols + j] = (cl::sycl::half)(genState / genMax);
+                genState = generateMinStd(genState);
+            }
+        });
+    });
+}
 
 int main(int argc, char * argv[])
 {
-    checkArguments(argc, argv, 1, &datasetFileName);
+    constexpr size_t nCols = 10;
+    constexpr size_t nRows = 500;
 
-    for (const auto & deviceSelector : getListOfDevices())
-    {
-        const auto & nameDevice = deviceSelector.first;
-        const auto & device     = deviceSelector.second;
-        cl::sycl::queue queue(device);
-        std::cout << "Running on " << nameDevice << "\n\n";
+    auto queue = cl::sycl::queue{cl::sycl::gpu_selector{}};
 
-        daal::services::SyclExecutionContext ctx(queue);
-        services::Environment::getInstance()->setDefaultExecutionContext(ctx);
+    services::Environment::getInstance()->setDefaultExecutionContext(
+        services::SyclExecutionContext{queue}
+    );
 
-        FileDataSource<CSVFeatureManager> dataSource(datasetFileName, DataSource::notAllocateNumericTable, DataSource::doDictionaryFromContext);
+    float16_t *dataDevice = (float16_t *)cl::sycl::malloc_shared(
+        sizeof(float16_t) * nRows * nCols, queue.get_device(), queue.get_context());
 
-        auto data = SyclHomogenNumericTable<>::create(10, 0, NumericTable::notAllocate);
-        dataSource.loadDataBlock(data.get());
+    generateData(queue, dataDevice, nRows, nCols).wait();
 
-        covariance::Batch<> algorithm;
-        algorithm.input.set(covariance::data, data);
+    NumericTablePtr dataTable = SyclHomogenNumericTable<float16_t>::create(
+        dataDevice, nCols, nRows, cl::sycl::usm::alloc::shared);
 
-        algorithm.parameter.outputMatrixType = covariance::correlationMatrix;
+    covariance::Batch<float16_t> algorithm;
+    algorithm.input.set(covariance::data, dataTable);
+    algorithm.parameter.outputMatrixType = covariance::correlationMatrix;
+    algorithm.compute();
+    const auto res = algorithm.getResult();
 
-        algorithm.compute();
+    std::cout << "Correlation matrix: " << std::endl
+              << TablePrinter{res->get(covariance::correlation)} << std::endl;
+    std::cout << "Mean: " << TablePrinter{res->get(covariance::mean)} << std::endl;
 
-        covariance::ResultPtr res = algorithm.getResult();
+    cl::sycl::free(dataDevice, queue.get_context());
 
-        printNumericTable(res->get(covariance::correlation), "Correlation matrix:");
-        printNumericTable(res->get(covariance::mean), "Mean vector:");
-    }
     return 0;
 }

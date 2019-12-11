@@ -38,10 +38,10 @@ struct Typelist
 
 typedef Typelist<daal::oneapi::internal::int8_t, daal::oneapi::internal::int16_t, daal::oneapi::internal::int32_t, daal::oneapi::internal::int64_t,
                  daal::oneapi::internal::uint8_t, daal::oneapi::internal::uint16_t, daal::oneapi::internal::uint32_t,
-                 daal::oneapi::internal::uint64_t, daal::oneapi::internal::float32_t, daal::oneapi::internal::float64_t>
+                 daal::oneapi::internal::uint64_t, daal::oneapi::internal::float16_t, daal::oneapi::internal::float32_t, daal::oneapi::internal::float64_t>
     PrimitiveTypes;
 
-typedef Typelist<daal::oneapi::internal::float32_t, daal::oneapi::internal::float64_t> FloatTypes;
+typedef Typelist<daal::oneapi::internal::float16_t, daal::oneapi::internal::float32_t, daal::oneapi::internal::float64_t> FloatTypes;
 
 /**
  *  <a name="DAAL-CLASS-ONEAPI-INTERNAL__TYPEDISPATCHER"></a>

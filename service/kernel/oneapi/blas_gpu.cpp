@@ -105,6 +105,7 @@ services::Status ReferenceGemm<algorithmFPType>::operator()(const Transpose tran
 
 template class ReferenceGemm<float>;
 template class ReferenceGemm<double>;
+template class ReferenceGemm<cl::sycl::half>;
 
 } // namespace interface1
 } // namespace math

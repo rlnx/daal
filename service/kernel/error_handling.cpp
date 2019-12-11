@@ -571,12 +571,14 @@ static SharedErrorCollection * getOwnCopy(void *& ptr)
 Status & Status::add(ErrorID id)
 {
     getOwnCopy(_impl)->add(id);
+    throw *this;
     return *this;
 }
 
 Status & Status::add(const ErrorPtr & e)
 {
     getOwnCopy(_impl)->add(e);
+    throw *this;
     return *this;
 }
 
@@ -591,6 +593,7 @@ Status & Status::add(const Status & other)
             _impl = other._impl;
             static_cast<SharedErrorCollection *>(_impl)->addRef();
         }
+        throw *this;
     }
     return *this;
 }

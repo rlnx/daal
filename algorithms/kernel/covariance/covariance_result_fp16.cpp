@@ -1,6 +1,6 @@
-/* file: base_types.h */
+/* file: covariance_result_fpt.cpp */
 /*******************************************************************************
-* Copyright 2019 Intel Corporation
+* Copyright 2014-2019 Intel Corporation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,32 +15,23 @@
 * limitations under the License.
 *******************************************************************************/
 
-#ifndef __DAAL_ONEAPI_BASE_INTERNAL_TYPES_H__
-#define __DAAL_ONEAPI_BASE_INTERNAL_TYPES_H__
+/*
+//++
+//  Implementation of covariance algorithm and types methods.
+//--
+*/
 
-#include <stdint.h>
-#include "services/daal_defines.h"
+#include "covariance_result.h"
 
 namespace daal
 {
-namespace oneapi
+namespace algorithms
 {
-namespace internal
+namespace covariance
 {
-typedef ::int8_t int8_t;
-typedef ::int16_t int16_t;
-typedef ::int32_t int32_t;
-typedef ::int64_t int64_t;
-typedef ::uint8_t uint8_t;
-typedef ::uint16_t uint16_t;
-typedef ::uint32_t uint32_t;
-typedef ::uint64_t uint64_t;
-typedef float16 float16_t;
-typedef float float32_t;
-typedef double float64_t;
+template DAAL_EXPORT services::Status Result::allocate<float16>(const daal::algorithms::Input * input,
+                                                                const daal::algorithms::Parameter * parameter, const int method);
 
-} // namespace internal
-} // namespace oneapi
+} // namespace covariance
+} // namespace algorithms
 } // namespace daal
-
-#endif

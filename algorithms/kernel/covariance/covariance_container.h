@@ -367,6 +367,37 @@ services::Status DistributedContainer<step2Master, algorithmFPType, method, cpu>
                        crossProductTable, sumTable, covTable, meanTable, parameter);
 }
 
+
+template <CpuType cpu>
+BatchContainer<float16, defaultDense, cpu>::BatchContainer(
+    daal::services::Environment::env * daalEnv)
+{
+    _kernel = new oneapi::internal::CovarianceDenseBatchKernelOneAPI<float16, defaultDense>();
+}
+
+template <CpuType cpu>
+BatchContainer<float16, defaultDense, cpu>::~BatchContainer()
+{
+    delete _kernel;
+}
+
+template <CpuType cpu>
+services::Status BatchContainer<float16, defaultDense, cpu>::compute()
+{
+    Result * result = static_cast<Result *>(_res);
+    Input * input   = static_cast<Input *>(_in);
+
+    NumericTable * dataTable = input->get(data).get();
+    NumericTable * covTable  = result->get(covariance).get();
+    NumericTable * meanTable = result->get(mean).get();
+
+    Parameter * parameter                  = static_cast<Parameter *>(_par);
+    daal::services::Environment::env & env = *_env;
+
+    return ((oneapi::internal::CovarianceDenseBatchKernelOneAPI<float16, defaultDense> *)(_kernel))
+        ->compute(dataTable, covTable, meanTable, parameter);
+}
+
 } // namespace covariance
 } // namespace algorithms
 } // namespace daal

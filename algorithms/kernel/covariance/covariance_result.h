@@ -50,22 +50,22 @@ DAAL_EXPORT services::Status Result::allocate(const daal::algorithms::Input * in
     auto & context    = services::Environment::getInstance()->getDefaultExecutionContext();
     auto & deviceInfo = context.getInfoDevice();
 
-    if (deviceInfo.isCpu)
-    {
-        set(covariance, HomogenNumericTable<algorithmFPType>::create(nColumns, nColumns, NumericTable::doAllocate, &status));
-        DAAL_CHECK_STATUS_VAR(status);
+    // if (deviceInfo.isCpu)
+    // {
+    //     set(covariance, HomogenNumericTable<algorithmFPType>::create(nColumns, nColumns, NumericTable::doAllocate, &status));
+    //     DAAL_CHECK_STATUS_VAR(status);
 
-        set(mean, HomogenNumericTable<algorithmFPType>::create(nColumns, 1, NumericTable::doAllocate, &status));
-        DAAL_CHECK_STATUS_VAR(status);
-    }
-    else
-    {
+    //     set(mean, HomogenNumericTable<algorithmFPType>::create(nColumns, 1, NumericTable::doAllocate, &status));
+    //     DAAL_CHECK_STATUS_VAR(status);
+    // }
+    // else
+    // {
         set(covariance, SyclHomogenNumericTable<algorithmFPType>::create(nColumns, nColumns, NumericTable::doAllocate, &status));
         DAAL_CHECK_STATUS_VAR(status);
 
         set(mean, SyclHomogenNumericTable<algorithmFPType>::create(nColumns, 1, NumericTable::doAllocate, &status));
         DAAL_CHECK_STATUS_VAR(status);
-    }
+    // }
 
     return status;
 }

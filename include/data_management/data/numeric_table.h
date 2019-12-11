@@ -560,6 +560,11 @@ public:
      */
     virtual services::Status getBlockOfRows(size_t vector_idx, size_t vector_num, ReadWriteMode rwflag, BlockDescriptor<int> & block) = 0;
 
+    virtual services::Status getBlockOfRows(size_t vector_idx, size_t vector_num, ReadWriteMode rwflag, BlockDescriptor<float16> & block)
+    {
+        return services::Status(services::ErrorMethodNotImplemented);
+    }
+
     /**
      *  Releases a block of rows.
      *  \param[in] block      The block of rows.
@@ -577,6 +582,11 @@ public:
      *  \param[in] block      The block of rows.
      */
     virtual services::Status releaseBlockOfRows(BlockDescriptor<int> & block) = 0;
+
+    virtual services::Status releaseBlockOfRows(BlockDescriptor<float16> & block)
+    {
+        return services::Status(services::ErrorMethodNotImplemented);
+    }
 
     /**
      *  Gets a block of values for a given feature.

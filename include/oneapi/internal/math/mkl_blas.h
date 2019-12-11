@@ -25,7 +25,8 @@
 #define __ONEAPI_INTERNAL_MKL_BLAS_H__
 
 #include "services/buffer.h"
-#include "mkl_dal_sycl.hpp"
+// #include "mkl_dal_sycl.hpp"
+#include "mkl_blas_sycl.hpp"
 
 namespace daal
 {
@@ -81,7 +82,7 @@ private:
                            int64_t lda, cl::sycl::buffer<double, 1> b, int64_t ldb, double beta, cl::sycl::buffer<double, 1> c, int64_t ldc,
                            int64_t offset_a, int64_t offset_b, int64_t offset_c)
     {
-        fpk::gpu::dgemm_sycl(&_queue, transa, transb, m, n, k, alpha, &a, lda, &b, ldb, beta, &c, ldc, offset_a, offset_b, offset_c);
+        // fpk::gpu::dgemm_sycl(&_queue, transa, transb, m, n, k, alpha, &a, lda, &b, ldb, beta, &c, ldc, offset_a, offset_b, offset_c);
     }
 
     template <>
@@ -89,7 +90,17 @@ private:
                           int64_t lda, cl::sycl::buffer<float, 1> b, int64_t ldb, float beta, cl::sycl::buffer<float, 1> c, int64_t ldc,
                           int64_t offset_a, int64_t offset_b, int64_t offset_c)
     {
-        fpk::gpu::sgemm_sycl(&_queue, transa, transb, m, n, k, alpha, &a, lda, &b, ldb, beta, &c, ldc, offset_a, offset_b, offset_c);
+        // fpk::gpu::sgemm_sycl(&_queue, transa, transb, m, n, k, alpha, &a, lda, &b, ldb, beta, &c, ldc, offset_a, offset_b, offset_c);
+    }
+
+    template <>
+    void innerGemm<cl::sycl::half>(MKL_TRANSPOSE transa, MKL_TRANSPOSE transb, int64_t m, int64_t n, int64_t k, cl::sycl::half alpha, cl::sycl::buffer<cl::sycl::half, 1> a,
+                          int64_t lda, cl::sycl::buffer<cl::sycl::half, 1> b, int64_t ldb, cl::sycl::half beta, cl::sycl::buffer<cl::sycl::half, 1> c, int64_t ldc,
+                          int64_t offset_a, int64_t offset_b, int64_t offset_c)
+    {
+        const mkl::transpose transamkl = transa == MKL_TRANS ? mkl::transpose::T : mkl::transpose::N;
+        const mkl::transpose transbmkl = transb == MKL_TRANS ? mkl::transpose::T : mkl::transpose::N;
+        mkl::blas::gemm(_queue, transamkl, transbmkl, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc);
     }
 
     cl::sycl::queue & _queue;
@@ -132,14 +143,20 @@ private:
     void innerSyrk(MKL_UPLO uplo, MKL_TRANSPOSE trans, int64_t n, int64_t k, double alpha, cl::sycl::buffer<double, 1> a, int64_t lda, double beta,
                    cl::sycl::buffer<double, 1> c, int64_t ldc, int64_t offset_a, int64_t offset_c)
     {
-        fpk::gpu::dsyrk_sycl(&_queue, uplo, trans, n, k, alpha, &a, lda, beta, &c, ldc, offset_a, offset_c);
+        // fpk::gpu::dsyrk_sycl(&_queue, uplo, trans, n, k, alpha, &a, lda, beta, &c, ldc, offset_a, offset_c);
     }
 
     template <>
     void innerSyrk(MKL_UPLO uplo, MKL_TRANSPOSE trans, int64_t n, int64_t k, float alpha, cl::sycl::buffer<float, 1> a, int64_t lda, float beta,
                    cl::sycl::buffer<float, 1> c, int64_t ldc, int64_t offset_a, int64_t offset_c)
     {
-        fpk::gpu::ssyrk_sycl(&_queue, uplo, trans, n, k, alpha, &a, lda, beta, &c, ldc, offset_a, offset_c);
+        // fpk::gpu::ssyrk_sycl(&_queue, uplo, trans, n, k, alpha, &a, lda, beta, &c, ldc, offset_a, offset_c);
+    }
+
+    template <>
+    void innerSyrk(MKL_UPLO uplo, MKL_TRANSPOSE trans, int64_t n, int64_t k, cl::sycl::half alpha, cl::sycl::buffer<cl::sycl::half, 1> a, int64_t lda, cl::sycl::half beta,
+                   cl::sycl::buffer<cl::sycl::half, 1> c, int64_t ldc, int64_t offset_a, int64_t offset_c)
+    {
     }
 
     cl::sycl::queue & _queue;

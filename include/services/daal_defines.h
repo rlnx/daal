@@ -27,6 +27,7 @@
 /** \file daal_defines.h */
 
 #include <cstddef> // for size_t
+#include <CL/sycl.hpp>
 
 #if defined(_WIN32) || defined(_WIN64)
     #ifdef __DAAL_IMPLEMENTATION
@@ -160,6 +161,7 @@ enum MemType
 };
 
 typedef unsigned char byte;
+typedef cl::sycl::half float16;
 
 /**
  * <a name="DAAL-STRUCT-ISSAMETYPE"></a>

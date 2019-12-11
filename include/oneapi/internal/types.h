@@ -36,17 +36,27 @@ namespace internal
  */
 
 template <typename algorithmFPType>
-services::String getKeyFPType()
+inline services::String getKeyFPType()
 {
-    if (IsSameType<algorithmFPType, float>::value)
-    {
-        return services::String(" -D algorithmFPType=float -D algorithmFPType2=float2 -D algorithmFPType4=float4 ");
-    }
-    if (IsSameType<algorithmFPType, double>::value)
-    {
-        return services::String(" -D algorithmFPType=double -D algorithmFPType2=double2  -D algorithmFPType4=double4 ");
-    }
     return services::String();
+}
+
+template <>
+inline services::String getKeyFPType<float>()
+{
+    return services::String(" -D algorithmFPType=float -D algorithmFPType2=float2 -D algorithmFPType4=float4 ");
+}
+
+template <>
+inline services::String getKeyFPType<double>()
+{
+    return services::String(" -D algorithmFPType=double -D algorithmFPType2=double2  -D algorithmFPType4=double4 ");
+}
+
+template <>
+inline services::String getKeyFPType<float16>()
+{
+    return services::String(" -D algorithmFPType=half -D algorithmFPType2=half2 -D algorithmFPType4=half4 ");
 }
 
 namespace interface1
@@ -73,6 +83,7 @@ public:
         uint64,
 
         /* Floatin point */
+        float16,
         float32,
         float64,
 
@@ -111,6 +122,7 @@ DAAL_DECLARE_TYPE_ID_MAP(uint8);
 DAAL_DECLARE_TYPE_ID_MAP(uint16);
 DAAL_DECLARE_TYPE_ID_MAP(uint32);
 DAAL_DECLARE_TYPE_ID_MAP(uint64);
+DAAL_DECLARE_TYPE_ID_MAP(float16);
 DAAL_DECLARE_TYPE_ID_MAP(float32);
 DAAL_DECLARE_TYPE_ID_MAP(float64);
 

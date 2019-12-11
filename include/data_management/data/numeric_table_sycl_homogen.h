@@ -141,11 +141,18 @@ public:
         return getTBlock<int>(vector_idx, vector_num, rwflag, block);
     }
 
+    services::Status getBlockOfRows(size_t vector_idx, size_t vector_num, ReadWriteMode rwflag, BlockDescriptor<float16> & block) DAAL_C11_OVERRIDE
+    {
+        return getTBlock<float16>(vector_idx, vector_num, rwflag, block);
+    }
+
     services::Status releaseBlockOfRows(BlockDescriptor<double> & block) DAAL_C11_OVERRIDE { return releaseTBlock<double>(block); }
 
     services::Status releaseBlockOfRows(BlockDescriptor<float> & block) DAAL_C11_OVERRIDE { return releaseTBlock<float>(block); }
 
     services::Status releaseBlockOfRows(BlockDescriptor<int> & block) DAAL_C11_OVERRIDE { return releaseTBlock<int>(block); }
+
+    services::Status releaseBlockOfRows(BlockDescriptor<float16> & block) DAAL_C11_OVERRIDE { return releaseTBlock<float16>(block); }
 
     services::Status getBlockOfColumnValues(size_t feature_idx, size_t vector_idx, size_t value_num, ReadWriteMode rwflag,
                                             BlockDescriptor<double> & block) DAAL_C11_OVERRIDE
@@ -236,13 +243,13 @@ protected:
 
         freeDataMemoryImpl();
 
-        if (isCpuContext())
-        {
-            status |= allocateDataMemoryOnCpu();
-            DAAL_CHECK_STATUS_VAR(status);
-        }
-        else
-        {
+        // if (isCpuContext())
+        // {
+        //     status |= allocateDataMemoryOnCpu();
+        //     DAAL_CHECK_STATUS_VAR(status);
+        // }
+        // else
+        // {
             if (!getNumberOfColumns())
             {
                 status |= services::Status(services::ErrorIncorrectNumberOfFeatures);
@@ -261,7 +268,7 @@ protected:
 
                 _buffer = universalBuffer.template get<DataType>();
             }
-        }
+        // }
 
         _memStatus = internallyAllocated;
         return status;
@@ -270,7 +277,7 @@ protected:
     void freeDataMemoryImpl() DAAL_C11_OVERRIDE
     {
         _buffer.reset();
-        _cpuTable.reset();
+        // _cpuTable.reset();
         _memStatus = notAllocated;
     }
 
@@ -278,10 +285,10 @@ protected:
     {
         services::Status status;
 
-        if (isCpuTable())
-        {
-            status |= _cpuTable->setNumberOfColumns(ncol);
-        }
+        // if (isCpuTable())
+        // {
+        //     status |= _cpuTable->setNumberOfColumns(ncol);
+        // }
 
         if (status && _ddict->getNumberOfFeatures() != ncol)
         {
@@ -307,14 +314,14 @@ protected:
         }
 
         const size_t size = getNumberOfColumns() * getNumberOfRows();
-        if (isCpuTable())
-        {
-            archive->set(_cpuTable->getArray(), size);
-        }
-        else
-        {
+        // if (isCpuTable())
+        // {
+        //     archive->set(_cpuTable->getArray(), size);
+        // }
+        // else
+        // {
             archive->set(_buffer.toHost(data_management::readOnly).get(), size);
-        }
+        // }
 
         return services::Status();
     }
@@ -331,10 +338,10 @@ protected:
             return status;
         }
 
-        if (isCpuTable())
-        {
-            return _cpuTable->assign(value);
-        }
+        // if (isCpuTable())
+        // {
+        //     return _cpuTable->assign(value);
+        // }
 
         oneapi::internal::getDefaultContext().fill(_buffer, (double)value, &status);
         services::throwIfPossible(status);
@@ -412,10 +419,10 @@ private:
     template <typename T>
     services::Status getTBlock(size_t rowOffset, size_t nRowsBlockDesired, ReadWriteMode rwFlag, BlockDescriptor<T> & block)
     {
-        if (isCpuTable())
-        {
-            return _cpuTable->getBlockOfRows(rowOffset, nRowsBlockDesired, rwFlag, block);
-        }
+        // if (isCpuTable())
+        // {
+        //     return _cpuTable->getBlockOfRows(rowOffset, nRowsBlockDesired, rwFlag, block);
+        // }
 
         const size_t nRows = getNumberOfRows();
         const size_t nCols = getNumberOfColumns();
@@ -435,10 +442,10 @@ private:
     template <typename T>
     services::Status releaseTBlock(BlockDescriptor<T> & block)
     {
-        if (isCpuTable())
-        {
-            return _cpuTable->releaseBlockOfRows(block);
-        }
+        // if (isCpuTable())
+        // {
+        //     return _cpuTable->releaseBlockOfRows(block);
+        // }
 
         services::Status status;
 
@@ -458,10 +465,10 @@ private:
     template <typename T>
     services::Status getTFeature(size_t columnIndex, size_t rowOffset, size_t nRowsBlockDesired, ReadWriteMode rwFlag, BlockDescriptor<T> & block)
     {
-        if (isCpuTable())
-        {
-            return _cpuTable->getBlockOfColumnValues(columnIndex, rowOffset, nRowsBlockDesired, rwFlag, block);
-        }
+        // if (isCpuTable())
+        // {
+        //     return _cpuTable->getBlockOfColumnValues(columnIndex, rowOffset, nRowsBlockDesired, rwFlag, block);
+        // }
 
         services::throwIfPossible(services::ErrorMethodNotImplemented);
         return services::ErrorMethodNotImplemented;
@@ -470,30 +477,30 @@ private:
     template <typename T>
     services::Status releaseTFeature(BlockDescriptor<T> & block)
     {
-        if (isCpuTable())
-        {
-            return _cpuTable->releaseBlockOfColumnValues(block);
-        }
+        // if (isCpuTable())
+        // {
+        //     return _cpuTable->releaseBlockOfColumnValues(block);
+        // }
 
         services::throwIfPossible(services::ErrorMethodNotImplemented);
         return services::ErrorMethodNotImplemented;
     }
 
-    services::Status allocateDataMemoryOnCpu()
-    {
-        services::Status status;
+    // services::Status allocateDataMemoryOnCpu()
+    // {
+    //     services::Status status;
 
-        _cpuTable = HomogenNumericTable<DataType>::create(getNumberOfColumns(), getNumberOfRows(), NumericTableIface::doAllocate, &status);
+    //     _cpuTable = HomogenNumericTable<DataType>::create(getNumberOfColumns(), getNumberOfRows(), NumericTableIface::doAllocate, &status);
 
-        return status;
-    }
+    //     return status;
+    // }
 
-    inline bool isCpuTable() const { return (bool)_cpuTable; }
+    // inline bool isCpuTable() const { return (bool)_cpuTable; }
 
-    static bool isCpuContext() { return oneapi::internal::getDefaultContext().getInfoDevice().isCpu; }
+    // static bool isCpuContext() { return oneapi::internal::getDefaultContext().getInfoDevice().isCpu; }
 
     services::Buffer<DataType> _buffer;
-    services::SharedPtr<HomogenNumericTable<DataType> > _cpuTable;
+    // services::SharedPtr<HomogenNumericTable<DataType> > _cpuTable;
 };
 /** @} */
 

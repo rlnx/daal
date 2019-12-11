@@ -25,7 +25,7 @@
 #define __ONEAPI_INTERNAL_MKL_LAPACK_H__
 
 #include "services/buffer.h"
-#include "mkl_dal_sycl.hpp"
+// #include "mkl_dal_sycl.hpp"
 
 namespace daal
 {
@@ -54,13 +54,13 @@ struct MKLPotrf
     {
         services::Status status;
 
-        const fpk::uplo uplomkl                          = uplo == math::UpLo::Upper ? fpk::uplo::upper : fpk::uplo::lower;
-        cl::sycl::buffer<algorithmFPType, 1> a_sycl_buff = a.toSycl();
-        cl::sycl::buffer<int64_t, 1> info(cl::sycl::range<1>(1));
+        // const fpk::uplo uplomkl                          = uplo == math::UpLo::Upper ? fpk::uplo::upper : fpk::uplo::lower;
+        // cl::sycl::buffer<algorithmFPType, 1> a_sycl_buff = a.toSycl();
+        // cl::sycl::buffer<int64_t, 1> info(cl::sycl::range<1>(1));
 
-        fpk::lapack::potrf(_queue, uplomkl, n, a_sycl_buff, lda, info);
+        // fpk::lapack::potrf(_queue, uplomkl, n, a_sycl_buff, lda, info);
 
-        _queue.wait();
+        // _queue.wait();
         /** TODO: Check info buffer for containing errors. Now it is not supported.:
          *  https://software.intel.com/en-us/oneapi-mkl-dpcpp-developer-reference-potrf
         */
@@ -85,14 +85,14 @@ struct MKLPotrs
     {
         services::Status status;
 
-        const fpk::uplo uplomkl                          = uplo == math::UpLo::Upper ? fpk::uplo::upper : fpk::uplo::lower;
-        cl::sycl::buffer<algorithmFPType, 1> a_sycl_buff = a.toSycl();
-        cl::sycl::buffer<algorithmFPType, 1> b_sycl_buff = b.toSycl();
+        // const fpk::uplo uplomkl                          = uplo == math::UpLo::Upper ? fpk::uplo::upper : fpk::uplo::lower;
+        // cl::sycl::buffer<algorithmFPType, 1> a_sycl_buff = a.toSycl();
+        // cl::sycl::buffer<algorithmFPType, 1> b_sycl_buff = b.toSycl();
 
-        cl::sycl::buffer<int64_t, 1> info(cl::sycl::range<1>(1));
-        fpk::lapack::potrs(_queue, uplomkl, n, ny, a_sycl_buff, lda, b_sycl_buff, ldb, info);
+        // cl::sycl::buffer<int64_t, 1> info(cl::sycl::range<1>(1));
+        // fpk::lapack::potrs(_queue, uplomkl, n, ny, a_sycl_buff, lda, b_sycl_buff, ldb, info);
 
-        _queue.wait();
+        // _queue.wait();
         /** TODO: Check info buffer for containing errors. Now it is not supported.:
          *  https://software.intel.com/en-us/oneapi-mkl-dpcpp-developer-reference-potrs
         */

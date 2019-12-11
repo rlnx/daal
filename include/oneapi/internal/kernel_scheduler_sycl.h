@@ -136,10 +136,20 @@ public:
                               const char *options,
                               services::Status *status = nullptr)
     {
+        std::string programSrcCopy(programSrc);
+        for (size_t i = 0; i < programSrcCopy.size(); i++)
+        {
+            if (programSrcCopy[i] == '@')
+            {
+                programSrcCopy[i] = '#';
+            }
+        }
+
         _progamName = programName;
         cl_int err = 0;
-        const char *sources[] = {programSrc};
-        const size_t lengths[] = {std::strlen(programSrc)};
+        const char *sources[] = {programSrcCopy.c_str()};
+        const size_t lengths[] = {programSrcCopy.size()};
+
         reset(clCreateProgramWithSource(clContext, 1, sources, lengths, &err));
         DAAL_CHECK_OPENCL(err, status)
 
@@ -150,7 +160,7 @@ public:
             {
                 size_t logLen = 0;
                 clGetProgramBuildInfo(get(), clDevice, CL_PROGRAM_BUILD_LOG, 0, nullptr, &logLen);
-                services::Collection<char> buildLogCollection(loglen);
+                services::Collection<char> buildLogCollection(logLen);
                 char *buildLog = buildLogCollection.data();
                 if (buildLog == nullptr)
                 {
@@ -426,6 +436,7 @@ private:
         }
         catch (const cl::sycl::exception &e)
         {
+            std::cout << e.what() << std::endl;
             convertSyclExceptionToStatus(e, status);
         }
     }

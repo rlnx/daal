@@ -30,6 +30,8 @@
 
 DECLARE_SOURCE(covariance_kernels,
 
+@pragma OPENCL EXTENSION cl_khr_fp16 : enable \n
+
 bool isFirstDataBlock(const algorithmFPType nObservations)
 {
     return (nObservations < (algorithmFPType)(0.5));

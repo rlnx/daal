@@ -28,6 +28,8 @@
 
 DECLARE_SOURCE(sum_reducer,
 
+@pragma OPENCL EXTENSION cl_khr_fp16 : enable \n
+
 __kernel void sum_singlepass(uint vectorsAreRows,
                              __global algorithmFPType* vectors,
                              uint nVectors,
