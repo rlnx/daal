@@ -38,7 +38,7 @@ help: ; $(info $(help))
 #===============================================================================
 
 ifeq (help,$(MAKECMDGOALS))
-    PLAT:=win32e
+		PLAT:=win32e
 endif
 
 attr.lnx32e = lnx intel64 lin
@@ -62,7 +62,7 @@ PLAT_is_$(PLAT)          := yes
 # Compiler specific part
 #===============================================================================
 
-include build/cmplr.$(COMPILER).mk
+include build/make/cmplr.$(COMPILER).mk
 
 $(if $(filter $(PLATs.$(COMPILER)),$(PLAT)),,$(error PLAT for $(COMPILER) must be defined to one of $(PLATs.$(COMPILER))))
 
@@ -70,8 +70,8 @@ $(if $(filter $(PLATs.$(COMPILER)),$(PLAT)),,$(error PLAT for $(COMPILER) must b
 # Dependencies generation
 #===============================================================================
 
-include build/common.mk
-include build/deps.mk
+include build/make/common.mk
+include build/make/deps.mk
 
 #===============================================================================
 # Common macros
@@ -113,9 +113,9 @@ USECPUS.out := $(filter-out $(USECPUS),$(CPUs))
 USECPUS.out.for.grep.filter := $(addprefix _,$(addsuffix _,$(subst $(space),_|_,$(USECPUS.out))))
 USECPUS.out.grep.filter := $(if $(USECPUS.out),| grep -v -E '$(USECPUS.out.for.grep.filter)')
 USECPUS.out.defs := $(subst sse2,^\#define DAAL_KERNEL_SSE2\b,$(subst ssse3,^\#define DAAL_KERNEL_SSSE3\b,\
-                    $(subst sse42,^\#define DAAL_KERNEL_SSE42\b,$(subst avx,^\#define DAAL_KERNEL_AVX\b,\
-                    $(subst avx2,^\#define DAAL_KERNEL_AVX2\b,$(subst avx512,^\#define DAAL_KERNEL_AVX512\b,\
-                    $(subst avx512_mic,^\#define DAAL_KERNEL_AVX512_MIC\b,$(USECPUS.out))))))))
+										$(subst sse42,^\#define DAAL_KERNEL_SSE42\b,$(subst avx,^\#define DAAL_KERNEL_AVX\b,\
+										$(subst avx2,^\#define DAAL_KERNEL_AVX2\b,$(subst avx512,^\#define DAAL_KERNEL_AVX512\b,\
+										$(subst avx512_mic,^\#define DAAL_KERNEL_AVX512_MIC\b,$(USECPUS.out))))))))
 USECPUS.out.defs := $(subst $(space)^,|^,$(strip $(USECPUS.out.defs)))
 USECPUS.out.defs.filter := $(if $(USECPUS.out.defs),sed $(sed.-b) $(sed.-i) -E -e 's/$(USECPUS.out.defs)/$(sed.eol)/')
 
@@ -182,9 +182,9 @@ WORKDIR.lib := $(WORKDIR)/daal/lib
 COVFILE   := $(subst BullseyeStub,$(RELEASEDIR.daal)/Bullseye_$(_IA).cov,$(COVFILE))
 COV.libia := $(if $(BULLSEYEROOT),$(BULLSEYEROOT)/lib)
 
-MKLFPKDIR:= $(if $(wildcard $(DIR)/externals/mklfpk/$(_OS)/*),$(DIR)/externals/mklfpk,                            \
-                $(if $(wildcard $(MKLFPKROOT)/include/*),$(subst \,/,$(MKLFPKROOT)),                              \
-                    $(error Can`t find MKLFPK libs nether in $(DIR)/externals/mklfpk/$(_OS) not in MKLFPKROOT.)))
+MKLFPKDIR:= $(if $(wildcard $(DIR)/cpp/daal/externals/mklfpk/$(_OS)/*),$(DIR)/cpp/daal/externals/mklfpk, \
+								$(if $(wildcard $(MKLFPKROOT)/include/*),$(subst \,/,$(MKLFPKROOT)),                     \
+										$(error Can`t find MKLFPK libs nether in $(DIR)/cpp/daal/externals/mklfpk/$(_OS) not in MKLFPKROOT.)))
 MKLFPKDIR.include := $(MKLFPKDIR)/include $(MKLFPKDIR)/$(if $(OS_is_fbsd),lnx,$(_OS))/include
 MKLFPKDIR.libia   := $(MKLFPKDIR)/$(if $(OS_is_fbsd),lnx,$(_OS))/lib/$(_IA)
 
@@ -193,9 +193,9 @@ frompf = $(shell echo $1 | sed 's/ProgramFilesx86/Program\\ Files\\ (x86)/')
 
 
 #============================= TBB folders =====================================
-TBBDIR := $(if $(wildcard $(DIR)/externals/tbb/$(_OS)/*),$(DIR)/externals/tbb/$(_OS)$(if $(OS_is_win),/tbb))
+TBBDIR := $(if $(wildcard $(DIR)/cpp/daal/externals/tbb/$(_OS)/*),$(DIR)/cpp/daal/externals/tbb/$(_OS)$(if $(OS_is_win),/tbb))
 TBBDIR.2 := $(if $(TBBDIR),$(TBBDIR),$(call topf,$$TBBROOT))
-TBBDIR.2 := $(if $(TBBDIR.2),$(TBBDIR.2),$(error Can`t find TBB neither in $(DIR)/externals/tbb nor in $$TBBROOT))
+TBBDIR.2 := $(if $(TBBDIR.2),$(TBBDIR.2),$(error Can`t find TBB neither in $(DIR)/cpp/daal/externals/tbb nor in $$TBBROOT))
 
 TBBDIR.include := $(if $(TBBDIR),$(TBBDIR)/include/tbb $(TBBDIR)/include)
 
@@ -233,11 +233,11 @@ RELEASEDIR.tbb.libia := $(RELEASEDIR.tbb)/lib$(if $(OS_is_mac),,/$(_IA)$(if $(OS
 RELEASEDIR.tbb.soia  := $(if $(OS_is_win),$(RELEASEDIR.tbb)/redist/$(_IA)/vc_mt,$(RELEASEDIR.tbb.libia))
 releasetbb.LIBS_A := $(if $(OS_is_win),$(TBBDIR.libia)/tbb.$(a) $(TBBDIR.libia)/tbbmalloc.$(a))
 releasetbb.LIBS_Y := $(TBBDIR.soia)/$(plib)tbb.$(y) $(TBBDIR.soia)/$(plib)tbbmalloc.$(y) \
-                     $(if $(or $(OS_is_lnx),$(OS_is_fbsd)),$(TBBDIR.libia)/$(plib)tbb.so.2 $(TBBDIR.libia)/$(plib)tbbmalloc.so.2,)
+										 $(if $(or $(OS_is_lnx),$(OS_is_fbsd)),$(TBBDIR.libia)/$(plib)tbb.so.2 $(TBBDIR.libia)/$(plib)tbbmalloc.so.2,)
 
 RELEASEDIR.include.mklgpufpk := $(RELEASEDIR.include)/oneapi/internal/math
 
-MKLGPUFPKDIR:= $(if $(wildcard $(DIR)/externals/mklgpufpk/*),$(DIR)/externals/mklgpufpk,$(subst \,/,$(MKLGPUFPKROOT)))
+MKLGPUFPKDIR:= $(if $(wildcard $(DIR)/cpp/daal/externals/mklgpufpk/*),$(DIR)/cpp/daal/externals/mklgpufpk,$(subst \,/,$(MKLGPUFPKROOT)))
 MKLGPUFPKDIR.include := $(MKLGPUFPKDIR)/include
 MKLGPUFPKDIR.libia   := $(MKLGPUFPKDIR)/lib/$(_IA)
 
@@ -261,8 +261,8 @@ daal_jar  := daal.jar
 jni_so    := $(plib)JavaAPI.$y
 
 release.LIBS_A := $(core_a)                                                             \
-                  $(if $(OS_is_win),$(foreach ilib,$(core_a),$(ilib:%.lib=%_dll.lib)),) \
-                  $(if $(DAALTHRS),$(foreach i,$(DAALTHRS),$(thr_$(i)_a)),)
+									$(if $(OS_is_win),$(foreach ilib,$(core_a),$(ilib:%.lib=%_dll.lib)),) \
+									$(if $(DAALTHRS),$(foreach i,$(DAALTHRS),$(thr_$(i)_a)),)
 release.LIBS_Y := $(core_y) $(if $(DAALTHRS),$(foreach i,$(DAALTHRS),$(thr_$(i)_y)),)
 release.LIBS_J := $(jni_so)
 release.JARS = $(daal_jar)
@@ -271,16 +271,16 @@ release.JARS = $(daal_jar)
 daaldep.lnx32e.mkl.thr := $(MKLFPKDIR.libia)/$(plib)daal_mkl_thread.$a
 daaldep.lnx32e.mkl.seq := $(MKLFPKDIR.libia)/$(plib)daal_mkl_sequential.$a
 daaldep.lnx32e.mkl := $(MKLFPKDIR.libia)/$(plib)daal_vmlipp_core.$a
-daaldep.lnx32e.vml := 
+daaldep.lnx32e.vml :=
 daaldep.lnx32e.ipp := $(if $(COV.libia),$(COV.libia)/libcov.a)
 daaldep.lnx32e.rt.thr := -L$(RELEASEDIR.tbb.soia) -ltbb -ltbbmalloc -lpthread $(daaldep.lnx32e.rt.$(COMPILER)) $(if $(COV.libia),$(COV.libia)/libcov.a)
 daaldep.lnx32e.rt.seq := -lpthread $(daaldep.lnx32e.rt.$(COMPILER)) $(if $(COV.libia),$(COV.libia)/libcov.a)
 daaldep.lnx32e.threxport := export_lnx32e.def
 
-daaldep.lnx32.mkl.thr := $(MKLFPKDIR.libia)/$(plib)daal_mkl_thread.$a    
+daaldep.lnx32.mkl.thr := $(MKLFPKDIR.libia)/$(plib)daal_mkl_thread.$a
 daaldep.lnx32.mkl.seq := $(MKLFPKDIR.libia)/$(plib)daal_mkl_sequential.$a
 daaldep.lnx32.mkl := $(MKLFPKDIR.libia)/$(plib)daal_vmlipp_core.$a
-daaldep.lnx32.vml := 
+daaldep.lnx32.vml :=
 daaldep.lnx32.ipp := $(if $(COV.libia),$(COV.libia)/libcov32.a)
 daaldep.lnx32.rt.thr := -L$(RELEASEDIR.tbb.soia) -ltbb -ltbbmalloc -lpthread $(daaldep.lnx32.rt.$(COMPILER)) $(if $(COV.libia),$(COV.libia)/libcov32.a)
 daaldep.lnx32.rt.seq := -lpthread $(daaldep.lnx32.rt.$(COMPILER)) $(if $(COV.libia),$(COV.libia)/libcov32.a)
@@ -292,8 +292,8 @@ daaldep.lnx.threxport.create = grep -v -E '^(EXPORTS|;|$$)' $< $(USECPUS.out.gre
 daaldep.win32e.mkl.thr := $(MKLFPKDIR.libia)/daal_mkl_thread.$a
 daaldep.win32e.mkl.seq := $(MKLFPKDIR.libia)/daal_mkl_sequential.$a
 daaldep.win32e.mkl := $(MKLFPKDIR.libia)/$(plib)daal_vmlipp_core.$a
-daaldep.win32e.vml := 
-daaldep.win32e.ipp := 
+daaldep.win32e.vml :=
+daaldep.win32e.ipp :=
 daaldep.win32e.rt.thr  := -LIBPATH:$(RELEASEDIR.tbb.libia) tbb.lib tbbmalloc.lib libcpmt.lib libcmt.lib $(if $(CHECK_DLL_SIG),Wintrust.lib)
 daaldep.win32e.rt.seq  := libcpmt.lib libcmt.lib $(if $(CHECK_DLL_SIG),Wintrust.lib)
 daaldep.win32e.threxport := export_lnx32e.def
@@ -301,8 +301,8 @@ daaldep.win32e.threxport := export_lnx32e.def
 daaldep.win32.mkl.thr := $(MKLFPKDIR.libia)/daal_mkl_thread.$a
 daaldep.win32.mkl.seq := $(MKLFPKDIR.libia)/daal_mkl_sequential.$a
 daaldep.win32.mkl := $(MKLFPKDIR.libia)/$(plib)daal_vmlipp_core.$a
-daaldep.win32.vml := 
-daaldep.win32.ipp := 
+daaldep.win32.vml :=
+daaldep.win32.ipp :=
 daaldep.win32.rt.thr := -LIBPATH:$(RELEASEDIR.tbb.libia) tbb.lib tbbmalloc.lib libcpmt.lib libcmt.lib $(if $(CHECK_DLL_SIG),Wintrust.lib)
 daaldep.win32.rt.seq := libcpmt.lib libcmt.lib $(if $(CHECK_DLL_SIG),Wintrust.lib)
 daaldep.win32.threxport := export.def
@@ -310,11 +310,11 @@ daaldep.win32.threxport := export.def
 daaldep.win.threxport.create = grep -v -E '^(;|$$)' $< $(USECPUS.out.grep.filter)
 
 
-daaldep.mac32e.mkl.thr := $(MKLFPKDIR.libia)/$(plib)daal_mkl_thread.$a    
+daaldep.mac32e.mkl.thr := $(MKLFPKDIR.libia)/$(plib)daal_mkl_thread.$a
 daaldep.mac32e.mkl.seq := $(MKLFPKDIR.libia)/$(plib)daal_mkl_sequential.$a
 daaldep.mac32e.mkl := $(MKLFPKDIR.libia)/$(plib)daal_vmlipp_core.$a
-daaldep.mac32e.vml := 
-daaldep.mac32e.ipp := 
+daaldep.mac32e.vml :=
+daaldep.mac32e.ipp :=
 daaldep.mac32e.rt.thr := -L$(RELEASEDIR.tbb.soia) -ltbb -ltbbmalloc $(daaldep.mac32e.rt.$(COMPILER))
 daaldep.mac32e.rt.seq := $(daaldep.mac32e.rt.$(COMPILER))
 daaldep.mac32e.threxport := export_mac.def
@@ -352,7 +352,7 @@ daaldep.rt.thr  := $(daaldep.$(PLAT).rt.thr)
 daaldep.rt.seq  := $(daaldep.$(PLAT).rt.seq)
 
 # List header files to populate release/include.
-release.HEADERS := $(shell find include -type f -name "*.h")
+release.HEADERS := $(shell find cpp/daal/include -type f -name "*.h")
 release.HEADERS.OSSPEC := $(foreach fn,$(release.HEADERS),$(if $(filter %$(_OS),$(basename $(fn))),$(fn)))
 release.HEADERS.COMMON := $(foreach fn,$(release.HEADERS),$(if $(filter $(addprefix %,$(OSList)),$(basename $(fn))),,$(fn)))
 release.HEADERS.COMMON := $(filter-out $(subst _$(_OS),,$(release.HEADERS.OSSPEC)),$(release.HEADERS.COMMON))
@@ -365,32 +365,32 @@ release.EXAMPLES.DATA  := $(filter $(expat),$(shell find examples/data -type f))
 release.EXAMPLES.JAVA  := $(filter $(expat),$(shell find examples/java -type f))
 
 # List env files to populate release.
-release.ENV = bin/vars_$(_OS).$(scr)
+release.ENV = $(DIR)/build/release/vars_$(_OS).$(scr)
 
 # List config files to populate release.
-release.CONF = bin/config.txt
+release.CONF = $(DIR)/build/release/config.txt
 
 # List samples files to populate release/examples.
 SAMPLES.srcdir:= $(DIR)/samples
 spat = %.scala %.java %.cpp %.h %.txt %.csv %.html %.png %.parquet %.blob
 spat += $(if $(OS_is_win),%.bat %.vcxproj %.filters %.user %.sln,%_$(_OS).lst %makefile_$(_OS) %.sh)
 release.SAMPLES.CPP  := $(if $(wildcard $(SAMPLES.srcdir)/cpp/*),                                                        \
-                          $(if $(OS_is_mac),                                                                             \
-                            $(filter $(spat),$(shell find $(SAMPLES.srcdir)/cpp -not -wholename '*mpi*' -type f))        \
-                          ,                                                                                              \
-                            $(filter $(spat),$(shell find $(SAMPLES.srcdir)/cpp -type f))                                \
-                          )                                                                                              \
-                        )
+													$(if $(OS_is_mac),                                                                             \
+														$(filter $(spat),$(shell find $(SAMPLES.srcdir)/cpp -not -wholename '*mpi*' -type f))        \
+													,                                                                                              \
+														$(filter $(spat),$(shell find $(SAMPLES.srcdir)/cpp -type f))                                \
+													)                                                                                              \
+												)
 release.SAMPLES.JAVA := $(if $(wildcard $(SAMPLES.srcdir)/java/*),                                                       \
-                          $(if $(or $(OS_is_lnx),$(OS_is_mac),$(OS_is_fbsd)),                                                          \
-                            $(filter $(spat),$(shell find $(SAMPLES.srcdir)/java -type f))                               \
-                          )                                                                                              \
-                        )
+													$(if $(or $(OS_is_lnx),$(OS_is_mac),$(OS_is_fbsd)),                                                          \
+														$(filter $(spat),$(shell find $(SAMPLES.srcdir)/java -type f))                               \
+													)                                                                                              \
+												)
 release.SAMPLES.SCALA := $(if $(wildcard $(SAMPLES.srcdir)/scala/*),                                                     \
-                          $(if $(or $(OS_is_lnx),$(OS_is_mac),$(OS_is_fbsd)),                                                          \
-                            $(filter $(spat),$(shell find $(SAMPLES.srcdir)/scala -type f))                              \
-                          )                                                                                              \
-                        )
+													$(if $(or $(OS_is_lnx),$(OS_is_mac),$(OS_is_fbsd)),                                                          \
+														$(filter $(spat),$(shell find $(SAMPLES.srcdir)/scala -type f))                              \
+													)                                                                                              \
+												)
 
 # List doc files to populate release/documentation.
 DOC.srcdir:= $(DIR)/../documentation
@@ -404,19 +404,19 @@ release.DOC.OSSPEC := $(foreach fn,$(release.DOC),$(if $(filter %$(_OS),$(basena
 include makefile.ver
 include makefile.lst
 
-THR.srcdir       := $(DIR)/algorithms/threading
-CORE.srcdir      := $(DIR)/algorithms/kernel
-EXTERNALS.srcdir := $(DIR)/externals
+THR.srcdir       := $(DIR)/cpp/daal/algorithms/threading
+CORE.srcdir      := $(DIR)/cpp/daal/algorithms/kernel
+EXTERNALS.srcdir := $(DIR)/cpp/daal/externals
 
-CORE.SERV.srcdir          := $(DIR)/service/kernel
-CORE.SERV.COMPILER.srcdir := $(DIR)/service/kernel/compiler/$(CORE.SERV.COMPILER.$(COMPILER))
+CORE.SERV.srcdir          := $(DIR)/cpp/daal/service/kernel
+CORE.SERV.COMPILER.srcdir := $(DIR)/cpp/daal/service/kernel/compiler/$(CORE.SERV.COMPILER.$(COMPILER))
 
 CORE.srcdirs  := $(CORE.SERV.srcdir) $(CORE.srcdir)                  \
-                 $(if $(DAALTHRS),,$(THR.srcdir))                    \
-                 $(addprefix $(CORE.SERV.srcdir)/, $(CORE.SERVICES)) \
-                 $(addprefix $(CORE.srcdir)/, $(CORE.ALGORITHMS))    \
-                 $(CORE.SERV.COMPILER.srcdir) $(EXTERNALS.srcdir)    \
-                 $(CORE.SERV.srcdir)/oneapi
+								 $(if $(DAALTHRS),,$(THR.srcdir))                    \
+								 $(addprefix $(CORE.SERV.srcdir)/, $(CORE.SERVICES)) \
+								 $(addprefix $(CORE.srcdir)/, $(CORE.ALGORITHMS))    \
+								 $(CORE.SERV.COMPILER.srcdir) $(EXTERNALS.srcdir)    \
+								 $(CORE.SERV.srcdir)/oneapi
 
 CORE.incdirs.rel  := $(addprefix $(RELEASEDIR.include)/,$(addprefix algorithms/,$(CORE.ALGORITHMS.INC)) algorithms data_management/compression data_management/data_source data_management/data services)
 CORE.incdirs.thr    := $(THR.srcdir)
@@ -581,7 +581,7 @@ $(THR.objs_a): COPT += @$(THR.tmpdir_a)/thr_inc_a_folders.txt
 
 $(THR.objs_y): $(THR.tmpdir_y)/thr_inc_y_folders.txt
 $(THR.objs_y): COPT += @$(THR.tmpdir_y)/thr_inc_y_folders.txt
-$(THR.objs_y): COPT += -D__DAAL_IMPLEMENTATION 
+$(THR.objs_y): COPT += -D__DAAL_IMPLEMENTATION
 
 $(THR.tmpdir_a)/thr_inc_a_folders.txt: makefile.lst | $(THR.tmpdir_a)/. $(CORE.incdirs) ; $(call WRITE.PREREQS,$(addprefix -I, $(CORE.incdirs)),$(space))
 $(THR.tmpdir_y)/thr_inc_y_folders.txt: makefile.lst | $(THR.tmpdir_y)/. $(CORE.incdirs) ; $(call WRITE.PREREQS,$(addprefix -I, $(CORE.incdirs)),$(space))
@@ -602,25 +602,25 @@ $(THR.tmpdir_y)/%_seq.res: %.rc | $(THR.tmpdir_y)/. ; $(RC.COMPILE)
 #===============================================================================
 # Java/JNI part
 #===============================================================================
-JAVA.srcdir      := $(DIR)/lang_interface/java
+JAVA.srcdir      := $(DIR)/java/daal
 JAVA.srcdir.full := $(JAVA.srcdir)/com/intel/daal
 JAVA.tmpdir      := $(WORKDIR)/java_tmpdir
 
-JNI.srcdir       := $(DIR)/lang_service/java
+JNI.srcdir       := $(DIR)/java/daal
 JNI.srcdir.full  := $(JNI.srcdir)/com/intel/daal
 JNI.tmpdir       := $(WORKDIR)/jni_tmpdir
 
 JAVA.srcdirs := $(JAVA.srcdir.full)                                                                                         \
-                $(JAVA.srcdir.full)/algorithms $(addprefix $(JAVA.srcdir.full)/algorithms/,$(JJ.ALGORITHMS))                \
-                $(JAVA.srcdir.full)/data_management $(addprefix $(JAVA.srcdir.full)/data_management/,$(JJ.DATA_MANAGEMENT)) \
-                $(JAVA.srcdir.full)/services $(JAVA.srcdir.full)/utils
+								$(JAVA.srcdir.full)/algorithms $(addprefix $(JAVA.srcdir.full)/algorithms/,$(JJ.ALGORITHMS))                \
+								$(JAVA.srcdir.full)/data_management $(addprefix $(JAVA.srcdir.full)/data_management/,$(JJ.DATA_MANAGEMENT)) \
+								$(JAVA.srcdir.full)/services $(JAVA.srcdir.full)/utils
 JAVA.srcs.f := $(wildcard $(JAVA.srcdirs:%=%/*.java))
 JAVA.srcs   := $(subst $(JAVA.srcdir)/,,$(JAVA.srcs.f))
 
 JNI.srcdirs := $(JNI.srcdir.full)                                                                                         \
-               $(JNI.srcdir.full)/algorithms $(addprefix $(JNI.srcdir.full)/algorithms/,$(JJ.ALGORITHMS))                 \
-               $(JNI.srcdir.full)/data_management $(addprefix $(JNI.srcdir.full)/data_management/,$(JJ.DATA_MANAGEMENT)) \
-               $(JNI.srcdir.full)/services
+							 $(JNI.srcdir.full)/algorithms $(addprefix $(JNI.srcdir.full)/algorithms/,$(JJ.ALGORITHMS))                 \
+							 $(JNI.srcdir.full)/data_management $(addprefix $(JNI.srcdir.full)/data_management/,$(JJ.DATA_MANAGEMENT)) \
+							 $(JNI.srcdir.full)/services
 JNI.srcs.f := $(wildcard $(JNI.srcdirs:%=%/*.cpp))
 JNI.srcs   := $(subst $(JNI.srcdir)/,,$(JNI.srcs.f))
 JNI.objs   := $(addprefix $(JNI.tmpdir)/,$(JNI.srcs:%.cpp=%.$o))
@@ -661,9 +661,9 @@ $(JNI.tmpdir)/%.res: %.rc | $(JNI.tmpdir)/. ; $(RC.COMPILE)
 # Top level targets
 #===============================================================================
 daal: $(if $(CORE.ALGORITHMS.CUSTOM),                                              \
-          _daal _release_c,                                                        \
-          _daal _daal_jj _release _release_doc                                     \
-      )
+					_daal _release_c,                                                        \
+					_daal _daal_jj _release _release_doc                                     \
+			)
 
 _daal:    _daal_core _daal_thr
 _daal_jj: _daal_jar _daal_jni
@@ -707,7 +707,7 @@ $(RELEASEDIR.jardir)/%.jar: $(WORKDIR.lib)/%.jar | $(RELEASEDIR.jardir)/. ; $(cp
 define .release.x
 $3: $2/$(subst _$(_OS),,$1)
 $2/$(subst _$(_OS),,$1): $(DIR)/$1 | $(dir $2/$1)/.
-	$(if $(filter %makefile_win,$1),python ./bin/utils/generate_win_makefile.py $(dir $(DIR)/$1) $(dir $2/$1),$(value cpy))
+	$(if $(filter %makefile_win,$1),python $(DIR)/build/scripts/generate_win_makefile.py $(dir $(DIR)/$1) $(dir $2/$1),$(value cpy))
 	$(if $(filter %.sh %.bat,$1),chmod +x $$@)
 endef
 $(foreach x,$(release.EXAMPLES.DATA),$(eval $(call .release.x,$x,$(RELEASEDIR.daal),_release_common)))
@@ -751,8 +751,8 @@ $2: $1 ; $(value mkdir)$(value cpy)
 	$(if $(filter %library_version_info.h,$2),+$(daalmake) -f makefile update_headers_version)
 	$(if $(USECPUS.out.defs.filter),$(if $(filter %daal_kernel_defines.h,$2),$(USECPUS.out.defs.filter) $2; rm -rf $(subst .h,.h.bak,$2)))
 endef
-$(foreach d,$(release.HEADERS.COMMON),$(eval $(call .release.dd,$d,$(subst include/,$(RELEASEDIR.include)/,$d),_release_c_h)))
-$(foreach d,$(release.HEADERS.OSSPEC),$(eval $(call .release.dd,$d,$(subst include/,$(RELEASEDIR.include)/,$(subst _$(_OS),,$d)),_release_c_h)))
+$(foreach d,$(release.HEADERS.COMMON),$(eval $(call .release.dd,$d,$(subst cpp/daal/include/,$(RELEASEDIR.include)/,$d),_release_c_h)))
+$(foreach d,$(release.HEADERS.OSSPEC),$(eval $(call .release.dd,$d,$(subst cpp/daal/include/,$(RELEASEDIR.include)/,$(subst _$(_OS),,$d)),_release_c_h)))
 
 #----- releasing static/dynamic Intel(R) TBB libraries
 $(RELEASEDIR.tbb.libia) $(RELEASEDIR.tbb.soia): _release_common
@@ -783,22 +783,22 @@ cleanall: clean cleanrel
 define help
 Usage: make [target...] [flag=value...]
 Targets:
-  daal      - build all (use -j to speedup the build)
-  _daal_core ... _daal_jar _daal_jni - build only a part of the product,
-             without populating release directory (read makefile for details)
-  _release - populate release directory
-  clean    - clean working directory $(WORKDIR)
-  cleanrel - clean release directory $(RELEASEDIR) (for entire OS!)
-  cleanall - clean both working and release directories
+	daal      - build all (use -j to speedup the build)
+	_daal_core ... _daal_jar _daal_jni - build only a part of the product,
+						 without populating release directory (read makefile for details)
+	_release - populate release directory
+	clean    - clean working directory $(WORKDIR)
+	cleanrel - clean release directory $(RELEASEDIR) (for entire OS!)
+	cleanall - clean both working and release directories
 Flags:
-  COMPILER   - compiler to use ($(COMPILERs)) [default: $(COMPILER)]
-  WORKDIR    - directory for intermediate results [default: $(WORKDIR)]
-  RELEASEDIR - directory for release [default: $(RELEASEDIR)]
-  CORE.ALGORITHMS.CUSTOM - list of algorithms to be included into library
-      build cpp interfaces only
-      possible values: $(CORE.ALGORITHMS.CUSTOM.AVAILABLE)
-  REQCPU - list of CPU optimizations to be included into library
-      possible values: $(CPUs)
+	COMPILER   - compiler to use ($(COMPILERs)) [default: $(COMPILER)]
+	WORKDIR    - directory for intermediate results [default: $(WORKDIR)]
+	RELEASEDIR - directory for release [default: $(RELEASEDIR)]
+	CORE.ALGORITHMS.CUSTOM - list of algorithms to be included into library
+			build cpp interfaces only
+			possible values: $(CORE.ALGORITHMS.CUSTOM.AVAILABLE)
+	REQCPU - list of CPU optimizations to be included into library
+			possible values: $(CPUs)
 endef
 
 daal_dbg:
@@ -809,3 +809,10 @@ daal_dbg:
 	@echo "5" ${DYLD_LIBRARY_PATH}
 	@echo "6" ${LIBRARY_PATH}
 	@echo "7" ${TBBROOT}
+
+# define .release.t_dbg
+# _release_tbb_dbg: $2/$(notdir $1)
+# $2/$(notdir $1): $(call frompf,$1) | $2/. ; $(value cpy)
+# endef
+# $(foreach t,$(releasetbb.LIBS_Y),$(eval $(call .release.t_dbg,$t,$(RELEASEDIR.tbb.soia))))
+# $(foreach t,$(releasetbb.LIBS_A),$(eval $(call .release.t_dbg,$t,$(RELEASEDIR.tbb.libia))))
