@@ -8,4 +8,5 @@ __work*
 # Visual Studio related files, e.g., ".vscode"
 .vs*
 
-
+# Bazel
+/bazel-*
