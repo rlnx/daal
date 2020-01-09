@@ -169,6 +169,55 @@ DAAL_CPP_EXTERNAL_INCLUDES = [
   "externals/tbb/mac/include",
 ]
 
+DAAL_FP_TYPES = [
+  "float",
+  "double",
+]
+
+DAAL_CPUS = [
+  "sse2",
+  "ssse3",
+  "sse42",
+  "avx",
+  "avx2",
+  "avx512_mic",
+  "avx512",
+]
+
+def _daal_defines(*lst):
+  return list(lst) + [
+    '__int64="long long"',
+    '__int32="int"',
+  ]
+
+def _daal_fpt_cc_library(name, **kwargs):
+  for fpt in DAAL_FP_TYPES:
+    native.cc_library(
+      name = name + "_" + fpt,
+      local_defines = _daal_defines("DAAL_FPTYPE={}".format(fpt)),
+      **kwargs
+    )
+
+def _daal_cpu_cc_library(name, **kwargs):
+  for cpu in DAAL_CPUS:
+    native.cc_library(
+      name = name + "_" + cpu,
+      copts = [ "-m{}".format(cpu) ],
+      local_defines = _daal_defines("DAAL_CPU={}".format(cpu)),
+      **kwargs
+    )
+
+def _daal_fpt_cpu_cc_library(name, **kwargs):
+  for fpt in DAAL_FP_TYPES:
+    for cpu in DAAL_CPUS:
+      native.cc_library(
+        name = name + "_" + fpt + "_" + cpu,
+        copts = [ "-m{}".format(cpu) ],
+        local_defines = _daal_defines("DAAL_FPTYPE={}".format(fpt),
+                                      "DAAL_CPU={}".format(cpu)),
+        **kwargs
+      )
+
 def daal_includes():
   includes  = [ ".", "include" ]
   includes += [ paths.join("include", x) for x in DAAL_CPP_PUBLIC_INCLUDE_DIRS ]
@@ -180,14 +229,20 @@ def daal_includes():
 def daal_module(srcs, **kwargs):
   fpt_files = []
   cpu_files = []
+  normal_files = []
+  fpt_cpu_files = []
   for src in srcs:
-    filename, ext = paths.split_extension(src)
-    is_fpt_file = filename.endswith('_fpt'):
-    is_cpu_file = filename.endswith('_cpu')
-
-  native.cc_library(
-    name = "rule unique name",
-    srcs = ["source files"],
-    hdrs = ["header files"],
-    deps = ["header files"],
-  )
+    is_cpu_file = "_cpu" in src
+    is_fpt_file = "_fpt" in src
+    if is_fpt_file and is_cpu_file:
+      fpt_cpu_files.append(src)
+    elif is_cpu_file:
+      cpu_files.append(src)
+    elif is_fpt_file:
+      fpt_files.append(src)
+    else:
+      normal_files.append(src)
+  native.cc_library(srcs = normal_files, **kwargs)
+  _daal_fpt_cc_library(srcs = fpt_files, **kwargs)
+  _daal_cpu_cc_library(srcs = cpu_files, **kwargs)
+  _daal_fpt_cpu_cc_library(srcs = fpt_cpu_files, **kwargs)
