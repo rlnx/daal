@@ -162,11 +162,11 @@ DAAL_CPP_KERNEL_INCLUDES = [
 ]
 
 DAAL_CPP_EXTERNAL_INCLUDES = [
-  "externals",
+#  "externals",
   "externals/mklfpk/include",
-  "externals/mklfpk/mac/include",
-  "externals/tbb/mac/include/tbb",
-  "externals/tbb/mac/include",
+  "externals/mklfpk/lnx/include",
+  "externals/tbb/lnx/include/tbb",
+  "externals/tbb/lnx/include",
 ]
 
 DAAL_FP_TYPES = [
@@ -184,49 +184,91 @@ DAAL_CPUS = [
   "avx512",
 ]
 
-def _daal_defines(*lst):
-  return list(lst) + [
+
+def daal_includes():
+  includes  = [ ".", "include" ]
+  # includes += [ paths.join("include", x) for x in DAAL_CPP_PUBLIC_INCLUDE_DIRS ]
+  # includes += [ paths.join("algorithms/kernel", x) for x in DAAL_CPP_ALGORITHMS ]
+  # includes += DAAL_CPP_KERNEL_INCLUDES
+  includes += DAAL_CPP_EXTERNAL_INCLUDES
+  return includes
+
+def _daal_cpu_copts_gcc(cpu):
+  march = {
+    "sse2":       "nocona",
+    "ssse3":      "nocona",
+    "sse42":      "corei7",
+    "avx":        "sandybridge",
+    "avx2":       "haswell",
+    "avx512_mic": "haswell",
+    "avx512":     "haswell",
+  }
+  return [ "-march={}".format(march[cpu]) ]
+
+def _daal_cpu_copts_clang(cpu):
+  march = {
+    "sse2":       "nocona",
+    "ssse3":      "core2",
+    "sse42":      "nehalem",
+    "avx":        "sandybridge",
+    "avx2":       "haswell",
+    "avx512_mic": "knl",
+    "avx512":     "skx",
+  }
+  return [ "-march={}".format(march[cpu]) ]
+
+def _daal_common_copts_gcc():
+  return [
+    "-w",
+    "-fwrapv",
+    "-fno-strict-overflow",
+    "-fno-delete-null-pointer-checks",
+  ]
+
+def _daal_common_defines_gcc():
+  return [
     '__int64="long long"',
     '__int32="int"',
   ]
 
-def _daal_fpt_cc_library(name, **kwargs):
+def _daal_cc_library(copts=[], local_defines=[], **kwargs):
+  native.cc_library(
+    copts = copts + _daal_common_copts_gcc(),
+    local_defines = local_defines + _daal_common_defines_gcc(),
+    **kwargs
+  )
+
+def _daal_fpt_cc_library(name, copts=[], local_defines=[], **kwargs):
   for fpt in DAAL_FP_TYPES:
-    native.cc_library(
+    _daal_cc_library(
       name = name + "_" + fpt,
-      local_defines = _daal_defines("DAAL_FPTYPE={}".format(fpt)),
+      local_defines = local_defines + [ "DAAL_FPTYPE={}".format(fpt) ],
       **kwargs
     )
 
-def _daal_cpu_cc_library(name, **kwargs):
+def _daal_cpu_cc_library(name, copts=[], local_defines=[], **kwargs):
   for cpu in DAAL_CPUS:
-    native.cc_library(
+    _daal_cc_library(
       name = name + "_" + cpu,
-      copts = [ "-m{}".format(cpu) ],
-      local_defines = _daal_defines("DAAL_CPU={}".format(cpu)),
+      copts = copts + _daal_cpu_copts_gcc(cpu),
+      local_defines = local_defines + [ "DAAL_CPU={}".format(cpu) ],
       **kwargs
     )
 
-def _daal_fpt_cpu_cc_library(name, **kwargs):
+def _daal_fpt_cpu_cc_library(name, copts=[], local_defines=[], **kwargs):
   for fpt in DAAL_FP_TYPES:
     for cpu in DAAL_CPUS:
-      native.cc_library(
+      _daal_cc_library(
         name = name + "_" + fpt + "_" + cpu,
-        copts = [ "-m{}".format(cpu) ],
-        local_defines = _daal_defines("DAAL_FPTYPE={}".format(fpt),
-                                      "DAAL_CPU={}".format(cpu)),
+        copts = copts + _daal_cpu_copts_gcc(cpu),
+        local_defines = local_defines + [ "DAAL_FPTYPE={}".format(fpt),
+                                          "DAAL_CPU={}".format(cpu) ],
         **kwargs
       )
 
-def daal_includes():
-  includes  = [ ".", "include" ]
-  includes += [ paths.join("include", x) for x in DAAL_CPP_PUBLIC_INCLUDE_DIRS ]
-  includes += [ paths.join("algorithms/kernel", x) for x in DAAL_CPP_ALGORITHMS ]
-  includes += DAAL_CPP_KERNEL_INCLUDES
-  includes += DAAL_CPP_EXTERNAL_INCLUDES
-  return includes
-
-def daal_module(srcs, **kwargs):
+def daal_module(srcs=[], **kwargs):
+  if not len(srcs):
+    _daal_cc_library(**kwargs)
   fpt_files = []
   cpu_files = []
   normal_files = []
@@ -242,7 +284,11 @@ def daal_module(srcs, **kwargs):
       fpt_files.append(src)
     else:
       normal_files.append(src)
-  native.cc_library(srcs = normal_files, **kwargs)
-  _daal_fpt_cc_library(srcs = fpt_files, **kwargs)
-  _daal_cpu_cc_library(srcs = cpu_files, **kwargs)
-  _daal_fpt_cpu_cc_library(srcs = fpt_cpu_files, **kwargs)
+  if len(normal_files) > 0:
+    _daal_cc_library(srcs=normal_files, **kwargs)
+  if len(fpt_files) > 0:
+    _daal_fpt_cc_library(srcs=fpt_files, **kwargs)
+  if len(cpu_files) > 0:
+    _daal_cpu_cc_library(srcs=cpu_files, **kwargs)
+  if len(fpt_cpu_files) > 0:
+    _daal_fpt_cpu_cc_library(srcs=fpt_cpu_files, **kwargs)
