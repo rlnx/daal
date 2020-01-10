@@ -21,9 +21,9 @@
 //--
 */
 
-#include "daal_kernel_defines.h"
-#include "service_dispatch.h"
-#include "data_conversion_cpu.h"
+#include "services/daal_kernel_defines.h"
+#include "externals/service_dispatch.h"
+#include "services/kernel/data_management/data_conversion_cpu.h"
 #include "data_management/data/internal/conversion.h"
 
 namespace daal

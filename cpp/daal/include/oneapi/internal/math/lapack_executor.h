@@ -31,12 +31,12 @@
 #endif
 
 #ifdef ONEAPI_DAAL_USE_MKL_GPU_FUNC
-    #include "mkl_lapack.h"
+#include "oneapi/internal/math/mkl_lapack.h"
 #endif
 
 #include "oneapi/internal/types_utils.h"
 #include "services/internal/error_handling_helpers.h"
-#include "reference_lapack.h"
+#include "oneapi/internal/math/reference_lapack.h"
 #include "types.h"
 
 #include <CL/sycl.hpp>

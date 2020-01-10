@@ -27,7 +27,7 @@
 #include "algorithms/kmeans/kmeans_init_types.h"
 #include "execution_context.h"
 #include "oneapi/internal/types.h"
-#include "numeric_table_sycl_homogen.h"
+#include "data_management/data/numeric_table_sycl_homogen.h"
 
 using namespace daal::oneapi::internal;
 

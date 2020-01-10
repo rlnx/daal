@@ -22,8 +22,8 @@
 */
 
 #include "algorithms/decision_tree/decision_tree_regression_training_types.h"
-#include "serialization_utils.h"
-#include "daal_strings.h"
+#include "services/kernel/serialization_utils.h"
+#include "services/kernel/daal_strings.h"
 
 namespace daal
 {

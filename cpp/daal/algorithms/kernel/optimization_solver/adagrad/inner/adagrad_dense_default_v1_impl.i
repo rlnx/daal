@@ -24,15 +24,15 @@
 #ifndef __ADAGRAD_DENSE_DEFAULT_V1_IMPL_I__
 #define __ADAGRAD_DENSE_DEFAULT_V1_IMPL_I__
 
-#include "service_micro_table.h"
-#include "service_numeric_table.h"
-#include "service_math.h"
-#include "service_utils.h"
-#include "service_numeric_table.h"
-#include "../iterative_solver_kernel.h"
+#include "services/kernel/data_management/service_micro_table.h"
+#include "services/kernel/data_management/service_numeric_table.h"
+#include "externals/service_math.h"
+#include "services/kernel/service_utils.h"
+#include "services/kernel/data_management/service_numeric_table.h"
+#include "algorithms/kernel/optimization_solver/iterative_solver_kernel.h"
 #include "algorithms/optimization_solver/iterative_solver/iterative_solver_types.h"
 #include "algorithms/optimization_solver/adagrad/adagrad_types.h"
-#include "service_data_utils.h"
+#include "services/kernel/service_data_utils.h"
 
 namespace daal
 {

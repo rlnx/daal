@@ -190,7 +190,7 @@ def daal_includes():
   # includes += [ paths.join("include", x) for x in DAAL_CPP_PUBLIC_INCLUDE_DIRS ]
   # includes += [ paths.join("algorithms/kernel", x) for x in DAAL_CPP_ALGORITHMS ]
   # includes += DAAL_CPP_KERNEL_INCLUDES
-  includes += DAAL_CPP_EXTERNAL_INCLUDES
+  # includes += DAAL_CPP_EXTERNAL_INCLUDES
   return includes
 
 def _daal_cpu_copts_gcc(cpu):

@@ -16,8 +16,8 @@
 *******************************************************************************/
 
 #include "oneapi/internal/math/reference_gemm.h"
-#include "blas_gpu.h"
-#include "cl_kernels/kernel_blas.cl"
+#include "services/kernel/oneapi/blas_gpu.h"
+#include "services/kernel/oneapi/cl_kernels/kernel_blas.cl"
 
 namespace daal
 {

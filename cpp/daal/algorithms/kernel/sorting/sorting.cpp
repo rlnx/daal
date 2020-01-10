@@ -21,9 +21,9 @@
 //--
 */
 
-#include "sorting_types.h"
-#include "serialization_utils.h"
-#include "daal_strings.h"
+#include "algorithms/sorting/sorting_types.h"
+#include "services/kernel/serialization_utils.h"
+#include "services/kernel/daal_strings.h"
 
 using namespace daal::data_management;
 using namespace daal::services;

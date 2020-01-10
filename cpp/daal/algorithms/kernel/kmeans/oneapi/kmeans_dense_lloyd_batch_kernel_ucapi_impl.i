@@ -24,14 +24,14 @@
 #ifndef __KMEANS_DENSE_LLOYD_BATCH_KERNEL_UCAPI_IMPL__
 #define __KMEANS_DENSE_LLOYD_BATCH_KERNEL_UCAPI_IMPL__
 
-#include "env_detect.h"
-#include "cl_kernels/kmeans_cl_kernels.cl"
+#include "services/env_detect.h"
+#include "algorithms/kernel/kmeans/oneapi/cl_kernels/kmeans_cl_kernels.cl"
 #include "execution_context.h"
-#include "oneapi/service_defines_oneapi.h"
+#include "services/kernel/oneapi/service_defines_oneapi.h"
 #include "oneapi/internal/types.h"
-#include "oneapi/blas_gpu.h"
+#include "services/kernel/oneapi/blas_gpu.h"
 
-#include "service_ittnotify.h"
+#include "externals/service_ittnotify.h"
 
 DAAL_ITTNOTIFY_DOMAIN(kmeans.dense.lloyd.batch.oneapi);
 

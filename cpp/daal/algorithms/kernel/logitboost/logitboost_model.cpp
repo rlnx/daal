@@ -24,8 +24,8 @@
 #include "algorithms/boosting/logitboost_model.h"
 #include "algorithms/stump/stump_regression_training_batch.h"
 #include "algorithms/stump/stump_regression_predict.h"
-#include "serialization_utils.h"
-#include "daal_strings.h"
+#include "services/kernel/serialization_utils.h"
+#include "services/kernel/daal_strings.h"
 
 using namespace daal::data_management;
 using namespace daal::services;

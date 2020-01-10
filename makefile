@@ -182,9 +182,9 @@ WORKDIR.lib := $(WORKDIR)/daal/lib
 COVFILE   := $(subst BullseyeStub,$(RELEASEDIR.daal)/Bullseye_$(_IA).cov,$(COVFILE))
 COV.libia := $(if $(BULLSEYEROOT),$(BULLSEYEROOT)/lib)
 
-MKLFPKDIR:= $(if $(wildcard $(DIR)/cpp/daal/externals/mklfpk/$(_OS)/*),$(DIR)/cpp/daal/externals/mklfpk, \
+MKLFPKDIR:= $(if $(wildcard $(DIR)/build/externals/mklfpk/$(_OS)/*),$(DIR)/build/externals/mklfpk, \
 								$(if $(wildcard $(MKLFPKROOT)/include/*),$(subst \,/,$(MKLFPKROOT)),                     \
-										$(error Can`t find MKLFPK libs nether in $(DIR)/cpp/daal/externals/mklfpk/$(_OS) not in MKLFPKROOT.)))
+										$(error Can`t find MKLFPK libs nether in $(DIR)/build/externals/mklfpk/$(_OS) not in MKLFPKROOT.)))
 MKLFPKDIR.include := $(MKLFPKDIR)/include $(MKLFPKDIR)/$(if $(OS_is_fbsd),lnx,$(_OS))/include
 MKLFPKDIR.libia   := $(MKLFPKDIR)/$(if $(OS_is_fbsd),lnx,$(_OS))/lib/$(_IA)
 
@@ -193,9 +193,9 @@ frompf = $(shell echo $1 | sed 's/ProgramFilesx86/Program\\ Files\\ (x86)/')
 
 
 #============================= TBB folders =====================================
-TBBDIR := $(if $(wildcard $(DIR)/cpp/daal/externals/tbb/$(_OS)/*),$(DIR)/cpp/daal/externals/tbb/$(_OS)$(if $(OS_is_win),/tbb))
+TBBDIR := $(if $(wildcard $(DIR)/build/externals/tbb/$(_OS)/*),$(DIR)/build/externals/tbb/$(_OS)$(if $(OS_is_win),/tbb))
 TBBDIR.2 := $(if $(TBBDIR),$(TBBDIR),$(call topf,$$TBBROOT))
-TBBDIR.2 := $(if $(TBBDIR.2),$(TBBDIR.2),$(error Can`t find TBB neither in $(DIR)/cpp/daal/externals/tbb nor in $$TBBROOT))
+TBBDIR.2 := $(if $(TBBDIR.2),$(TBBDIR.2),$(error Can`t find TBB neither in $(DIR)/build/externals/tbb nor in $$TBBROOT))
 
 TBBDIR.include := $(if $(TBBDIR),$(TBBDIR)/include/tbb $(TBBDIR)/include)
 
@@ -237,7 +237,7 @@ releasetbb.LIBS_Y := $(TBBDIR.soia)/$(plib)tbb.$(y) $(TBBDIR.soia)/$(plib)tbbmal
 
 RELEASEDIR.include.mklgpufpk := $(RELEASEDIR.include)/oneapi/internal/math
 
-MKLGPUFPKDIR:= $(if $(wildcard $(DIR)/cpp/daal/externals/mklgpufpk/*),$(DIR)/cpp/daal/externals/mklgpufpk,$(subst \,/,$(MKLGPUFPKROOT)))
+MKLGPUFPKDIR:= $(if $(wildcard $(DIR)/build/externals/mklgpufpk/*),$(DIR)/build/externals/mklgpufpk,$(subst \,/,$(MKLGPUFPKROOT)))
 MKLGPUFPKDIR.include := $(MKLGPUFPKDIR)/include
 MKLGPUFPKDIR.libia   := $(MKLGPUFPKDIR)/lib/$(_IA)
 
@@ -408,8 +408,8 @@ THR.srcdir       := $(DIR)/cpp/daal/algorithms/threading
 CORE.srcdir      := $(DIR)/cpp/daal/algorithms/kernel
 EXTERNALS.srcdir := $(DIR)/cpp/daal/externals
 
-CORE.SERV.srcdir          := $(DIR)/cpp/daal/service/kernel
-CORE.SERV.COMPILER.srcdir := $(DIR)/cpp/daal/service/kernel/compiler/$(CORE.SERV.COMPILER.$(COMPILER))
+CORE.SERV.srcdir          := $(DIR)/cpp/daal/services/kernel
+CORE.SERV.COMPILER.srcdir := $(DIR)/cpp/daal/services/kernel/compiler/$(CORE.SERV.COMPILER.$(COMPILER))
 
 CORE.srcdirs  := $(CORE.SERV.srcdir) $(CORE.srcdir)                  \
 								 $(if $(DAALTHRS),,$(THR.srcdir))                    \
@@ -423,7 +423,8 @@ CORE.incdirs.thr    := $(THR.srcdir)
 CORE.incdirs.core   := $(CORE.SERV.srcdir) $(addprefix $(CORE.SERV.srcdir)/, $(CORE.SERVICES)) $(CORE.srcdir) $(addprefix $(CORE.srcdir)/, $(CORE.ALGORITHMS.FULL)) ## change CORE.ALGORITHMS.FULL --> CORE.ALGORITHMS
 CORE.incdirs.common := $(RELEASEDIR.include) $(WORKDIR)
 CORE.incdirs.thirdp := $(EXTERNALS.srcdir) $(MKLFPKDIR.include) $(TBBDIR.include)
-CORE.incdirs := $(CORE.incdirs.rel) $(CORE.incdirs.thr) $(CORE.incdirs.core) $(CORE.incdirs.common) $(CORE.incdirs.thirdp)
+CORE.incdirs := cpp/daal $(RELEASEDIR.include) $(WORKDIR) $(MKLFPKDIR.include) $(TBBDIR.include)
+# CORE.incdirs := $(CORE.incdirs.rel) $(CORE.incdirs.thr) $(CORE.incdirs.core) $(CORE.incdirs.common) $(CORE.incdirs.thirdp)
 
 containing = $(foreach v,$2,$(if $(findstring $1,$v),$v))
 notcontaining = $(foreach v,$2,$(if $(findstring $1,$v),,$v))

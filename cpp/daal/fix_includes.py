@@ -1,79 +1,102 @@
 import os
 import re
 import glob
-from collections import defaultdict
+import argparse
+
+def superglob(patterns, extensions=[''], root=''):
+    for pattern in patterns:
+        for extension in extensions:
+            search_pattern = os.path.join(root, pattern + extension)
+            for path in glob.iglob(search_pattern, recursive=True):
+                yield path
+
+def normalize_include(include: str):
+    normalized_include = os.path.normpath(include)
+    return normalized_include.replace('../', '')
+
+def normalize_include_full_path(config, include_full_path: str):
+    normalized_path = os.path.normpath(include_full_path)
+    normalized_path = os.path.relpath(normalized_path, config.root)
+    normalized_path = normalized_path.replace('include/', '')
+    return normalized_path
 
 _include_re = re.compile(r' *#include +"(.+)"')
+def try_extract_include(line):
+    match = _include_re.match(line)
+    if match:
+        return match.group(1)
 
-def find_all(names, path='.'):
-    result = {}
-    for root, dirs, files in os.walk(path):
-        for name in names:
-            name_added = False
-            for file in files:
-                full_path = os.path.join(root, file)
-                if name in full_path:
-                    result[name] = full_path
-                    name_added = True
+_includes_cache = {}
+_includes_glob_cache = None
+def find_full_include_path(config, include):
+    global _includes_cache
+    global _includes_glob_cache
+    variants = []
+    normalized_include = normalize_include(include)
+    if normalize_include in _includes_cache:
+        return _includes_cache[normalize_include]
+    if _includes_glob_cache is None:
+        glob_iter = superglob(config.directories_pattern,
+                              config.include_extensions,
+                              config.root)
+        _includes_glob_cache = list(glob_iter)
+    for filename in _includes_glob_cache:
+        if ('./' + filename).endswith('/' + normalized_include):
+            normalized_full_path = normalize_include_full_path(config, filename)
+            variants.append(normalized_full_path)
+    if len(variants) == 1:
+        _includes_cache[normalized_include] = variants[0]
+    return variants
 
-    for name in names:
-        if not name in result:
-            print(f'WARNING: Cannot find path for "{name}"')
-    return result
-
-def normalize_include(included_filename: str):
-    fragments = [ './', '../' ]
-    result = included_filename
-    need_replace_more = True
-    while need_replace_more:
-        need_replace_more = False
-        for frag in fragments:
-            if result.startswith(frag):
-                result = result.replace(frag, '', 1)
-                need_replace_more = True
-    return result
-
-def process_file(filename):
-    includes = []
-    with open(filename) as f:
-        for line in f:
-            match = _include_re.match(line)
-            if match:
-                include = normalize_include(match.group(1))
-                includes.append(include)
-    return includes
-
-def main():
-    h_files = glob.glob(f'./**/*.h', recursive=True)
-    cpp_files = glob.glob(f'./**/*.cpp', recursive=True)
-    i_files = glob.glob(f'./**/*.i', recursive=True)
-    files = h_files + cpp_files + i_files
-    filename_to_include_map = {}
-    all_includes_flat = []
-    for file in files:
-        includes = process_file(file)
-        filename_to_include_map[file] = includes
-        all_includes_flat += includes
-    all_includes_set = set(all_includes_flat)
-    include_to_file_mapping = find_all(all_includes_set)
-
-    for filename, includes in filename_to_include_map.items():
-        with open(filename, 'r') as input_file:
-            output_content = ''
-            for line in input_file:
-                replacement_happend = False
-                if '#include' in line:
-                    for include in includes:
-                        if include in line and include in include_to_file_mapping:
-                            full_include = include_to_file_mapping[include]
-                            full_include_fixed = full_include.replace('./include/', '').replace('./', '')
-                            output_content += f'#include "{full_include_fixed}"\n'
-                            replacement_happend = True
-                            break
-                if not replacement_happend:
-                    output_content += line
+def replace_includes_in_file(config, filename):
+    output_file_lines = []
+    any_replacement_happend = False
+    with open(filename, 'r') as input_file:
+        for line in input_file:
+            is_replacement_happend = False
+            include = try_extract_include(line)
+            if include:
+                full_include_paths = find_full_include_path(config, include)
+                if len(full_include_paths) == 1:
+                    is_replacement_happend = True
+                    any_replacement_happend = True
+                    include_replacement = f'#include "{full_include_paths[0]}"\n'
+                    output_file_lines.append(include_replacement)
+                elif len(full_include_paths) == 0:
+                    print(f'WARNING: Cannot find full path to "{include}" in "{filename}"')
+                elif len(full_include_paths) > 0:
+                    print(f'WARNING: Include "{include}" matches several full paths in "{filename}":')
+                    for full_include_path in full_include_paths:
+                        print(f'   {full_include_path}')
+            if not is_replacement_happend:
+                output_file_lines.append(line)
+    if (not config.test) and any_replacement_happend:
         with open(filename, 'w') as output_file:
-            output_file.write(output_content)
+            output_file.writelines(output_file_lines)
+
+def process_files(config):
+    for filename in superglob(config.directories_pattern,
+                              config.include_users_extensions,
+                              config.root):
+        if config.progress:
+            print(filename)
+        replace_includes_in_file(config, filename)
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--test', action='store_true', default=False)
+    parser.add_argument('--progress', action='store_true', default=False)
+    parser.add_argument('--root', type=str, default='')
+    config = parser.parse_args()
+    config.directories_pattern = [
+        'include/algorithms/**/*',
+        'include/data_management/**/*',
+        'include/oneapi/**/*',
+        'include/services/**/*',
+        'algorithms/**/*',
+        'externals/*',
+        'services/**/*',
+    ]
+    config.include_extensions = [ '.h', '.i', '.cl' ]
+    config.include_users_extensions = [ '.h', '.i', '.cpp' ]
+    process_files(config)

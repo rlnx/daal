@@ -23,7 +23,7 @@
 */
 
 #include "algorithms/regression/regression_training_types.h"
-#include "daal_strings.h"
+#include "services/kernel/daal_strings.h"
 
 namespace daal
 {

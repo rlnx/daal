@@ -5,14 +5,18 @@ cc_library(
   name = "public_common_headers",
   hdrs = glob(["**/*.h", "**/*.i", "**/*.cl"]),
   includes = daal_includes(),
-  visibility = [ "//visibility:public" ]
+  deps = [
+    "//build/externals:tbb_headers",
+    "//build/externals:mklfpk_headers",
+  ],
+  visibility = [ "//visibility:public" ],
 )
 
 daal_module(
   name = "daal_core_service",
   srcs = glob(["services/kernel/**/*.cpp"]),
   deps = [
-    ":public_common_headers"
+    ":public_common_headers",
   ],
 )
 

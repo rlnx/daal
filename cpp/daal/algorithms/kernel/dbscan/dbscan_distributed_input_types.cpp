@@ -21,9 +21,9 @@
 //--
 */
 
-#include "dbscan_types.h"
-#include "service_numeric_table.h"
-#include "daal_strings.h"
+#include "algorithms/dbscan/dbscan_types.h"
+#include "services/kernel/data_management/service_numeric_table.h"
+#include "services/kernel/daal_strings.h"
 
 using namespace daal::data_management;
 using namespace daal::services;

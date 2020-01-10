@@ -27,7 +27,7 @@
 #include "services/env_detect.h"
 #include "oneapi/internal/execution_context.h"
 #include "oneapi/internal/types_utils.h"
-#include "oneapi/math_service_types.h"
+#include "services/kernel/oneapi/math_service_types.h"
 #include "services/buffer.h"
 #include "oneapi/internal/math/types.h"
 

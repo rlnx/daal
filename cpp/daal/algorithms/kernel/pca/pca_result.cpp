@@ -21,11 +21,11 @@
 //--
 */
 
-#include "pca_types.h"
-#include "pca_result_impl.h"
-#include "serialization_utils.h"
-#include "daal_strings.h"
-#include "service_defines.h"
+#include "algorithms/pca/pca_types.h"
+#include "algorithms/kernel/pca/pca_result_impl.h"
+#include "services/kernel/serialization_utils.h"
+#include "services/kernel/daal_strings.h"
+#include "services/kernel/service_defines.h"
 
 using namespace daal::data_management;
 using namespace daal::services;

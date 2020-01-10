@@ -31,13 +31,13 @@
 #endif
 
 #ifdef ONEAPI_DAAL_USE_MKL_GPU_FUNC
-    #include "mkl_blas.h"
+#include "oneapi/internal/math/mkl_blas.h"
 #endif
 
 #include "oneapi/internal/types_utils.h"
 #include "types.h"
 #include "services/internal/error_handling_helpers.h"
-#include "reference_gemm.h"
+#include "oneapi/internal/math/reference_gemm.h"
 
 #include <CL/sycl.hpp>
 

@@ -22,11 +22,11 @@
 */
 
 #include "algorithms/kmeans/kmeans_init_types.h"
-#include "daal_defines.h"
-#include "kmeans_init_impl.h"
-#include "memory_block.h"
-#include "serialization_utils.h"
-#include "daal_strings.h"
+#include "services/daal_defines.h"
+#include "algorithms/kernel/kmeans/kmeans_init_impl.h"
+#include "data_management/data/memory_block.h"
+#include "services/kernel/serialization_utils.h"
+#include "services/kernel/daal_strings.h"
 
 using namespace daal::data_management;
 using namespace daal::services;

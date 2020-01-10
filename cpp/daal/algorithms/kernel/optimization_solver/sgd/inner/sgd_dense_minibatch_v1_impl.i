@@ -26,9 +26,9 @@
 #ifndef __SGD_DENSE_MINIBATCH_V1_IMPL_I__
 #define __SGD_DENSE_MINIBATCH_V1_IMPL_I__
 
-#include "service_numeric_table.h"
-#include "service_math.h"
-#include "service_utils.h"
+#include "services/kernel/data_management/service_numeric_table.h"
+#include "externals/service_math.h"
+#include "services/kernel/service_utils.h"
 
 using namespace daal::internal;
 using namespace daal::services;

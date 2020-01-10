@@ -25,8 +25,8 @@
 #ifndef __LINEAR_REGRESSION_TRAIN_DENSE_NORMEQ_ONEAPI_IMPL_I__
 #define __LINEAR_REGRESSION_TRAIN_DENSE_NORMEQ_ONEAPI_IMPL_I__
 
-#include "linear_regression_train_kernel_oneapi.h"
-#include "data_management/data/numeric_table_sycl_homogen.h" //to delete
+#include "algorithms/kernel/linear_regression/oneapi/linear_regression_train_kernel_oneapi.h"
+#include "data_management/data/numeric_table_sycl_homogen.h"
 
 namespace daal
 {

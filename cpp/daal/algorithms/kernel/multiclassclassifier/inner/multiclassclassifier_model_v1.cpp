@@ -21,9 +21,9 @@
 //--
 */
 
-#include "multi_class_classifier_model.h"
-#include "serialization_utils.h"
-#include "daal_strings.h"
+#include "algorithms/multi_class_classifier/multi_class_classifier_model.h"
+#include "services/kernel/serialization_utils.h"
+#include "services/kernel/daal_strings.h"
 
 namespace daal
 {

@@ -22,7 +22,7 @@
 */
 
 #include "algorithms/decision_tree/decision_tree_classification_training_types.h"
-#include "serialization_utils.h"
+#include "services/kernel/serialization_utils.h"
 
 namespace daal
 {

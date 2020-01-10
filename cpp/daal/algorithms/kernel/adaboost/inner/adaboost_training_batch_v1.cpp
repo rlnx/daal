@@ -22,7 +22,7 @@
 */
 
 #include "algorithms/boosting/adaboost_training_types.h"
-#include "serialization_utils.h"
+#include "services/kernel/serialization_utils.h"
 
 using namespace daal::data_management;
 using namespace daal::services;
