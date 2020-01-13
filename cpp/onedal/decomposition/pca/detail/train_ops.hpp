@@ -17,7 +17,6 @@
 #pragma once
 
 #include "onedal/decomposition/pca/train_types.hpp"
-#include "onedal/detail/dispatcher.hpp"
 
 namespace dal {
 namespace decomposition {
@@ -50,15 +49,10 @@ struct train_ops {
 
   }
 
-  template <typename DispatchId>
-  constexpr auto get_kernel(DispatchId dispatch_id) const {
-    return backend::train_kernel<DispatchId, float_t, method_t>();
-  }
-
   template <typename Context>
   auto operator()(const Context& ctx, const Params& params, const train_input& input) const {
     validate(params, input);
-    return backend::train_ops<float_t, method_t>(ctx, params, input);
+    return backend::train_ops<float_t, method_t>()(ctx, params, input);
   }
 };
 
