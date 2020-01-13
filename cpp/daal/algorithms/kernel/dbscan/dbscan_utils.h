@@ -28,7 +28,7 @@
 
 #include "algorithms/threading/threading.h"
 #include "services/daal_defines.h"
-#include "error_handling.h"
+#include "services/error_handling.h"
 #include "externals/service_memory.h"
 #include "services/kernel/data_management/service_numeric_table.h"
 #include "externals/service_math.h"

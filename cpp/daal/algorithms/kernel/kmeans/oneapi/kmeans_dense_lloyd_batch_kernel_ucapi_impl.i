@@ -26,7 +26,7 @@
 
 #include "services/env_detect.h"
 #include "algorithms/kernel/kmeans/oneapi/cl_kernels/kmeans_cl_kernels.cl"
-#include "execution_context.h"
+#include "services/execution_context.h"
 #include "services/kernel/oneapi/service_defines_oneapi.h"
 #include "oneapi/internal/types.h"
 #include "services/kernel/oneapi/blas_gpu.h"

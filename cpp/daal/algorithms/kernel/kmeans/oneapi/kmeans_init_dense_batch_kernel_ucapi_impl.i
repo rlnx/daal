@@ -22,7 +22,7 @@
 */
 
 #include "algorithms/kernel/kmeans/oneapi/cl_kernels/kmeans_init_cl_kernels.cl"
-#include "execution_context.h"
+#include "services/execution_context.h"
 #include "services/kernel/oneapi/service_defines_oneapi.h"
 #include "oneapi/internal/types.h"
 

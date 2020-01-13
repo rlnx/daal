@@ -36,7 +36,7 @@
 
 #include "algorithms/kernel/dtrees/gbt/oneapi/cl_kernels/gbt_common_kernels.cl"
 
-#include "execution_context.h"
+#include "services/execution_context.h"
 #include "services/kernel/oneapi/service_defines_oneapi.h"
 #include "oneapi/internal/types.h"
 

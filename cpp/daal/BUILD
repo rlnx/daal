@@ -1,10 +1,9 @@
-load("//build/bazel:rules.bzl", "daal_module",
-                                "daal_includes")
+load("//build/bazel:rules.bzl", "daal_module")
 
 cc_library(
   name = "public_common_headers",
   hdrs = glob(["**/*.h", "**/*.i", "**/*.cl"]),
-  includes = daal_includes(),
+  includes = [ '.', 'include' ],
   deps = [
     "//build/externals:tbb_headers",
     "//build/externals:mklfpk_headers",
@@ -20,18 +19,19 @@ daal_module(
   ],
 )
 
-# daal_module(
-#   name = "daal_core_algorithms",
-#   srcs = glob(["algorithms/kernel/**/*.cpp"]),
-#   deps = [
-#     ":public_common_headers"
-#   ],
-# )
+daal_module(
+  name = "daal_core_algorithms",
+  srcs = glob(["algorithms/kernel/**/*.cpp"]),
+  deps = [
+    ":public_common_headers",
+    "//cpp/daal/algorithms/kernel/pca:pca",
+  ],
+)
 
 daal_module(
   name = "daal_core",
   deps = [
     ":daal_core_service",
-    # ":daal_core_algorithms",
+    ":daal_core_algorithms",
   ]
 )

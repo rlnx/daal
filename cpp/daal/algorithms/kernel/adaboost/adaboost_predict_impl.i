@@ -25,7 +25,7 @@
 #define __ADABOOST_PREDICT_IMPL_I__
 
 #include "services/kernel/data_management/service_numeric_table.h"
-#include "collection.h"
+#include "services/collection.h"
 #include "externals/service_math.h"
 #include "services/kernel/service_data_utils.h"
 #include "externals/service_memory.h"

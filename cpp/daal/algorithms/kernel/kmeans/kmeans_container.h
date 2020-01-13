@@ -30,7 +30,7 @@
 #include "algorithms/kmeans/kmeans_distributed.h"
 #include "algorithms/kernel/kmeans/kmeans_lloyd_kernel.h"
 #include "algorithms/kernel/kmeans/oneapi/kmeans_dense_lloyd_batch_kernel_ucapi.h"
-#include "execution_context.h"
+#include "services/execution_context.h"
 
 #include "services/kernel/data_management/service_numeric_table.h"
 
