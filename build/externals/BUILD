@@ -19,3 +19,34 @@ cc_library(
   ],
   visibility = [ "//visibility:public" ],
 )
+
+cc_library(
+  name = "tbb",
+  srcs = [
+    "tbb/lnx/lib/intel64/gcc4.8/libtbb.so.2",
+    "tbb/lnx/lib/intel64/gcc4.8/libtbbmalloc.so.2",
+  ],
+  deps = [
+    ":tbb_headers",
+  ],
+  linkopts = [
+    "-lpthread",
+  ],
+  visibility = [ "//visibility:public" ],
+)
+
+cc_library(
+  name = "mklfpk",
+  srcs = [
+    "mklfpk/lnx/lib/intel64/libdaal_mkl_thread.a",
+    "mklfpk/lnx/lib/intel64/libdaal_vmlipp_core.a",
+  ],
+  deps = [
+    ":mklfpk_headers",
+    ":tbb",
+  ],
+  linkopts = [
+    "-ldl",
+  ],
+  visibility = [ "//visibility:public" ],
+)

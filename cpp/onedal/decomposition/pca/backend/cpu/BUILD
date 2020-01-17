@@ -1,19 +1,13 @@
 load("//build/bazel:rules.bzl", "dal_module", "dal_cpu_kernel")
 
-dal_module(
-  name = "headers",
-  hdrs = glob(["*.hpp"]),
-  visibility = ["//visibility:public"],
-)
-
 dal_cpu_kernel(
   name = "train_kernels",
+  hdrs = glob(["*.hpp"]),
   srcs = glob(["train_*.cpp"]),
   deps = [
-    ":headers",
-    "//cpp/onedal:common_headers",
+    "//cpp/onedal:common",
     "//cpp/onedal/decomposition/pca:headers",
-    "//cpp/daal:public_common_headers",
+    "//cpp/daal/algorithms/kernel/pca",
   ],
   visibility = ["//visibility:public"],
 )

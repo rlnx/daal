@@ -1,12 +1,11 @@
 load("//build/bazel:rules.bzl", "daal_kernel_module")
 
 daal_kernel_module(
-  name = "pca",
+  name = "covariance",
   hdrs = glob(["**/*.h", "**/*.i", "**/*.cl"]),
   srcs = glob(["**/*.cpp"]),
   deps = [
     "//cpp/daal:services",
-    "//cpp/daal/algorithms/kernel/covariance",
   ],
   visibility = [ "//visibility:public" ],
 )

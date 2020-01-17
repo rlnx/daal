@@ -37,8 +37,8 @@ dal_dpcpp_module(
   name = "train_ops_dp",
   deps = [
     ":headers",
-    "//cpp/onedal/common_dp",
-    "//cpp/onedal/decomposition/pca/backend/gpu:train_kernels",
+    "//cpp/onedal:common_dp",
+    # "//cpp/onedal/decomposition/pca/backend/gpu:train_kernels",
   ],
   visibility = ["//visibility:public"],
 )

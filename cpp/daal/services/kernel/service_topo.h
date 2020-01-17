@@ -29,6 +29,7 @@
 
         #include <stdio.h>
         #include <stdlib.h>
+        #include <stdint.h>
         #include <unistd.h>
         #include <string.h>
         #include <sched.h>
@@ -98,9 +99,9 @@ typedef cpuset_t cpu_set_t;
         #endif
 
         #ifdef __x86_64__
-            #define AFFINITY_MASK unsigned __int64
+            #define AFFINITY_MASK uint64_t
         #else
-            #define AFFINITY_MASK unsigned __int32
+            #define AFFINITY_MASK uint32_t
         #endif
 
     #else /* WINDOWS */
@@ -112,7 +113,7 @@ typedef cpuset_t cpu_set_t;
             #define LNX_MY1CON  1LL
         #else
             #ifdef _M_X64
-                #define LNX_PTR2INT __int64
+                #define LNX_PTR2INT int64_t
                 #define LNX_MY1CON  1LL
             #else
                 #define LNX_PTR2INT unsigned int
@@ -135,9 +136,9 @@ typedef cpuset_t cpu_set_t;
         #endif
 
         #ifdef _M_IA64
-typedef unsigned __int64 AFFINITY_MASK;
+typedef uint64_t AFFINITY_MASK;
         #else
-typedef unsigned __int32 AFFINITY_MASK;
+typedef uint32_t AFFINITY_MASK;
         #endif
 
     #endif /* WINDOWS */
@@ -186,13 +187,13 @@ typedef struct dcache_str
 
 typedef struct
 {
-    unsigned __int32 EAX, EBX, ECX, EDX;
+    uint32_t EAX, EBX, ECX, EDX;
 } CPUIDinfo;
 
 struct CPUIDinfox
 {
     CPUIDinfo * subleaf[MAX_CACHE_SUBLEAFS];
-    unsigned __int32 subleaf_max = 0;
+    uint32_t subleaf_max = 0;
 };
 
 typedef struct
@@ -241,35 +242,35 @@ typedef struct
 
 typedef struct
 {
-    unsigned __int32 APICID;        // the full x2APIC ID or initial APIC ID of a logical
-                                    //  processor assigned by HW
-    unsigned __int32 OrdIndexOAMsk; // An ordinal index (zero-based) for each logical
-                                    //  processor in the system, 1:1 with "APICID"
+    uint32_t APICID;        // the full x2APIC ID or initial APIC ID of a logical
+                            //  processor assigned by HW
+    uint32_t OrdIndexOAMsk; // An ordinal index (zero-based) for each logical
+                            //  processor in the system, 1:1 with "APICID"
     // Next three members are the sub IDs for processor topology enumeration
-    unsigned __int32 pkg_IDAPIC;  // Pkg_ID field, subset of APICID bits
-                                  //  to distinguish different packages
-    unsigned __int32 Core_IDAPIC; // Core_ID field, subset of APICID bits to
-                                  //  distinguish different cores in a package
-    unsigned __int32 SMT_IDAPIC;  // SMT_ID field, subset of APICID bits to
-                                  //  distinguish different logical processors in a core
+    uint32_t pkg_IDAPIC;  // Pkg_ID field, subset of APICID bits
+                          //  to distinguish different packages
+    uint32_t Core_IDAPIC; // Core_ID field, subset of APICID bits to
+                          //  distinguish different cores in a package
+    uint32_t SMT_IDAPIC;  // SMT_ID field, subset of APICID bits to
+                          //  distinguish different logical processors in a core
     // the next three members stores a numbering scheme of ordinal index
     // for each level of the processor topology.
-    unsigned __int32 packageORD; // a zero-based numbering scheme for each physical
-                                 //  package in the system
-    unsigned __int32 coreORD;    // a zero-based numbering scheme for each core in the same package
-    unsigned __int32 threadORD;  // a zero-based numbering scheme for each thread in the same core
+    uint32_t packageORD; // a zero-based numbering scheme for each physical
+                         //  package in the system
+    uint32_t coreORD;    // a zero-based numbering scheme for each core in the same package
+    uint32_t threadORD;  // a zero-based numbering scheme for each thread in the same core
     // Next two members are the sub IDs for cache topology enumeration
-    unsigned __int32 EaCacheSMTIDAPIC[MAX_CACHE_SUBLEAFS]; // SMT_ID field, subset of APICID bits
-                                                           // to distinguish different logical processors sharing the same cache level
-    unsigned __int32 EaCacheIDAPIC[MAX_CACHE_SUBLEAFS];    // sub ID to enumerate different cache entities
-                                                           // of the cache level corresponding to the array index/cpuid leaf 4 subleaf index
+    uint32_t EaCacheSMTIDAPIC[MAX_CACHE_SUBLEAFS]; // SMT_ID field, subset of APICID bits
+                                                   // to distinguish different logical processors sharing the same cache level
+    uint32_t EaCacheIDAPIC[MAX_CACHE_SUBLEAFS];    // sub ID to enumerate different cache entities
+                                                   // of the cache level corresponding to the array index/cpuid leaf 4 subleaf index
     // the next three members stores a numbering scheme of ordinal index
     // for enumerating different cache entities of a cache level, and enumerating
     // logical processors sharing the same cache entity.
-    unsigned __int32 EachCacheORD[MAX_CACHE_SUBLEAFS];        // a zero-based numbering scheme
-                                                              // for each cache entity of the specified cache level in the system
-    unsigned __int32 threadPerEaCacheORD[MAX_CACHE_SUBLEAFS]; // a zero-based numbering scheme
-                                                              // for each logical processor sharing the same cache of the specified cache level
+    uint32_t EachCacheORD[MAX_CACHE_SUBLEAFS];        // a zero-based numbering scheme
+                                                      // for each cache entity of the specified cache level in the system
+    uint32_t threadPerEaCacheORD[MAX_CACHE_SUBLEAFS]; // a zero-based numbering scheme
+                                                      // for each logical processor sharing the same cache of the specified cache level
 
 } idAffMskOrdMapping_t;
 

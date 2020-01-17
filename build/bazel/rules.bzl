@@ -1,3 +1,6 @@
+load("//build/bazel:cc_rules.bzl", "cc_multidef_library",
+                                   "cc_shared_lib")
+
 DAAL_FP_TYPES = [
   "float",
   "double",
@@ -46,97 +49,41 @@ def _daal_common_copts_gcc():
   ]
 
 def _daal_common_defines_gcc():
-  return [
-    '__int64="long long"',
-    '__int32="int"',
-  ]
+  return []
 
-def _daal_cc_library(copts=[], local_defines=[], **kwargs):
+def daal_module(name, copts=[], local_defines=[], **kwargs):
   native.cc_library(
+    name = name,
     copts = copts + _daal_common_copts_gcc(),
     local_defines = local_defines + _daal_common_defines_gcc(),
+    **kwargs,
+  )
+
+def daal_kernel_module(name, hdrs=[], copts=[],
+                       local_defines=[], deps=[], **kwargs):
+  native.cc_library(
+    name = name + "_headers",
+    hdrs = hdrs,
+  )
+  cc_multidef_library(
+    name = name,
+    cpus = {
+      "sse2": ["DAAL_CPU=sse2"],
+      "avx512": ["DAAL_CPU=avx512"],
+    },
+    fpts = {
+      "float": ["DAAL_FPTYPE=float"],
+      "double": ["DAAL_FPTYPE=double"],
+    },
+    copts = copts + _daal_common_copts_gcc(),
+    local_defines = local_defines + _daal_common_defines_gcc(),
+    deps = deps + [":" + name + "_headers"],
     **kwargs
   )
 
-def _daal_fpt_cc_library(name, copts=[], local_defines=[], **kwargs):
-  deps = []
-  for fpt in DAAL_FP_TYPES:
-    deps.append(name + "_" + fpt)
-    _daal_cc_library(
-      name = name + "_" + fpt,
-      local_defines = local_defines + [ "DAAL_FPTYPE={}".format(fpt) ],
-      **kwargs
-    )
-  return deps
-
-def _daal_cpu_cc_library(name, copts=[], local_defines=[], **kwargs):
-  deps = []
-  for cpu in DAAL_CPUS:
-    deps.append(name + "_" + cpu)
-    _daal_cc_library(
-      name = name + "_" + cpu,
-      copts = copts + _daal_cpu_copts_gcc(cpu),
-      local_defines = local_defines + [ "DAAL_CPU={}".format(cpu) ],
-      **kwargs
-    )
-  return deps
-
-def _daal_fpt_cpu_cc_library(name, copts=[], local_defines=[], **kwargs):
-  deps = []
-  for fpt in DAAL_FP_TYPES:
-    for cpu in DAAL_CPUS:
-      deps.append(name + "_" + fpt + "_" + cpu)
-      _daal_cc_library(
-        name = name + "_" + fpt + "_" + cpu,
-        copts = copts + _daal_cpu_copts_gcc(cpu),
-        local_defines = local_defines + [ "DAAL_FPTYPE={}".format(fpt),
-                                          "DAAL_CPU={}".format(cpu) ],
-        **kwargs
-      )
-  return deps
-
-def daal_module(name, srcs=[], deps=[], **kwargs):
-  fpt_files = []
-  cpu_files = []
-  normal_files = []
-  fpt_cpu_files = []
-  for src in srcs:
-    is_cpu_file = "_cpu" in src
-    is_fpt_file = "_fpt" in src
-    if is_fpt_file and is_cpu_file:
-      fpt_cpu_files.append(src)
-    elif is_cpu_file:
-      cpu_files.append(src)
-    elif is_fpt_file:
-      fpt_files.append(src)
-    else:
-      normal_files.append(src)
-  local_deps = []
-  if len(fpt_files) > 0:
-    local_deps += _daal_fpt_cc_library(
-      name = name,
-      srcs = fpt_files,
-      deps = deps,
-      **kwargs
-    )
-  if len(cpu_files) > 0:
-    local_deps += _daal_cpu_cc_library(
-      name = name,
-      srcs = cpu_files,
-      deps = deps,
-      **kwargs
-    )
-  if len(fpt_cpu_files) > 0:
-    local_deps += _daal_fpt_cpu_cc_library(
-      name = name,
-      srcs = fpt_cpu_files,
-      deps = deps,
-      **kwargs
-    )
-  _daal_cc_library(
+def daal_shared_lib(name, **kwargs):
+  return cc_shared_lib(
     name = name,
-    srcs = normal_files,
-    deps = deps + local_deps,
     **kwargs
   )
 

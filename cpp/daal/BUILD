@@ -1,45 +1,110 @@
-load("//build/bazel:rules.bzl", "daal_module")
+package(default_visibility = ["//visibility:public"])
+load("//build/bazel:rules.bzl", "daal_module",
+                                "daal_kernel_module",
+                                "daal_shared_lib")
 
-cc_library(
-  name = "public_common_headers",
-  hdrs = glob(["**/*.h"]),
-  includes = [ 'include' ],
-  visibility = [ "//visibility:public" ],
+daal_module(
+  name = "public_headers",
+  hdrs = glob(["include/**/*.h"]),
+  includes = ["include"],
 )
 
-cc_library(
+daal_module(
   name = "common_headers",
-  hdrs = glob(["**/*.h", "**/*.i", "**/*.cl"]),
-  includes = [ '.' ],
+  hdrs = glob(["**/*.h", "**/*.i", "**/*.cl"], exclude=["include/**"]),
+  includes = ["."],
   deps = [
-    ":public_common_headers",
+    ":public_headers",
     "//build/externals:tbb_headers",
     "//build/externals:mklfpk_headers",
   ],
-  visibility = [ "//visibility:public" ],
 )
 
-daal_module(
-  name = "daal_core_service",
-  srcs = glob(["services/kernel/**/*.cpp"]),
+daal_kernel_module(
+  name = "services",
+  srcs = glob([
+    "services/kernel/**/*.cpp",
+    "algorithms/kernel/*.cpp",
+  ]) + [
+    "externals/service_atomic_int.cpp",
+    "externals/service_memory.cpp",
+    "externals/service_profiler.cpp",
+    "externals/service_service.cpp",
+  ],
   deps = [
     ":common_headers",
   ],
 )
 
 daal_module(
-  name = "daal_core_algorithms",
-  srcs = glob(["algorithms/kernel/**/*.cpp"]),
+  name = "threading_tbb",
+  srcs = glob([
+    "algorithms/threading/*.cpp"
+  ]),
+  local_defines = ["__DO_TBB_LAYER__"],
   deps = [
     ":common_headers",
-    "//cpp/daal/algorithms/kernel/pca:pca",
+    "//build/externals:tbb",
+    "//build/externals:mklfpk",
   ],
 )
 
 daal_module(
+  name = "threading_seq",
+  srcs = glob([
+    "algorithms/threading/*.cpp"
+  ]),
+  local_defines = ["__DO_SEQ_LAYER__"],
+  deps = [
+    ":common_headers",
+    "//build/externals:tbb",
+    "//build/externals:mklfpk",
+  ],
+)
+
+daal_module(
+  name = "algorithms",
+  deps = [
+    ":services",
+    "//cpp/daal/algorithms/kernel/covariance",
+    "//cpp/daal/algorithms/kernel/pca",
+  ],
+)
+
+daal_module(
+  name = "core",
+  deps = [
+    ":services",
+    ":algorithms",
+  ],
+)
+
+daal_shared_lib(
   name = "daal_core",
   deps = [
-    ":daal_core_service",
-    ":daal_core_algorithms",
-  ]
+    ":core",
+  ],
+)
+
+daal_shared_lib(
+  name = "daal_thread",
+  deps = [
+    ":threading_tbb",
+  ],
+)
+
+daal_shared_lib(
+  name = "daal_sequential",
+  deps = [
+    ":threading_seq",
+  ],
+)
+
+filegroup(
+  name = "daal",
+  srcs = [
+    ":daal_core",
+    ":daal_thread",
+    ":daal_sequential",
+  ],
 )

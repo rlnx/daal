@@ -24,7 +24,7 @@ namespace pca {
 
 namespace backend {
 template <typename... Options>
-struct train_ops {
+struct train_kernel {
   auto operator()(const default_execution_context&,
                   const params_base&,
                   const train_input&) const -> train_result;
@@ -52,7 +52,7 @@ struct train_ops {
   template <typename Context>
   auto operator()(const Context& ctx, const Params& params, const train_input& input) const {
     validate(params, input);
-    return backend::train_ops<float_t, method_t>()(ctx, params, input);
+    return backend::train_kernel<float_t, method_t>()(ctx, params, input);
   }
 };
 

@@ -15,35 +15,40 @@
  *******************************************************************************/
 
 #include "daal/include/algorithms/pca/pca_batch.h"
-
 #include "onedal/decomposition/pca/backend/cpu/train_kernel.hpp"
-
-#include <iostream>
 
 namespace dal {
 namespace decomposition {
 namespace pca {
 namespace backend {
 
-template <typename Cpu, typename Float>
+namespace daal_pca = daal::algorithms::pca;
+
+template <typename Float>
 static train_result train_cov(const default_execution_context& ctx,
                               const params_base& params,
                               const train_input& input) {
-  daal::algorithms::pca::Batch<Float> algorithm;
+  daal_pca::Batch<Float, daal_pca::correlationDense> alg;
+  alg.parameter.nComponents = params.get_components_count();
+  alg.parameter.isDeterministic = params.get_is_deterministic();
+
+  // TODO: Wrap input.get_data() into NumericTable and pass to:
+  //       alg.input.set(daal_pca::data, );
+
   return train_result();
 };
 
-template <typename Cpu, typename Float>
-struct train_kernel<Cpu, Float, method::cov> {
+template <typename Float>
+struct train_kernel<Float, method::cov> {
   train_result operator()(const default_execution_context& ctx,
                           const params_base& params,
                           const train_input& input) const {
-    return train_cov<Cpu, Float>(ctx, params, input);
+    return train_cov<Float>(ctx, params, input);
   }
 };
 
-template struct train_kernel<DAL_CPU_ID_, float, method::cov>;
-template struct train_kernel<DAL_CPU_ID_, double, method::cov>;
+template struct train_kernel<float, method::cov>;
+template struct train_kernel<double, method::cov>;
 
 } // namespace backend
 } // namespace pca

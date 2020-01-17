@@ -18,14 +18,6 @@
 
 #include "onedal/execution_context.hpp"
 
-#if !defined(DAL_CPU_ID_)
-#define DAL_CPU_ID_ dal::backend::cpu_dispatch_default
-#endif
-
-#if !defined(DAL_GPU_ID_)
-#define DAL_GPU_ID_ dal::backend::gpu_dispatch_default
-#endif
-
 namespace dal {
 namespace backend {
 
