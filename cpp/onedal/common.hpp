@@ -20,9 +20,9 @@
 
 namespace dal {
 
-class base {
+class Base {
  public:
-  virtual ~base() = default;
+  virtual ~Base() = default;
 };
 
 } // namespace dal

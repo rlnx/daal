@@ -28,22 +28,22 @@ namespace dal {
 namespace detail {
 
 template <typename T>
-using shared = std::shared_ptr<T>;
+using Shared = std::shared_ptr<T>;
 
 template <typename T>
-using pimpl = shared<T>;
+using Pimpl = Shared<T>;
 
-struct pimpl_accessor {
-  template <typename Object>
-  auto& operator()(Object&& object) const {
-    return *object.impl_;
-  }
-};
+// struct pimpl_accessor {
+//   template <typename Object>
+//   auto& operator()(Object&& object) const {
+//     return *object.impl_;
+//   }
+// };
 
-template <typename Impl, typename Object>
-Impl& get_impl(Object&& object) {
-  return static_cast<Impl&>(pimpl_accessor()(object));
-}
+// template <typename Impl, typename Object>
+// Impl& get_impl(Object&& object) {
+//   return static_cast<Impl&>(pimpl_accessor()(object));
+// }
 
 }  // namespace detail
 }  // namespace dal

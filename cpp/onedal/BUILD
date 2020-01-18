@@ -1,6 +1,22 @@
 load("//build/bazel:rules.bzl", "dal_module",
                                 "dal_dpcpp_module")
 
+cc_library(
+    name = "dm",
+    srcs = glob(["data_management/**/*.cpp"]),
+    hdrs = glob(["data_management/**/*.hpp"]) + ["common.hpp"] + glob(["detail/*.hpp"]),
+    copts = ["--std=c++17"],
+    includes = [".."],
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+  name = "dm_test",
+  srcs = ["dm_test.cpp"],
+  copts = ["--std=c++17"],
+  deps = [":dm"],
+)
+
 dal_module(
   name = "headers",
   hdrs = glob(["**/*.hpp"], exclude=["**/*_dp.hpp"]),
