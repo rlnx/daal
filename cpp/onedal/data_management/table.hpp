@@ -2,6 +2,7 @@
 
 #include "onedal/common.hpp"
 #include "onedal/detail/common.hpp"
+#include "onedal/data_management/slice.hpp"
 
 namespace dal {
 namespace data_management {
@@ -21,6 +22,12 @@ public:
 
     std::int32_t get_num_rows() const noexcept;
     std::int32_t get_num_cols() const noexcept;
+
+    Slice row(std::int32_t idx) const;
+    Slice col(std::int32_t idx) const;
+
+    Slice rows(const Range& r) const;
+    Slice cols(const Range& r) const;
 
     detail::TableImpl* get_impl_ptr() const noexcept {
         return _impl.get();

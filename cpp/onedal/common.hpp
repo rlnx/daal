@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include <cstdint>
+#include "onedal/range.hpp"
 
 namespace dal {
 
