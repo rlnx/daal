@@ -13,12 +13,11 @@ HomogenTable create_table(const DataType* data,
                           DataFormat df = DataFormat::rowmajor);
 
 } // namespace detail
-
+} // namespace data_management
 
 template <typename... Args>
 auto create_table(Args&&... args) {
-    return detail::create_table(std::forward<Args>(args)...);
+    return data_management::detail::create_table(std::forward<Args>(args)...);
 }
 
-} // namespace data_management
 } // namespace dal

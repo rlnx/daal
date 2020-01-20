@@ -19,11 +19,11 @@ public:
         : _dataOwner(dataOwner),
           _rows(rows),
           _cols(cols) {
-        _data = _dataOwner->template get_data_ptr<T>(rows, cols);
+        _data = _dataOwner->get_slice(_data, _rows, _cols);
     }
 
     ~ArrayImpl() {
-        _dataOwner->update_data_ptr(_data, _rows, _cols);
+        _dataOwner->release_slice(_data, _rows, _cols);
     }
 
     const T* get_data_ptr() const noexcept {
@@ -32,11 +32,13 @@ public:
 
 private:
     DataOwnerPtr _dataOwner;
+
     Range _rows;
     Range _cols;
+
     T* _data;
 };
-    
+
 } // namespace detail
 } // namespace data_management
 } // namespace dal

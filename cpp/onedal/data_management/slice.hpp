@@ -1,18 +1,21 @@
 #pragma once
 #include "onedal/common.hpp"
 #include "onedal/detail/common.hpp"
+#include "onedal/data_management/array.hpp"
 
 namespace dal {
 namespace data_management {
 
-/*template <typename T>
-class Array {};*/
+class Slice;
 
 namespace detail {
 class Slicable;
+
+template <typename T>
+Array<T> create_array(Slice&);
 } // namespace detail
 
-// TODO: think of how to semantically distinguish 
+// TODO: think of how to semantically distinguish
 // "simple" and "complex" types
 class Slice : public Base {
 public:
@@ -29,12 +32,12 @@ public:
     std::int32_t get_num_cols() const noexcept;
 
     Slice& row(std::int32_t idx) {
-        _rows = Range{idx, idx+1}; 
-        return *this; 
+        _rows = Range{idx, idx+1};
+        return *this;
     }
     Slice& col(std::int32_t idx) {
-        _cols = Range{idx, idx+1}; 
-        return *this; 
+        _cols = Range{idx, idx+1};
+        return *this;
     }
 
     Slice& rows(Range r) {
@@ -47,13 +50,15 @@ public:
         return *this;
     }
 
-    /*template <typename T>
-    Array<T> to_array() const;*/
 private:
     PimplDataOwner _data_owner;
     Range _rows;
     Range _cols;
+
+private:
+    template <typename T>
+    friend Array<T> detail::create_array(Slice&);
 };
 
-} // namespace data_management   
+} // namespace data_management
 } // namespace dal

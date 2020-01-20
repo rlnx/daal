@@ -2,6 +2,7 @@
 
 #include "onedal/common.hpp"
 #include "onedal/data_management/data_format.hpp"
+#include "onedal/data_management/homogen_table.hpp"
 #include "onedal/data_management/detail/table_impl.hpp"
 #include "onedal/detail/type_rt.hpp"
 
@@ -29,11 +30,6 @@ public:
         _data_bytes = nullptr;
     }
 
-    template <typename DataType>
-    const DataType* get_data_ptr() const noexcept {
-        return static_cast<DataType*>(_data_bytes);
-    }
-
     dal::detail::TypeRT get_type() const noexcept {
         return _type_rt;
     }
@@ -41,6 +37,24 @@ public:
     DataFormat get_data_format() const noexcept {
         return _fmt;
     }
+
+    // TODO: warning! Usage of public class Range
+    virtual float* get_slice(float* src, Range rows, Range cols) const override;
+
+    // TODO: warning! Usage of public class Range
+    virtual double* get_slice(double* src, Range rows, Range cols) const override;
+
+    // TODO: warning! Usage of public class Range
+    virtual std::int32_t* get_slice(std::int32_t* src, Range rows, Range cols) const override;
+
+    // TODO: warning! Usage of public class Range
+    virtual void release_slice(float* data, Range rows, Range cols) override;
+
+    // TODO: warning! Usage of public class Range
+    virtual void release_slice(double* data, Range rows, Range cols) override;
+
+    // TODO: warning! Usage of public class Range
+    virtual void release_slice(std::int32_t* data, Range rows, Range cols) override;
 
 private:
     template <typename DataType>
@@ -51,6 +65,9 @@ private:
         std::memcpy(bytes, data, size_bytes);
         return bytes;
     }
+
+    template <typename DataType>
+    DataType* get_slice_impl(Range rows, Range cols) const;
 
 private:
     DataFormat _fmt;
