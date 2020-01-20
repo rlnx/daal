@@ -15,26 +15,26 @@ int32_t Table::get_num_cols() const noexcept {
 }
 
 Slice Table::row(int32_t idx) const {
-    // TODO: this method is the same with row() in Slice class.
-    // need to generalize it?
-    return Slice(_impl, Range{idx, idx+1}, Range{});
+    // TODO: check that index is correct. 
+    // How to organize error handling?
+    return Slice(_impl, Range{idx, idx+1}, Range{0, -1});
 }
 
 Slice Table::col(int32_t idx) const {
-    // TODO: this method is the same with col() in Slice class.
-    // need to generalize it?
-    return Slice(_impl, Range{}, Range {idx, idx+1});
+    // TODO: check that index is correct. 
+    // How to organize error handling?
+    return Slice(_impl, Range{0, -1}, Range {idx, idx+1});
 }
 
 Slice Table::rows(const Range& r) const {
-    // TODO: this method is the same with rows() in Slice class.
-    // need to generalize it?
-    return Slice(_impl, r, Range{});
+    // TODO: check that range is correct. 
+    // How to organize error handling?
+    return Slice(_impl, r, Range{0, -1});
 }
 Slice Table::cols(const Range& r) const {
-    // TODO: this method is the same with cols() in Slice class.
-    // need to generalize it?
-    return Slice(_impl, Range{}, r);
+    // TODO: check that range is correct. 
+    // How to organize error handling?
+    return Slice(_impl, Range{0, -1}, r);
 }
 
 } // namespace data_management

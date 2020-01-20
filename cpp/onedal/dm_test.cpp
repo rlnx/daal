@@ -15,18 +15,13 @@ int main(int argc, char const *argv[])
     std::cout <<  "table [" << table.get_num_rows() << "x" << table.get_num_cols() << "]" << std::endl;
 
     {
-        auto slice = table.rows({0, 3, 2}).cols(0);
-        std::cout << "slice [" << slice.get_num_rows() << "x" << slice.get_num_cols() << "]" << std::endl;
+        auto row = dal::create_array<float>(table.row(2));
+        const float* data = row.get_host_ptr();
 
-        auto array = dal::create_array<float>(slice);
-        const float* data = array.get_host_ptr();
-
-        for (int row = 0; row < slice.get_num_rows(); row++) {
-            for (int col = 0; col < slice.get_num_cols(); col++) {
-                std::cout << data[row*slice.get_num_cols() + col] << " ";
-            }
-            std::cout << std::endl;
+        for (int col = 0; col < table.get_num_cols(); col++) {
+            std::cout << data[col] << " ";
         }
+        std::cout << std::endl;
     }
 
     return 0;

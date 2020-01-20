@@ -78,7 +78,7 @@ private:
 };
 
 template <typename DataType>
-HomogenTable create_table(const DataType* data, uint32_t rows, uint32_t cols, DataFormat df) {
+HomogenTable create_table(const DataType* data, std::int32_t rows, std::int32_t cols, DataFormat df) {
     return HomogenTable(data, rows, cols, df);
 }
 

@@ -33,8 +33,8 @@ void HomogenTableImpl::release_slice(int32_t* data, Range rows, Range cols) {
 
 template <typename DataType>
 DataType* HomogenTableImpl::get_slice_impl(Range rows, Range cols) const {
-    const int32_t end_row = rows.end_idx == rows.maximum_idx ? get_num_rows() : rows.end_idx;
-    const int32_t end_col = cols.end_idx == cols.maximum_idx ? get_num_cols() : cols.end_idx;
+    const int32_t end_row = rows.end_idx == rows.last_element_idx ? get_num_rows() : rows.end_idx;
+    const int32_t end_col = cols.end_idx == cols.last_element_idx ? get_num_cols() : cols.end_idx;
 
     const int32_t ld_data = (_fmt == DataFormat::rowmajor) ? get_num_cols() : get_num_rows();
 
@@ -69,7 +69,7 @@ DataType* HomogenTableImpl::get_slice_impl(Range rows, Range cols) const {
             return out_array;
         }
         else {
-            return data;
+            return data + offset_x + offset_y*ld_data;
         }
     }
     // TODO: implement conversion

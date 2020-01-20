@@ -1,18 +1,12 @@
 #pragma once
 #include "onedal/common.hpp"
 #include "onedal/detail/common.hpp"
-#include "onedal/data_management/array.hpp"
 
 namespace dal {
 namespace data_management {
 
-class Slice;
-
 namespace detail {
 class Slicable;
-
-template <typename T>
-Array<T> create_array(Slice&);
 } // namespace detail
 
 // TODO: think of how to semantically distinguish
@@ -26,38 +20,34 @@ public:
         : _data_owner(impl),
           _rows(rows_range),
           _cols(cols_range)
-    { }
+    { } // TODO: check that ranges are correct
 
     std::int32_t get_num_rows() const noexcept;
     std::int32_t get_num_cols() const noexcept;
 
-    Slice& row(std::int32_t idx) {
-        _rows = Range{idx, idx+1};
-        return *this;
-    }
-    Slice& col(std::int32_t idx) {
-        _cols = Range{idx, idx+1};
-        return *this;
+    const Range& get_rows_range() const noexcept {
+        return _rows;
     }
 
-    Slice& rows(Range r) {
-        _rows = r;
-        return *this;
+    const Range& get_cols_range() const noexcept {
+        return _cols;
     }
 
-    Slice& cols(Range r) {
-        _cols = r;
-        return *this;
+    // TODO: too big exposure of details
+    // need to make SliceImpl?
+    PimplDataOwner get_data_owner_impl() const noexcept {
+        return _data_owner;
     }
+
+    Slice& row(std::int32_t idx);
+    Slice& col(std::int32_t idx);
+    Slice& rows(Range r);
+    Slice& cols(Range r);
 
 private:
     PimplDataOwner _data_owner;
     Range _rows;
     Range _cols;
-
-private:
-    template <typename T>
-    friend Array<T> detail::create_array(Slice&);
 };
 
 } // namespace data_management

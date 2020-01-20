@@ -1,7 +1,6 @@
 #pragma once
 
-#include "onedal/data_management/array.hpp"
-#include "onedal/data_management/slice.hpp"
+#include "onedal/data_management/detail/create_array.hpp"
 
 namespace dal {
 

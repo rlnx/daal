@@ -23,9 +23,11 @@ public:
     std::int32_t get_num_rows() const noexcept;
     std::int32_t get_num_cols() const noexcept;
 
+    // TODO: this methods is the same with row(), rows(), 
+    // col(), cols() in Slice class.
+    // need to generalize them?
     Slice row(std::int32_t idx) const;
     Slice col(std::int32_t idx) const;
-
     Slice rows(const Range& r) const;
     Slice cols(const Range& r) const;
 
