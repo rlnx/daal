@@ -39,8 +39,7 @@ dal_module(
   name = "dal_core",
   deps = [
     ":common",
-    "//cpp/onedal/decomposition/pca:pca",
-    "//cpp/onedal/data_management:data_management",
+    "//cpp/onedal/decomposition/pca:pca"
   ],
   visibility = ["//visibility:public"],
 )

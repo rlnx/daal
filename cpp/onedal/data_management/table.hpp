@@ -20,10 +20,14 @@ public:
         : _impl(table._impl)
     { }
 
+    Table(const Pimpl& impl)
+        : _impl(impl)
+    { }
+
     std::int32_t get_num_rows() const noexcept;
     std::int32_t get_num_cols() const noexcept;
 
-    // TODO: this methods is the same with row(), rows(), 
+    // TODO: this methods is the same with row(), rows(),
     // col(), cols() in Slice class.
     // need to generalize them?
     Slice row(std::int32_t idx) const;
@@ -38,11 +42,6 @@ public:
     Pimpl get_impl() const noexcept {
         return _impl;
     }
-
-protected:
-    Table(const Pimpl& impl)
-        : _impl(impl)
-    { }
 
 private:
     Pimpl _impl;

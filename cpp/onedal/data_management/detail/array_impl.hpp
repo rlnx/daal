@@ -26,7 +26,7 @@ public:
         _dataOwner->release_slice(_data, _rows, _cols);
     }
 
-    const T* get_data_ptr() const noexcept {
+    T* get_data_ptr() const noexcept {
         return _data;
     }
 

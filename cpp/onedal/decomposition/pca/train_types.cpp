@@ -15,57 +15,44 @@
 *******************************************************************************/
 
 #include "onedal/decomposition/pca/train_types.hpp"
+#include "onedal/decomposition/pca/detail/train_types_impl.hpp"
+
+using namespace dal::data_management;
 
 namespace dal {
 namespace decomposition {
 namespace pca {
 
-class detail::train_input_impl : public Base {
- public:
-  train_input_impl(const table& data)
-      : data(data) {}
-
-  table data;
-};
-
-class detail::train_result_impl : public Base {
- public:
-  model trained_model;
-  table eigenvalues;
-  table eigenvectors;
-  table explained_variance;
-};
-
 using detail::train_input_impl;
 using detail::train_result_impl;
 
-train_input::train_input(const table& data)
+train_input::train_input(const Table& data)
     : impl_(new train_input_impl(data)) {}
 
-auto train_input::get_data() const -> table {
+auto train_input::get_data() const -> Table {
   return impl_->data;
 }
 
-void train_input::set_data_impl(const table& data) {
+void train_input::set_data_impl(const Table& data) {
   impl_->data = data;
 }
 
-train_result::train_result()
-    : impl_(new train_result_impl()) {}
+train_result::train_result(const Pimpl& impl)
+    : impl_(impl) {}
 
 auto train_result::get_model() const -> model {
   return impl_->trained_model;
 }
 
-auto train_result::get_eigenvalues() const -> table {
+auto train_result::get_eigenvalues() const -> Table {
   return impl_->eigenvalues;
 }
 
-auto train_result::get_eigenvectors() const -> table {
+auto train_result::get_eigenvectors() const -> Table {
   return impl_->eigenvectors;
 }
 
-auto train_result::get_explained_variance() const -> table {
+auto train_result::get_explained_variance() const -> Table {
   return impl_->explained_variance;
 }
 

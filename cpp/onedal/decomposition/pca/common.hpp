@@ -17,10 +17,9 @@
 #pragma once
 
 #include "onedal/detail/common.hpp"
+#include "onedal/data_management/table.hpp"
 
 namespace dal {
-
-class table{};
 
 namespace decomposition {
 namespace pca {
@@ -74,12 +73,15 @@ class params : public params_base {
 };
 
 class model : public Base {
- public:
-  model();
+public:
+  using Pimpl = dal::detail::Pimpl<detail::model_impl>;
 
-  table get_eigenvectors() const;
+public:
+  model(const Pimpl& impl);
 
- private:
+  data_management::Table get_eigenvectors() const;
+
+private:
   dal::detail::Pimpl<detail::model_impl> impl_;
 };
 

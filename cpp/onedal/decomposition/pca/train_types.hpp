@@ -29,28 +29,31 @@ class train_result_impl;
 
 class train_input : public Base {
  public:
-  train_input(const table& data);
+  train_input(const data_management::Table& data);
 
-  auto get_data() const -> table;
+  data_management::Table get_data() const;
 
-  auto& set_data(const table& data) {
+  auto& set_data(const data_management::Table& data) {
     set_data_impl(data);
     return *this;
   }
 
  private:
-  void set_data_impl(const table& data);
+  void set_data_impl(const data_management::Table& data);
   dal::detail::Pimpl<detail::train_input_impl> impl_;
 };
 
 class train_result {
  public:
-  train_result();
+  using Pimpl = dal::detail::Pimpl<detail::train_result_impl>;
+
+ public:
+  train_result(const Pimpl& impl);
 
   auto get_model() const -> model;
-  auto get_eigenvalues() const -> table;
-  auto get_eigenvectors() const -> table;
-  auto get_explained_variance() const -> table;
+  data_management::Table get_eigenvalues() const;
+  data_management::Table get_eigenvectors() const;
+  data_management::Table get_explained_variance() const;
 
  private:
   dal::detail::Pimpl<detail::train_result_impl> impl_;

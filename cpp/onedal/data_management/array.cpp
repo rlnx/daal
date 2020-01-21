@@ -7,7 +7,7 @@ namespace dal {
 namespace data_management {
 
 template <typename T>
-const T* Array<T>::get_host_ptr() const noexcept {
+T* Array<T>::get_host_ptr() const noexcept {
     return _impl->get_data_ptr();
 }
 

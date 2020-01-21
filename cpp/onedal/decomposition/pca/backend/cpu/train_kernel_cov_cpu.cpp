@@ -19,12 +19,19 @@
 #include "daal/include/algorithms/pca/pca_batch.h"
 #include "onedal/decomposition/pca/backend/cpu/train_kernel.hpp"
 
+#include "onedal/data_management/create_array.hpp"
+
+#include "onedal/decomposition/pca/detail/train_types_impl.hpp"
+#include "onedal/decomposition/pca/detail/common_impl.hpp"
+#include "onedal/data_management/detail/homogen_table_impl.hpp"
+
 namespace dal {
 namespace decomposition {
 namespace pca {
 namespace backend {
 
 namespace daal_pca = daal::algorithms::pca;
+namespace daal_dm  = daal::data_management;
 
 template <typename Cpu, typename Float>
 struct train_kernel<Cpu, Float, method::cov> {
@@ -34,13 +41,38 @@ struct train_kernel<Cpu, Float, method::cov> {
     daal_pca::Batch<Float, daal_pca::correlationDense> alg;
     alg.parameter.nComponents = params.get_components_count();
     alg.parameter.isDeterministic = params.get_is_deterministic();
+    // TODO: algorithm.parameter.resultsToCompute = pca::mean | pca::variance | pca::eigenvalue;
 
-    // TODO: Wrap input.get_data() into NumericTable and pass to:
-    //       alg.input.set(daal_pca::data, );
+    auto data = input.get_data();
+    auto array = dal::create_array<Float>(data.rows({0, -1}));
+    auto inputNt = daal_dm::HomogenNumericTable<Float>::create(array.get_host_ptr(),
+                                                              data.get_num_cols(),
+                                                              data.get_num_rows());
+    alg.input.set(daal_pca::data, inputNt);
+    alg.compute();
 
-    std::cout << "train_kernel<Cpu, Float, method::cov>" << std::endl;
+    model::Pimpl model_impl { new detail::model_impl() };
+    train_result::Pimpl result_impl { new detail::train_result_impl() };
 
-    return train_result();
+    daal_pca::ResultPtr result = alg.getResult();
+    {
+      using dal::data_management::Table;
+      using dal::data_management::detail::HomogenTableImpl;
+
+      auto eigenvectors = result->get(daal_pca::eigenvectors);
+
+      daal_dm::BlockDescriptor<Float> desc;
+      eigenvectors->getBlockOfRows(0, eigenvectors->getNumberOfRows(), daal_dm::readOnly, desc);
+
+      Table::Pimpl eigenvectors_table { new HomogenTableImpl(desc.getBlockPtr(),
+                                                            eigenvectors->getNumberOfRows(),
+                                                            eigenvectors->getNumberOfColumns(),
+                                                            dal::data_management::DataFormat::colmajor) };
+      model_impl->eigenvectors = eigenvectors_table;
+    }
+
+    result_impl->trained_model = model_impl;
+    return train_result(result_impl);
   }
 };
 

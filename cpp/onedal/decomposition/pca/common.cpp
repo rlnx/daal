@@ -14,22 +14,14 @@
 * limitations under the License.
 *******************************************************************************/
 
-#include "onedal/decomposition/pca/common.hpp"
+#include "onedal/decomposition/pca/detail/common_impl.hpp"
+#include "onedal/data_management/detail/table_impl.hpp"
+
+using namespace dal::data_management;
 
 namespace dal {
 namespace decomposition {
 namespace pca {
-
-class detail::params_impl : public Base {
- public:
-  std::int32_t components_count = -1;
-  bool is_deterministic = false;
-};
-
-class detail::model_impl : public Base {
- public:
-  table eigenvectors;
-};
 
 using detail::params_impl;
 using detail::model_impl;
@@ -53,10 +45,10 @@ void params_base::set_is_deterministic(bool value) {
   impl_->is_deterministic = value;
 }
 
-model::model()
-  : impl_(new model_impl()) { }
+model::model(const Pimpl& impl)
+  : impl_(impl) { }
 
-table model::get_eigenvectors() const {
+Table model::get_eigenvectors() const {
   return impl_->eigenvectors;
 }
 

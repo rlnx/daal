@@ -21,7 +21,7 @@ public:
         : _impl(impl)
     { }
 
-    const T* get_host_ptr() const noexcept;
+    T* get_host_ptr() const noexcept;
 
 private:
     Pimpl _impl;
