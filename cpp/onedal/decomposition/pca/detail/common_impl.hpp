@@ -9,15 +9,15 @@ namespace decomposition {
 namespace pca {
 namespace detail {
 
-class params_impl : public Base {
+class params_impl : public base {
  public:
   std::int32_t components_count = -1;
   bool is_deterministic = false;
 };
 
-class model_impl : public Base {
+class model_impl : public base {
  public:
-  Table::Pimpl eigenvectors;
+  table::pimpl eigenvectors;
 };
 
 } // namespace detail

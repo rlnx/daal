@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2014-2019 Intel Corporation
+ * Copyright 2020 Intel Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 
 namespace dal {
 
-class detail::default_execution_context_impl : public Base {
- public:
-  cpu_extensions cpu_extensions_mask = cpu_extensions::avx;
+class detail::default_execution_context_impl : public base {
+public:
+    cpu_extensions cpu_extensions_mask = cpu_extensions::avx;
 };
 
 using detail::default_execution_context_impl;
@@ -30,11 +30,11 @@ default_execution_context::default_execution_context()
 
 void default_execution_context::set_enabled_cpu_extensions_impl(
     const cpu_extensions& extensions) noexcept {
-  impl_->cpu_extensions_mask = extensions;
+    impl_->cpu_extensions_mask = extensions;
 }
 
 cpu_extensions default_execution_context::get_enabled_cpu_extensions() const noexcept {
-  return impl_->cpu_extensions_mask;
+    return impl_->cpu_extensions_mask;
 }
 
 } // namespace dal

@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright 2020 Intel Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
+
 #pragma once
 
 #include "onedal/data_management/data_format.hpp"
@@ -10,49 +26,49 @@ namespace dal {
 namespace data_management {
 namespace detail {
 
-class HomogenTableImpl : public TableImpl {
+class homogen_table_impl : public table_impl {
 public:
     // TODO: figure out about using DataFormat object from public API here
     template <typename DataType>
-    HomogenTableImpl(const DataType* data,
+    homogen_table_impl(const DataType* data,
                      std::int32_t rows, std::int32_t cols,
-                     DataFormat fmt)
-        : TableImpl(rows, cols),
+                     data_format fmt)
+        : table_impl(rows, cols),
           _fmt(fmt),
           _type_rt(dal::detail::make_type_rt<DataType>()),
           _data_bytes(init_data(data, rows * cols * sizeof(DataType)))
     { }
 
-    ~HomogenTableImpl() {
+    ~homogen_table_impl() {
         delete[] _data_bytes;
         _data_bytes = nullptr;
     }
 
-    dal::detail::TypeRT get_type() const noexcept {
+    dal::detail::type_rt get_type() const noexcept {
         return _type_rt;
     }
 
-    DataFormat get_data_format() const noexcept {
+    data_format get_data_format() const noexcept {
         return _fmt;
     }
 
-    // TODO: warning! Usage of public class Range
-    virtual float* get_slice(float* src, Range rows, Range cols) const override;
+    // TODO: warning! Usage of public class range
+    virtual float* get_slice(float* src, range rows, range cols) const override;
 
-    // TODO: warning! Usage of public class Range
-    virtual double* get_slice(double* src, Range rows, Range cols) const override;
+    // TODO: warning! Usage of public class range
+    virtual double* get_slice(double* src, range rows, range cols) const override;
 
-    // TODO: warning! Usage of public class Range
-    virtual std::int32_t* get_slice(std::int32_t* src, Range rows, Range cols) const override;
+    // TODO: warning! Usage of public class range
+    virtual std::int32_t* get_slice(std::int32_t* src, range rows, range cols) const override;
 
-    // TODO: warning! Usage of public class Range
-    virtual void release_slice(float* data, Range rows, Range cols) override;
+    // TODO: warning! Usage of public class range
+    virtual void release_slice(float* data, range rows, range cols) override;
 
-    // TODO: warning! Usage of public class Range
-    virtual void release_slice(double* data, Range rows, Range cols) override;
+    // TODO: warning! Usage of public class range
+    virtual void release_slice(double* data, range rows, range cols) override;
 
-    // TODO: warning! Usage of public class Range
-    virtual void release_slice(std::int32_t* data, Range rows, Range cols) override;
+    // TODO: warning! Usage of public class range
+    virtual void release_slice(std::int32_t* data, range rows, range cols) override;
 
 private:
     template <typename DataType>
@@ -65,11 +81,11 @@ private:
     }
 
     template <typename DataType>
-    DataType* get_slice_impl(Range rows, Range cols) const;
+    DataType* get_slice_impl(range rows, range cols) const;
 
 private:
-    DataFormat _fmt;
-    dal::detail::TypeRT _type_rt;
+    data_format _fmt;
+    dal::detail::type_rt _type_rt;
 
     char* _data_bytes;
     bool _is_data_copied;

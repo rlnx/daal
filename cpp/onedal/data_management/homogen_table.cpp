@@ -7,13 +7,13 @@ namespace dal {
 namespace data_management {
 
 template<typename DataType>
-HomogenTable::HomogenTable(const DataType* data, int32_t rows, int32_t cols, DataFormat df)
-    : Table(Table::Pimpl(new detail::HomogenTableImpl(data, rows, cols, df)))
+homogen_table::homogen_table(const DataType* data, int32_t rows, int32_t cols, data_format df)
+    : table(table::pimpl(new detail::HomogenTableImpl(data, rows, cols, df)))
 { }
 
-template HomogenTable::HomogenTable<float>(const float* data, int32_t rows, int32_t cols, DataFormat df);
-template HomogenTable::HomogenTable<double>(const double* data, int32_t rows, int32_t cols, DataFormat df);
-template HomogenTable::HomogenTable<std::int32_t>(const std::int32_t* data, int32_t rows, int32_t cols, DataFormat df);
+template homogen_table::HomogenTable<float>(const float* data, int32_t rows, int32_t cols, DataFormat df);
+template homogen_table::HomogenTable<double>(const double* data, int32_t rows, int32_t cols, DataFormat df);
+template homogen_table::HomogenTable<std::int32_t>(const std::int32_t* data, int32_t rows, int32_t cols, DataFormat df);
 
 } // namespace data_management
 } // namespace dal

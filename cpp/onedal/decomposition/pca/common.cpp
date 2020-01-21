@@ -45,10 +45,10 @@ void params_base::set_is_deterministic(bool value) {
   impl_->is_deterministic = value;
 }
 
-model::model(const Pimpl& impl)
+model::model(const pimpl& impl)
   : impl_(impl) { }
 
-Table model::get_eigenvectors() const {
+table model::get_eigenvectors() const {
   return impl_->eigenvectors;
 }
 

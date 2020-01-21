@@ -26,33 +26,33 @@ namespace pca {
 using detail::train_input_impl;
 using detail::train_result_impl;
 
-train_input::train_input(const Table& data)
+train_input::train_input(const table& data)
     : impl_(new train_input_impl(data)) {}
 
-auto train_input::get_data() const -> Table {
+auto train_input::get_data() const -> table {
   return impl_->data;
 }
 
-void train_input::set_data_impl(const Table& data) {
+void train_input::set_data_impl(const table& data) {
   impl_->data = data;
 }
 
-train_result::train_result(const Pimpl& impl)
+train_result::train_result(const pimpl& impl)
     : impl_(impl) {}
 
 auto train_result::get_model() const -> model {
   return impl_->trained_model;
 }
 
-auto train_result::get_eigenvalues() const -> Table {
+auto train_result::get_eigenvalues() const -> table {
   return impl_->eigenvalues;
 }
 
-auto train_result::get_eigenvectors() const -> Table {
+auto train_result::get_eigenvectors() const -> table {
   return impl_->eigenvectors;
 }
 
-auto train_result::get_explained_variance() const -> Table {
+auto train_result::get_explained_variance() const -> table {
   return impl_->explained_variance;
 }
 

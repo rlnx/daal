@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright 2020 Intel Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
+
 #include "onedal/data_management/table.hpp"
 #include "onedal/data_management/detail/table_impl.hpp"
 
@@ -6,35 +22,35 @@ using std::int32_t;
 namespace dal {
 namespace data_management {
 
-int32_t Table::get_num_rows() const noexcept {
+int32_t table::get_num_rows() const noexcept {
     return _impl->get_num_rows();
 }
 
-int32_t Table::get_num_cols() const noexcept {
+int32_t table::get_num_cols() const noexcept {
     return _impl->get_num_cols();
 }
 
-Slice Table::row(int32_t idx) const {
-    // TODO: check that index is correct. 
+slice table::row(int32_t idx) const {
+    // TODO: check that index is correct.
     // How to organize error handling?
-    return Slice(_impl, Range{idx, idx+1}, Range{0, -1});
+    return slice(_impl, range{idx, idx+1}, range{0, -1});
 }
 
-Slice Table::col(int32_t idx) const {
-    // TODO: check that index is correct. 
+slice table::col(int32_t idx) const {
+    // TODO: check that index is correct.
     // How to organize error handling?
-    return Slice(_impl, Range{0, -1}, Range {idx, idx+1});
+    return slice(_impl, range{0, -1}, range {idx, idx+1});
 }
 
-Slice Table::rows(const Range& r) const {
-    // TODO: check that range is correct. 
+slice table::rows(const range& r) const {
+    // TODO: check that range is correct.
     // How to organize error handling?
-    return Slice(_impl, r, Range{0, -1});
+    return slice(_impl, r, range{0, -1});
 }
-Slice Table::cols(const Range& r) const {
-    // TODO: check that range is correct. 
+slice table::cols(const range& r) const {
+    // TODO: check that range is correct.
     // How to organize error handling?
-    return Slice(_impl, Range{0, -1}, r);
+    return slice(_impl, range{0, -1}, r);
 }
 
 } // namespace data_management

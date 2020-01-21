@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright 2020 Intel Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
+
 #include "onedal/data_management/detail/homogen_table_impl.hpp"
 
 using std::int32_t;
@@ -6,36 +22,36 @@ namespace dal {
 namespace data_management {
 namespace detail {
 
-float* HomogenTableImpl::get_slice(float* src, Range rows, Range cols) const {
+float* homogen_table_impl::get_slice(float* src, range rows, range cols) const {
     return get_slice_impl<float>(rows, cols);
 }
 
-double* HomogenTableImpl::get_slice(double* src, Range rows, Range cols) const {
+double* homogen_table_impl::get_slice(double* src, range rows, range cols) const {
     return get_slice_impl<double>(rows, cols);
 }
 
-int32_t* HomogenTableImpl::get_slice(int32_t* src, Range rows, Range cols) const {
+int32_t* homogen_table_impl::get_slice(int32_t* src, range rows, range cols) const {
     return get_slice_impl<int32_t>(rows, cols);
 }
 
-void HomogenTableImpl::release_slice(float* data, Range rows, Range cols) {
+void homogen_table_impl::release_slice(float* data, range rows, range cols) {
 
 }
 
-void HomogenTableImpl::release_slice(double* data, Range rows, Range cols) {
+void homogen_table_impl::release_slice(double* data, range rows, range cols) {
 
 }
 
-void HomogenTableImpl::release_slice(int32_t* data, Range rows, Range cols) {
+void homogen_table_impl::release_slice(int32_t* data, range rows, range cols) {
 
 }
 
 template <typename DataType>
-DataType* HomogenTableImpl::get_slice_impl(Range rows, Range cols) const {
+DataType* homogen_table_impl::get_slice_impl(range rows, range cols) const {
     const int32_t end_row = rows.end_idx == rows.last_element_idx ? get_num_rows() : rows.end_idx;
     const int32_t end_col = cols.end_idx == cols.last_element_idx ? get_num_cols() : cols.end_idx;
 
-    const int32_t ld_data = (_fmt == DataFormat::rowmajor) ? get_num_cols() : get_num_rows();
+    const int32_t ld_data = (_fmt == data_format::rowmajor) ? get_num_cols() : get_num_rows();
 
     int32_t offset_x = cols.start_idx;
     int32_t offset_y = rows.start_idx;
@@ -44,7 +60,7 @@ DataType* HomogenTableImpl::get_slice_impl(Range rows, Range cols) const {
     int32_t num_x = (end_col - cols.start_idx - 1) / cols.step + 1;
     int32_t num_y = (end_row - rows.start_idx - 1) / rows.step + 1;
 
-    if (_fmt == DataFormat::colmajor) {
+    if (_fmt == data_format::colmajor) {
         offset_x = rows.start_idx;
         offset_y = cols.start_idx;
         step_x = rows.step;

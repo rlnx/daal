@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright 2020 Intel Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
+
 #pragma once
 
 #include "onedal/common.hpp"
@@ -8,19 +24,19 @@ namespace dal {
 namespace data_management {
 
 namespace detail {
-class TableImpl;
+class table_impl;
 } // namespace detail
 
-class Table : public Base {
+class table : public base {
 public:
-    using Pimpl = dal::detail::Pimpl<detail::TableImpl>;
+    using pimpl = dal::detail::pimpl<detail::table_impl>;
 
 public:
-    Table(const Table& table)
+    table(const table& table)
         : _impl(table._impl)
     { }
 
-    Table(const Pimpl& impl)
+    table(const pimpl& impl)
         : _impl(impl)
     { }
 
@@ -30,21 +46,21 @@ public:
     // TODO: this methods is the same with row(), rows(),
     // col(), cols() in Slice class.
     // need to generalize them?
-    Slice row(std::int32_t idx) const;
-    Slice col(std::int32_t idx) const;
-    Slice rows(const Range& r) const;
-    Slice cols(const Range& r) const;
+    slice row(std::int32_t idx) const;
+    slice col(std::int32_t idx) const;
+    slice rows(const range& r) const;
+    slice cols(const range& r) const;
 
-    detail::TableImpl* get_impl_ptr() const noexcept {
+    detail::table_impl* get_impl_ptr() const noexcept {
         return _impl.get();
     }
 
-    Pimpl get_impl() const noexcept {
+    pimpl get_impl() const noexcept {
         return _impl;
     }
 
 private:
-    Pimpl _impl;
+    pimpl _impl;
 };
 
 } // namespace data_management

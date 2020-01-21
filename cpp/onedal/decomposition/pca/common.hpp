@@ -36,7 +36,7 @@ struct svd {};
 using by_default = cov;
 } // namespace method
 
-class params_base : public Base {
+class params_base : public base {
  public:
   using tag_t = detail::tag;
   using float_t = float;
@@ -51,7 +51,7 @@ class params_base : public Base {
   void set_is_deterministic(bool value);
 
  private:
-  dal::detail::Pimpl<detail::params_impl> impl_;
+  dal::detail::pimpl<detail::params_impl> impl_;
 };
 
 template <typename Float  = params_base::float_t,
@@ -72,17 +72,17 @@ class params : public params_base {
   }
 };
 
-class model : public Base {
+class model : public base {
 public:
-  using Pimpl = dal::detail::Pimpl<detail::model_impl>;
+  using pimpl = dal::detail::pimpl<detail::model_impl>;
 
 public:
-  model(const Pimpl& impl);
+  model(const pimpl& impl);
 
-  data_management::Table get_eigenvectors() const;
+  data_management::table get_eigenvectors() const;
 
 private:
-  dal::detail::Pimpl<detail::model_impl> impl_;
+  dal::detail::pimpl<detail::model_impl> impl_;
 };
 
 } // namespace pca

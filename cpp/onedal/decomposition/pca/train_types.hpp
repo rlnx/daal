@@ -27,36 +27,36 @@ class train_input_impl;
 class train_result_impl;
 } // namespace detail
 
-class train_input : public Base {
+class train_input : public base {
  public:
-  train_input(const data_management::Table& data);
+  train_input(const data_management::table& data);
 
-  data_management::Table get_data() const;
+  data_management::table get_data() const;
 
-  auto& set_data(const data_management::Table& data) {
+  auto& set_data(const data_management::table& data) {
     set_data_impl(data);
     return *this;
   }
 
  private:
-  void set_data_impl(const data_management::Table& data);
-  dal::detail::Pimpl<detail::train_input_impl> impl_;
+  void set_data_impl(const data_management::table& data);
+  dal::detail::pimpl<detail::train_input_impl> impl_;
 };
 
 class train_result {
  public:
-  using Pimpl = dal::detail::Pimpl<detail::train_result_impl>;
+  using pimpl = dal::detail::pimpl<detail::train_result_impl>;
 
  public:
-  train_result(const Pimpl& impl);
+  train_result(const pimpl& impl);
 
   auto get_model() const -> model;
-  data_management::Table get_eigenvalues() const;
-  data_management::Table get_eigenvectors() const;
-  data_management::Table get_explained_variance() const;
+  data_management::table get_eigenvalues() const;
+  data_management::table get_eigenvectors() const;
+  data_management::table get_explained_variance() const;
 
  private:
-  dal::detail::Pimpl<detail::train_result_impl> impl_;
+  dal::detail::pimpl<detail::train_result_impl> impl_;
 };
 
 } // namespace pca

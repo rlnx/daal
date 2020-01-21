@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright 2020 Intel Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
+
 #pragma once
 
 #include "onedal/data_management/table.hpp"
@@ -7,22 +23,22 @@ namespace dal {
 namespace data_management {
 
 namespace detail {
-class HomogenTableImpl;
+class homogen_table_impl;
 } // namespace detail
 
-class HomogenTable : public Table {
+class homogen_table : public table {
 public:
-    using Pimpl = dal::detail::Pimpl<detail::HomogenTableImpl>;
+    using pimpl = dal::detail::pimpl<detail::homogen_table_impl>;
 
-    HomogenTable(const HomogenTable& table)
-        : Table(table.get_impl())
+    homogen_table(const homogen_table& table)
+        : table(table.get_impl())
     { }
 
     template<typename DataType>
-    HomogenTable(const DataType* data, std::int32_t rows, std::int32_t cols, DataFormat df);
+    homogen_table(const DataType* data, std::int32_t rows, std::int32_t cols, data_format df);
 
-    detail::HomogenTableImpl* get_impl_ptr() const noexcept {
-        return reinterpret_cast<detail::HomogenTableImpl*>(Table::get_impl_ptr());
+    detail::homogen_table_impl* get_impl_ptr() const noexcept {
+        return reinterpret_cast<detail::homogen_table_impl*>(table::get_impl_ptr());
     }
 };
 

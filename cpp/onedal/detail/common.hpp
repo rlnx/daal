@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2014-2019 Intel Corporation
+ * Copyright 2020 Intel Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,12 +28,10 @@ namespace dal {
 namespace detail {
 
 template <typename T>
-using Shared = std::shared_ptr<T>;
+using shared = std::shared_ptr<T>;
 
 template <typename T>
-using Pimpl = Shared<T>;
-
-
+using pimpl = shared<T>;
 
 }  // namespace detail
 }  // namespace dal
