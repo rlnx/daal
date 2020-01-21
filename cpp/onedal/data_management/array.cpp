@@ -1,6 +1,8 @@
 #include "onedal/data_management/array.hpp"
 #include "onedal/data_management/detail/array_impl.hpp"
 
+using std::int32_t;
+
 namespace dal {
 namespace data_management {
 
@@ -11,7 +13,7 @@ const T* Array<T>::get_host_ptr() const noexcept {
 
 template class Array<float>;
 template class Array<double>;
-template class Array<std::int32_t>;
+template class Array<int32_t>;
 
 } // namespace data_management
 } // namespace dal

@@ -1,5 +1,4 @@
 #include "onedal/data_management/detail/homogen_table_impl.hpp"
-#include <iostream>
 
 using std::int32_t;
 

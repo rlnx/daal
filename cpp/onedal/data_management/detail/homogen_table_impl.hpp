@@ -1,8 +1,6 @@
 #pragma once
 
-#include "onedal/common.hpp"
 #include "onedal/data_management/data_format.hpp"
-#include "onedal/data_management/homogen_table.hpp"
 #include "onedal/data_management/detail/table_impl.hpp"
 #include "onedal/detail/type_rt.hpp"
 
@@ -76,11 +74,6 @@ private:
     char* _data_bytes;
     bool _is_data_copied;
 };
-
-template <typename DataType>
-HomogenTable create_table(const DataType* data, std::int32_t rows, std::int32_t cols, DataFormat df) {
-    return HomogenTable(data, rows, cols, df);
-}
 
 } // namespace detail
 } // namespace data_management
