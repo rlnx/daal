@@ -16,38 +16,21 @@
 
 #pragma once
 
-#include "onedal/common.hpp"
-#include "onedal/data_management/detail/slice_impl.hpp"
 #include "onedal/detail/common.hpp"
+#include "onedal/data_management/detail/slicable.hpp"
 
 namespace dal {
 namespace data_management {
 namespace detail {
 
-// TODO: this is particular array impl for slices,
-// rename it
-template <typename T>
-class array_impl {
+class slice_impl {
 public:
-    using slice_ptr = dal::detail::pimpl<slice_impl>;
+    using pimpl_data_owner = dal::detail::pimpl<detail::slicable>;
 
 public:
-    array_impl(const slice_ptr& slice)
-        : _slice(slice) {
-        _data = _slice->data_owner->get_slice(_data, _slice->rows, _slice->cols);
-    }
-
-    ~array_impl() {
-        _slice->data_owner->release_slice(_data, _slice->rows, _slice->cols);
-    }
-
-    T* get_data_ptr() const noexcept {
-        return _data;
-    }
-
-private:
-    slice_ptr _slice;
-    T* _data;
+    pimpl_data_owner data_owner;
+    range rows;
+    range cols;
 };
 
 } // namespace detail

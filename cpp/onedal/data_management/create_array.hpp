@@ -16,6 +16,7 @@
 
 #pragma once
 
+//TODO: reimplement that not to include details here
 #include "onedal/data_management/detail/create_array.hpp"
 
 namespace dal {

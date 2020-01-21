@@ -27,9 +27,7 @@ namespace detail {
 template <typename T>
 array<T> create_array(const slice& slice) {
     using array_pimpl = typename array<T>::pimpl;
-    array_pimpl impl { new array_impl<T>(slice.get_data_owner_impl(),
-                                         slice.get_rows_range(),
-                                         slice.get_cols_range()) };
+    array_pimpl impl { new array_impl<T>(slice.get_impl()) };
     return array<T>(impl);
 }
 

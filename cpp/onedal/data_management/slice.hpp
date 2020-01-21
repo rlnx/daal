@@ -22,37 +22,27 @@ namespace dal {
 namespace data_management {
 
 namespace detail {
-class slicable;
+class slice_impl;
 } // namespace detail
 
-// TODO: think of how to semantically distinguish
-// "simple" and "complex" types
 class slice : public base {
 public:
-    using pimpl_data_owner = dal::detail::pimpl<detail::slicable>;
+    using pimpl = dal::detail::pimpl<detail::slice_impl>;
 
 public:
-    slice(const pimpl_data_owner& impl, range rows_range, range cols_range)
-        : _data_owner(impl),
-          _rows(rows_range),
-          _cols(cols_range)
-    { } // TODO: check that ranges are correct
+    slice(const pimpl& impl)
+        : _impl(impl)
+    { }
 
     std::int32_t get_num_rows() const noexcept;
     std::int32_t get_num_cols() const noexcept;
-
-    const range& get_rows_range() const noexcept {
-        return _rows;
-    }
-
-    const range& get_cols_range() const noexcept {
-        return _cols;
-    }
+    const range& get_rows_range() const noexcept;
+    const range& get_cols_range() const noexcept;
 
     // TODO: too big exposure of details
     // need to make SliceImpl?
-    pimpl_data_owner get_data_owner_impl() const noexcept {
-        return _data_owner;
+    const pimpl& get_impl() const noexcept {
+        return _impl;
     }
 
     slice& row(std::int32_t idx);
@@ -61,9 +51,7 @@ public:
     slice& cols(range r);
 
 private:
-    pimpl_data_owner _data_owner;
-    range _rows;
-    range _cols;
+    pimpl _impl;
 };
 
 } // namespace data_management

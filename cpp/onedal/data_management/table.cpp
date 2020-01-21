@@ -16,6 +16,7 @@
 
 #include "onedal/data_management/table.hpp"
 #include "onedal/data_management/detail/table_impl.hpp"
+#include "onedal/data_management/detail/slice_impl.hpp"
 
 using std::int32_t;
 
@@ -33,24 +34,34 @@ int32_t table::get_num_cols() const noexcept {
 slice table::row(int32_t idx) const {
     // TODO: check that index is correct.
     // How to organize error handling?
-    return slice(_impl, range{idx, idx+1}, range{0, -1});
+    return slice{ create_slice_impl({idx, idx+1}, {0, -1}) };
 }
 
 slice table::col(int32_t idx) const {
     // TODO: check that index is correct.
     // How to organize error handling?
-    return slice(_impl, range{0, -1}, range {idx, idx+1});
+    return slice{ create_slice_impl({0, -1}, {idx, idx+1}) };
 }
 
 slice table::rows(const range& r) const {
     // TODO: check that range is correct.
     // How to organize error handling?
-    return slice(_impl, r, range{0, -1});
+    return slice{ create_slice_impl(r, {0, -1}) };
 }
 slice table::cols(const range& r) const {
     // TODO: check that range is correct.
     // How to organize error handling?
-    return slice(_impl, range{0, -1}, r);
+    return slice{ create_slice_impl({0, -1}, r) };
+}
+
+slice::pimpl table::create_slice_impl(const range& rows, const range& cols) const noexcept {
+    return slice::pimpl {
+        new detail::slice_impl {
+            .data_owner = _impl,
+            .rows = rows,
+            .cols = cols
+        }
+    };
 }
 
 } // namespace data_management

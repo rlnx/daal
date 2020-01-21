@@ -55,9 +55,11 @@ public:
         return _impl.get();
     }
 
-    pimpl get_impl() const noexcept {
+    const pimpl& get_impl() const noexcept {
         return _impl;
     }
+private:
+    slice::pimpl create_slice_impl(const range& rows, const range& cols) const noexcept;
 
 private:
     pimpl _impl;
