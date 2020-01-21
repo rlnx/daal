@@ -17,11 +17,12 @@
 #pragma once
 
 #include "onedal/detail/common.hpp"
-#include "onedal/data_management/detail/slicable.hpp"
 
 namespace dal {
 namespace data_management {
 namespace detail {
+
+class slicable;
 
 class slice_impl {
 public:
@@ -29,8 +30,12 @@ public:
 
 public:
     pimpl_data_owner data_owner;
+
     range rows;
     range cols;
+
+    bool need_update_data = true;
+    bool is_slice_data_copied = false;
 };
 
 } // namespace detail

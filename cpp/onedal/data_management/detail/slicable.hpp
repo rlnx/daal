@@ -17,6 +17,7 @@
 #pragma once
 
 #include "onedal/common.hpp"
+#include "onedal/data_management/detail/slice_impl.hpp"
 
 namespace dal {
 namespace data_management {
@@ -27,19 +28,13 @@ public:
     virtual std::int32_t get_num_rows() const noexcept = 0;
     virtual std::int32_t get_num_cols() const noexcept = 0;
 
-    // TODO: warning! Usage of public class range
-    virtual float* get_slice(float* src, range rows, range cols) const = 0;
-    // TODO: warning! Usage of public class range
-    virtual double* get_slice(double* src, range rows, range cols) const = 0;
-    // TODO: warning! Usage of public class range
-    virtual std::int32_t* get_slice(std::int32_t* src, range rows, range cols) const = 0;
+    virtual float* get_slice_data(slice_impl&, float*) const = 0;
+    virtual double* get_slice_data(slice_impl&, double*) const = 0;
+    virtual std::int32_t* get_slice_data(slice_impl&, std::int32_t*) const = 0;
 
-    // TODO: warning! Usage of public class range
-    virtual void release_slice(float* data, range rows, range cols) = 0;
-    // TODO: warning! Usage of public class range
-    virtual void release_slice(double* data, range rows, range cols) = 0;
-    // TODO: warning! Usage of public class range
-    virtual void release_slice(std::int32_t* data, range rows, range cols) = 0;
+    virtual void release_slice_data(slice_impl&, float*) = 0;
+    virtual void release_slice_data(slice_impl&, double*) = 0;
+    virtual void release_slice_data(slice_impl&, std::int32_t*) = 0;
 };
 
 } // namespace detail

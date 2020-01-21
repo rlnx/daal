@@ -17,8 +17,9 @@
 #pragma once
 
 #include "onedal/common.hpp"
-#include "onedal/data_management/detail/slice_impl.hpp"
 #include "onedal/detail/common.hpp"
+#include "onedal/data_management/detail/slicable.hpp"
+#include "onedal/data_management/detail/slice_impl.hpp"
 
 namespace dal {
 namespace data_management {
@@ -34,11 +35,11 @@ public:
 public:
     array_impl(const slice_ptr& slice)
         : _slice(slice) {
-        _data = _slice->data_owner->get_slice(_data, _slice->rows, _slice->cols);
+        _data = _slice->data_owner->get_slice_data(*_slice, _data);
     }
 
     ~array_impl() {
-        _slice->data_owner->release_slice(_data, _slice->rows, _slice->cols);
+        _slice->data_owner->release_slice_data(*_slice, _data);
     }
 
     T* get_data_ptr() const noexcept {

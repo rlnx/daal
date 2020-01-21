@@ -16,11 +16,11 @@
 
 #pragma once
 
+#include <cstring>
+
 #include "onedal/data_management/data_format.hpp"
 #include "onedal/data_management/detail/table_impl.hpp"
 #include "onedal/detail/type_rt.hpp"
-
-#include <cstring>
 
 namespace dal {
 namespace data_management {
@@ -52,23 +52,13 @@ public:
         return _fmt;
     }
 
-    // TODO: warning! Usage of public class range
-    virtual float* get_slice(float* src, range rows, range cols) const override;
+    virtual float* get_slice_data(slice_impl&, float*) const override;
+    virtual double* get_slice_data(slice_impl&, double*) const override;
+    virtual std::int32_t* get_slice_data(slice_impl&, std::int32_t*) const override;
 
-    // TODO: warning! Usage of public class range
-    virtual double* get_slice(double* src, range rows, range cols) const override;
-
-    // TODO: warning! Usage of public class range
-    virtual std::int32_t* get_slice(std::int32_t* src, range rows, range cols) const override;
-
-    // TODO: warning! Usage of public class range
-    virtual void release_slice(float* data, range rows, range cols) override;
-
-    // TODO: warning! Usage of public class range
-    virtual void release_slice(double* data, range rows, range cols) override;
-
-    // TODO: warning! Usage of public class range
-    virtual void release_slice(std::int32_t* data, range rows, range cols) override;
+    virtual void release_slice_data(slice_impl&, float*) override;
+    virtual void release_slice_data(slice_impl&, double*) override;
+    virtual void release_slice_data(slice_impl&, std::int32_t*) override;
 
 private:
     template <typename DataType>
@@ -81,7 +71,10 @@ private:
     }
 
     template <typename DataType>
-    DataType* get_slice_impl(range rows, range cols) const;
+    DataType* get_slice_impl(slice_impl&) const;
+
+    template <typename DataType>
+    void release_slice_impl(slice_impl&, DataType*) const;
 
 private:
     data_format _fmt;

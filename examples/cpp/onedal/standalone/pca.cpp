@@ -4,7 +4,6 @@
 #include "onedal/data_management/create_table.hpp"
 #include "onedal/data_management/create_array.hpp"
 
-
 int main(int argc, char const *argv[]) {
     using namespace dal::decomposition;
 

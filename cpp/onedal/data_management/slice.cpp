@@ -15,6 +15,7 @@
  *******************************************************************************/
 
 #include "onedal/data_management/slice.hpp"
+#include "onedal/data_management/detail/slicable.hpp"
 #include "onedal/data_management/detail/slice_impl.hpp"
 
 using std::int32_t;

@@ -22,59 +22,59 @@ namespace dal {
 namespace data_management {
 namespace detail {
 
-float* homogen_table_impl::get_slice(float* src, range rows, range cols) const {
-    return get_slice_impl<float>(rows, cols);
+float* homogen_table_impl::get_slice_data(slice_impl& s, float*) const {
+    return get_slice_impl<float>(s);
 }
 
-double* homogen_table_impl::get_slice(double* src, range rows, range cols) const {
-    return get_slice_impl<double>(rows, cols);
+double* homogen_table_impl::get_slice_data(slice_impl& s, double*) const {
+    return get_slice_impl<double>(s);
 }
 
-int32_t* homogen_table_impl::get_slice(int32_t* src, range rows, range cols) const {
-    return get_slice_impl<int32_t>(rows, cols);
+int32_t* homogen_table_impl::get_slice_data(slice_impl& s, int32_t*) const {
+    return get_slice_impl<int32_t>(s);
 }
 
-void homogen_table_impl::release_slice(float* data, range rows, range cols) {
-
+void homogen_table_impl::release_slice_data(slice_impl& s, float* data) {
+    release_slice_impl(s, data);
 }
 
-void homogen_table_impl::release_slice(double* data, range rows, range cols) {
-
+void homogen_table_impl::release_slice_data(slice_impl& s, double* data) {
+    release_slice_impl(s, data);
 }
 
-void homogen_table_impl::release_slice(int32_t* data, range rows, range cols) {
-
+void homogen_table_impl::release_slice_data(slice_impl& s, int32_t* data) {
+    release_slice_impl(s, data);
 }
 
 template <typename DataType>
-DataType* homogen_table_impl::get_slice_impl(range rows, range cols) const {
-    const int32_t end_row = rows.end_idx == rows.last_element_idx ? get_num_rows() : rows.end_idx;
-    const int32_t end_col = cols.end_idx == cols.last_element_idx ? get_num_cols() : cols.end_idx;
+DataType* homogen_table_impl::get_slice_impl(slice_impl& s) const {
+    const int32_t end_row = s.rows.end_idx == s.rows.last_element_idx ? get_num_rows() : s.rows.end_idx;
+    const int32_t end_col = s.cols.end_idx == s.cols.last_element_idx ? get_num_cols() : s.cols.end_idx;
 
     const int32_t ld_data = (_fmt == data_format::rowmajor) ? get_num_cols() : get_num_rows();
 
-    int32_t offset_x = cols.start_idx;
-    int32_t offset_y = rows.start_idx;
-    int32_t step_x = cols.step;
-    int32_t step_y = rows.step;
-    int32_t num_x = (end_col - cols.start_idx - 1) / cols.step + 1;
-    int32_t num_y = (end_row - rows.start_idx - 1) / rows.step + 1;
+    int32_t offset_x = s.cols.start_idx;
+    int32_t offset_y = s.rows.start_idx;
+    int32_t step_x = s.cols.step;
+    int32_t step_y = s.rows.step;
+    int32_t num_x = (end_col - s.cols.start_idx - 1) / s.cols.step + 1;
+    int32_t num_y = (end_row - s.rows.start_idx - 1) / s.rows.step + 1;
 
     if (_fmt == data_format::colmajor) {
-        offset_x = rows.start_idx;
-        offset_y = cols.start_idx;
-        step_x = rows.step;
-        step_y = cols.step;
-        num_x = (end_row - rows.start_idx - 1) / rows.step + 1;
-        num_y = (end_col - cols.start_idx - 1) / cols.step + 1;
+        offset_x = s.rows.start_idx;
+        offset_y = s.cols.start_idx;
+        step_x = s.rows.step;
+        step_y = s.cols.step;
+        num_x = (end_row - s.rows.start_idx - 1) / s.rows.step + 1;
+        num_y = (end_col - s.cols.start_idx - 1) / s.cols.step + 1;
     }
 
     if (_type_rt == dal::detail::make_type_rt<DataType>()) {
-        const bool need_copy = (step_x != 1) || (step_y != 1) || (num_y > 1 && num_x != ld_data);
+        s.need_update_data = (step_x != 1) || (step_y != 1) || (num_y > 1 && num_x != ld_data);
 
         DataType* data = reinterpret_cast<DataType*>(_data_bytes);
 
-        if (need_copy) {
+        if (s.need_update_data) {
             DataType* out_array = new DataType[num_x * num_y];
             for (int y = 0; y < num_y; y++) {
                 for (int x = 0; x < num_x; x++) {
@@ -89,6 +89,20 @@ DataType* homogen_table_impl::get_slice_impl(range rows, range cols) const {
     }
     // TODO: implement conversion
     return nullptr;
+}
+
+template <typename DataType>
+void homogen_table_impl::release_slice_impl(slice_impl& s, DataType* data) const {
+    if (s.need_update_data) {
+        // TODO: implement data update
+    }
+    s.need_update_data = false;
+    
+    if (s.is_slice_data_copied) {
+        delete[] data;
+        data = nullptr;
+    }
+    s.is_slice_data_copied = false;
 }
 
 } // namespace detail
