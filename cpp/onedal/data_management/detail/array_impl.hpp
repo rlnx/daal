@@ -27,11 +27,11 @@ namespace detail {
 template <typename T>
 class array_impl {
 public:
-    using DataOwnerPtr = dal::detail::pimpl<Slicable>;
+    using data_owner_ptr = dal::detail::pimpl<slicable>;
 
 public:
     // TODO: warning! Usage of public class range
-    array_impl(const DataOwnerPtr& dataOwner, range rows, range cols)
+    array_impl(const data_owner_ptr& dataOwner, range rows, range cols)
         : _dataOwner(dataOwner),
           _rows(rows),
           _cols(cols) {
@@ -47,7 +47,7 @@ public:
     }
 
 private:
-    DataOwnerPtr _dataOwner;
+    data_owner_ptr _dataOwner;
 
     range _rows;
     range _cols;

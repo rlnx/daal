@@ -30,8 +30,8 @@ class homogen_table : public table {
 public:
     using pimpl = dal::detail::pimpl<detail::homogen_table_impl>;
 
-    homogen_table(const homogen_table& table)
-        : table(table.get_impl())
+    homogen_table(const homogen_table& t)
+        : table(t.get_impl())
     { }
 
     template<typename DataType>

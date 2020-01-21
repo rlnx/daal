@@ -26,10 +26,11 @@ namespace detail {
 // TODO: use internal allocator instead of new()
 template <typename T>
 array<T> create_array(const slice& slice) {
-    using ArrayPimpl = typename array<T>::pimpl;
-    return array<T>(ArrayPimpl(new ArrayImpl<T>(slice.get_data_owner_impl(),
-                                                slice.get_rows_range(),
-                                                slice.get_cols_range())));
+    using array_pimpl = typename array<T>::pimpl;
+    array_pimpl impl { new array_impl<T>(slice.get_data_owner_impl(),
+                                         slice.get_rows_range(),
+                                         slice.get_cols_range()) };
+    return array<T>(impl);
 }
 
 template array<float> create_array(const slice&);
