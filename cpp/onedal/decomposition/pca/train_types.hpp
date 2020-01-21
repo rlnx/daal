@@ -27,7 +27,7 @@ class train_input_impl;
 class train_result_impl;
 } // namespace detail
 
-class train_input : public base {
+class train_input : public Base {
  public:
   train_input(const table& data);
 
@@ -40,7 +40,7 @@ class train_input : public base {
 
  private:
   void set_data_impl(const table& data);
-  dal::detail::pimpl<detail::train_input_impl> impl_;
+  dal::detail::Pimpl<detail::train_input_impl> impl_;
 };
 
 class train_result {
@@ -53,7 +53,7 @@ class train_result {
   auto get_explained_variance() const -> table;
 
  private:
-  dal::detail::pimpl<detail::train_result_impl> impl_;
+  dal::detail::Pimpl<detail::train_result_impl> impl_;
 };
 
 } // namespace pca

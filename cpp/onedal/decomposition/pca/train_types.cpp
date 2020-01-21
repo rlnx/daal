@@ -20,7 +20,7 @@ namespace dal {
 namespace decomposition {
 namespace pca {
 
-class detail::train_input_impl : public base {
+class detail::train_input_impl : public Base {
  public:
   train_input_impl(const table& data)
       : data(data) {}
@@ -28,7 +28,7 @@ class detail::train_input_impl : public base {
   table data;
 };
 
-class detail::train_result_impl : public base {
+class detail::train_result_impl : public Base {
  public:
   model trained_model;
   table eigenvalues;

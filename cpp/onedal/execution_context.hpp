@@ -39,7 +39,7 @@ enum class cpu_extensions : uint64_t {
   avx512 = 1U << 5
 };
 
-class default_execution_context : public base {
+class default_execution_context : public Base {
  public:
   using tag_t = detail::execution_context_tag;
   default_execution_context();
@@ -53,7 +53,7 @@ class default_execution_context : public base {
 
  private:
   void set_enabled_cpu_extensions_impl(const cpu_extensions& extensions) noexcept;
-  dal::detail::pimpl<detail::default_execution_context_impl> impl_;
+  dal::detail::Pimpl<detail::default_execution_context_impl> impl_;
 };
 
 inline auto make_context() {

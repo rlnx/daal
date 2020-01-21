@@ -16,10 +16,12 @@
 
 #pragma once
 
-#include "onedal/table.hpp"
 #include "onedal/detail/common.hpp"
 
 namespace dal {
+
+class table{};
+
 namespace decomposition {
 namespace pca {
 
@@ -35,7 +37,7 @@ struct svd {};
 using by_default = cov;
 } // namespace method
 
-class params_base : public base {
+class params_base : public Base {
  public:
   using tag_t = detail::tag;
   using float_t = float;
@@ -50,7 +52,7 @@ class params_base : public base {
   void set_is_deterministic(bool value);
 
  private:
-  dal::detail::pimpl<detail::params_impl> impl_;
+  dal::detail::Pimpl<detail::params_impl> impl_;
 };
 
 template <typename Float  = params_base::float_t,
@@ -71,14 +73,14 @@ class params : public params_base {
   }
 };
 
-class model : public base {
+class model : public Base {
  public:
   model();
 
   table get_eigenvectors() const;
 
  private:
-  dal::detail::pimpl<detail::model_impl> impl_;
+  dal::detail::Pimpl<detail::model_impl> impl_;
 };
 
 } // namespace pca

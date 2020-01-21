@@ -6,6 +6,7 @@ cc_binary(
   copts = COMMON_COPTS,
   deps = [
     "//cpp/onedal/decomposition/pca",
+    "//cpp/onedal/data_management",
     "//cpp/daal:threading_tbb",
   ],
 )

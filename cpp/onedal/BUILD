@@ -1,24 +1,6 @@
 load("//build/bazel:rules.bzl", "dal_module",
                                 "dal_dpcpp_module")
 
-cc_library(
-    name = "dm",
-    srcs = glob(["data_management/**/*.cpp"]),
-    hdrs = glob(["data_management/**/*.hpp"]) + 
-    ["common.hpp", "range.hpp", "integral_types.hpp"] + 
-    glob(["detail/*.hpp"]),
-    copts = ["--std=c++17"],
-    includes = [".."],
-    visibility = ["//visibility:public"],
-)
-
-cc_binary(
-  name = "dm_test",
-  srcs = ["dm_test.cpp"],
-  copts = ["--std=c++17"],
-  deps = [":dm"],
-)
-
 dal_module(
   name = "headers",
   hdrs = glob(["**/*.hpp"], exclude=["**/*_dp.hpp"]),
@@ -34,9 +16,10 @@ dal_dpcpp_module(
   visibility = ["//visibility:public"],
 )
 
+# TODO: no difference between public and private headers
 dal_module(
   name = "common",
-  srcs = glob(["**/*.cpp"], exclude=["**/*_dp.cpp"]),
+  srcs = glob(["**/*.cpp"], exclude=["**/*_dp.cpp"] + ["dm_test.cpp"]),
   deps = [
     ":headers",
   ],
@@ -57,6 +40,7 @@ dal_module(
   deps = [
     ":common",
     "//cpp/onedal/decomposition/pca:pca",
+    "//cpp/onedal/data_management:data_management",
   ],
   visibility = ["//visibility:public"],
 )

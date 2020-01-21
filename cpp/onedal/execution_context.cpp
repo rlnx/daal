@@ -18,7 +18,7 @@
 
 namespace dal {
 
-class detail::default_execution_context_impl : public base {
+class detail::default_execution_context_impl : public Base {
  public:
   cpu_extensions cpu_extensions_mask = cpu_extensions::avx;
 };

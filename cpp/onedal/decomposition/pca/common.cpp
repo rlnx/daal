@@ -20,13 +20,13 @@ namespace dal {
 namespace decomposition {
 namespace pca {
 
-class detail::params_impl : public base {
+class detail::params_impl : public Base {
  public:
   std::int32_t components_count = -1;
   bool is_deterministic = false;
 };
 
-class detail::model_impl : public base {
+class detail::model_impl : public Base {
  public:
   table eigenvectors;
 };

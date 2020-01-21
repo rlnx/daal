@@ -24,13 +24,13 @@ namespace detail {
 class data_parallel_execution_context;
 } // namespace detail
 
-class data_parallel_execution_context : public base {
+class data_parallel_execution_context : public Base {
  public:
   using tag_t = detail::execution_context_tag;
   data_parallel_execution_context() = default;
 
  private:
-  dal::detail::pimpl<detail::data_parallel_execution_context> impl_;
+  dal::detail::Pimpl<detail::data_parallel_execution_context> impl_;
 };
 
 template <typename Queue>
