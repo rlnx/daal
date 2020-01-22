@@ -19,7 +19,7 @@ dal_dpcpp_module(
 # TODO: no difference between public and private headers
 dal_module(
   name = "common",
-  srcs = glob(["**/*.cpp"], exclude=["**/*_dp.cpp"] + ["dm_test.cpp"]),
+  srcs = glob(["**/*.cpp"], exclude=["**/*_dp.cpp"]),
   deps = [
     ":headers",
   ],
@@ -39,7 +39,7 @@ dal_module(
   name = "dal_core",
   deps = [
     ":common",
-    "//cpp/onedal/decomposition/pca:pca"
+    "//cpp/onedal/decomposition/pca:pca",
   ],
   visibility = ["//visibility:public"],
 )
