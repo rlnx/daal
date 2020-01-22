@@ -19,21 +19,21 @@
 #include <cstring>
 
 #include "onedal/data_management/data_format.hpp"
-#include "onedal/data_management/detail/table_impl.hpp"
+#include "onedal/data_management/detail/table_data.hpp"
 #include "onedal/detail/type_rt.hpp"
 
 namespace dal {
 namespace data_management {
 namespace detail {
 
-class homogen_table_impl : public table_impl {
+class homogen_table_impl : public table_data {
 public:
     // TODO: figure out about using DataFormat object from public API here
     template <typename DataType>
     homogen_table_impl(const DataType* data,
-                     std::int32_t rows, std::int32_t cols,
-                     data_format fmt)
-        : table_impl(rows, cols),
+                       std::int32_t rows, std::int32_t cols,
+                       data_format fmt)
+        : table_data(rows, cols),
           _fmt(fmt),
           _type_rt(dal::detail::make_type_rt<DataType>()),
           _data_bytes(init_data(data, rows * cols * sizeof(DataType)))
@@ -52,13 +52,13 @@ public:
         return _fmt;
     }
 
-    virtual float* get_slice_data(slice_impl&, float*) const override;
-    virtual double* get_slice_data(slice_impl&, double*) const override;
-    virtual std::int32_t* get_slice_data(slice_impl&, std::int32_t*) const override;
+    virtual float* get_data_ptr(const slice&, float*) const override;
+    virtual double* get_data_ptr(const slice&, double*) const override;
+    virtual std::int32_t* get_data_ptr(const slice&, std::int32_t*) const override;
 
-    virtual void release_slice_data(slice_impl&, float*) override;
-    virtual void release_slice_data(slice_impl&, double*) override;
-    virtual void release_slice_data(slice_impl&, std::int32_t*) override;
+    virtual void release_data_ptr(const slice&, float*) override;
+    virtual void release_data_ptr(const slice&, double*) override;
+    virtual void release_data_ptr(const slice&, std::int32_t*) override;
 
 private:
     template <typename DataType>
@@ -71,10 +71,10 @@ private:
     }
 
     template <typename DataType>
-    DataType* get_slice_impl(slice_impl&) const;
+    DataType* get_slice_impl(const slice&) const;
 
     template <typename DataType>
-    void release_slice_impl(slice_impl&, DataType*) const;
+    void release_slice_impl(const slice&, DataType*);
 
 private:
     data_format _fmt;

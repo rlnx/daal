@@ -24,16 +24,19 @@ int main(int argc, char const *argv[]) {
 
     {
         auto eigvec = model.get_eigenvectors();
-        std::cout << "eigenvectors [" << eigvec.get_num_rows() << "x"
-                                      << eigvec.get_num_cols() << "]:" << std::endl;
+        std::cout << "eigenvectors "
+                  << "[" << eigvec.get_num_rows()
+                  << "x" << eigvec.get_num_cols()
+                  << "]:" << std::endl;
 
-        auto rows = dal::create_array<float>(eigvec.rows({0, -1}));
-        const float* data = rows.get_host_ptr();
+        for (int vector_num = 0; vector_num < eigvec.get_num_cols(); vector_num++) {
+            std::cout << "(" << vector_num << "): ";
 
-        const int ld = eigvec.get_num_cols();
-        for (int row = 0; row < eigvec.get_num_rows(); row++) {
-            for (int col = 0; col < table.get_num_cols(); col++) {
-                std::cout << data[row*ld + col] << " ";
+            auto vec = dal::create_array<float>(eigvec.cols(vector_num));
+            const float* vec_data = vec.get_host_ptr();
+
+            for(int i = 0; i < eigvec.get_num_rows(); i++) {
+                std::cout << vec_data[i] << " ";
             }
             std::cout << std::endl;
         }

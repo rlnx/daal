@@ -23,9 +23,6 @@ namespace dal {
   // "simple" and "complex" types
 class range {
 public:
-    static constexpr std::int32_t first_element_idx = 0;
-    static constexpr std::int32_t last_element_idx = -1;
-
     std::int32_t start_idx;
     std::int32_t end_idx;
     std::int32_t step;
@@ -37,6 +34,24 @@ public:
           end_idx(end),
           step(step)
     { }
+
+    std::int32_t get_num_of_elements(std::int32_t end_of_parent) const noexcept {
+        // TODO: handle error if (end_of_parent + end_idx) < 0
+        auto final_row = (end_idx < 0) ? end_of_parent + end_idx + 1 : end_idx;
+
+        return (final_row - start_idx - 1) / step + 1;
+    }
 };
+
+inline range intersect_borders(const range& r1, const range& r2, std::int32_t end_of_parent) {
+    // TODO: do not work if steps are not equal to one
+    // TODO: move to detail?
+    auto r1_end = r1.end_idx > 0 ? r1.end_idx - end_of_parent - 1 : r1.end_idx;
+    auto r2_end = r2.end_idx > 0 ? r2.end_idx - end_of_parent - 1 : r2.end_idx;
+
+    const auto start = r1.start_idx > r2.start_idx ? r1.start_idx : r2.start_idx;
+    const auto end = r1_end < r2_end ? r1_end : r2_end;
+    return { start, end };
+}
 
 } // namespace dal

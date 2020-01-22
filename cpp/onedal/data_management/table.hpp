@@ -18,7 +18,6 @@
 
 #include "onedal/common.hpp"
 #include "onedal/detail/common.hpp"
-#include "onedal/data_management/slice.hpp"
 
 namespace dal {
 namespace data_management {
@@ -43,13 +42,12 @@ public:
     std::int32_t get_num_rows() const noexcept;
     std::int32_t get_num_cols() const noexcept;
 
-    // TODO: this methods is the same with row(), rows(),
-    // col(), cols() in Slice class.
-    // need to generalize them?
-    slice row(std::int32_t idx) const;
-    slice col(std::int32_t idx) const;
-    slice rows(const range& r) const;
-    slice cols(const range& r) const;
+    // TODO: access to the slice affects new allocation
+    // of table_impl in the heap. Is it too valuable for performance?
+    table rows(std::int32_t idx) const;
+    table rows(const range& r) const;
+    table cols(std::int32_t idx) const;
+    table cols(const range& r) const;
 
     detail::table_impl* get_impl_ptr() const noexcept {
         return _impl.get();
@@ -58,8 +56,9 @@ public:
     const pimpl& get_impl() const noexcept {
         return _impl;
     }
+
 private:
-    slice::pimpl create_slice_impl(const range& rows, const range& cols) const noexcept;
+    table create_slice_impl(const range& rows, const range& cols) const;
 
 private:
     pimpl _impl;

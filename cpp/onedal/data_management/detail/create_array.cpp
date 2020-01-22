@@ -16,6 +16,7 @@
 
 #include "onedal/data_management/detail/create_array.hpp"
 #include "onedal/data_management/detail/array_impl.hpp"
+#include "onedal/data_management/detail/table_impl.hpp"
 
 using std::int32_t;
 
@@ -25,15 +26,17 @@ namespace detail {
 
 // TODO: use internal allocator instead of new()
 template <typename T>
-array<T> create_array(const slice& slice) {
+array<T> create_array(const table& t) {
     using array_pimpl = typename array<T>::pimpl;
-    array_pimpl impl { new array_impl<T>(slice.get_impl()) };
+    auto t_impl = t.get_impl();
+
+    array_pimpl impl { new array_impl<T>(t_impl->data_container, t_impl->elements_to_access) };
     return array<T>(impl);
 }
 
-template array<float> create_array(const slice&);
-template array<double> create_array(const slice&);
-template array<int32_t> create_array(const slice&);
+template array<float> create_array(const table&);
+template array<double> create_array(const table&);
+template array<int32_t> create_array(const table&);
 
 } // namespace detail
 } // namespace data_management

@@ -17,25 +17,47 @@
 #pragma once
 
 #include "onedal/common.hpp"
-#include "onedal/data_management/detail/slice_impl.hpp"
+#include "onedal/detail/common.hpp"
 
 namespace dal {
 namespace data_management {
 namespace detail {
 
-class slicable : public base {
+class slice {
 public:
-    virtual std::int32_t get_num_rows() const noexcept = 0;
-    virtual std::int32_t get_num_cols() const noexcept = 0;
-
-    virtual float* get_slice_data(slice_impl&, float*) const = 0;
-    virtual double* get_slice_data(slice_impl&, double*) const = 0;
-    virtual std::int32_t* get_slice_data(slice_impl&, std::int32_t*) const = 0;
-
-    virtual void release_slice_data(slice_impl&, float*) = 0;
-    virtual void release_slice_data(slice_impl&, double*) = 0;
-    virtual void release_slice_data(slice_impl&, std::int32_t*) = 0;
+    range rows;
+    range cols;
 };
+
+class table_data : public base {
+public:
+    table_data(std::int32_t rows, std::int32_t cols)
+        : _rows(rows)
+        , _cols(cols)
+    { }
+
+    virtual std::int32_t get_num_rows() const noexcept {
+        return _rows;
+    }
+
+    virtual std::int32_t get_num_cols() const noexcept {
+        return _cols;
+    }
+
+    virtual float* get_data_ptr(const slice&, float*) const = 0;
+    virtual double* get_data_ptr(const slice&, double*) const = 0;
+    virtual std::int32_t* get_data_ptr(const slice&, std::int32_t*) const = 0;
+
+    virtual void release_data_ptr(const slice&, float*) = 0;
+    virtual void release_data_ptr(const slice&, double*) = 0;
+    virtual void release_data_ptr(const slice&, std::int32_t*) = 0;
+
+private:
+    std::int32_t _rows;
+    std::int32_t _cols;
+};
+
+using table_data_ptr = dal::detail::shared<table_data>;
 
 } // namespace detail
 } // namespace data_management

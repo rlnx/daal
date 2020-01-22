@@ -16,7 +16,6 @@
 
 #include "onedal/data_management/table.hpp"
 #include "onedal/data_management/detail/table_impl.hpp"
-#include "onedal/data_management/detail/slice_impl.hpp"
 
 using std::int32_t;
 
@@ -24,42 +23,52 @@ namespace dal {
 namespace data_management {
 
 int32_t table::get_num_rows() const noexcept {
-    return _impl->get_num_rows();
+    auto rows_total = _impl->data_container->get_num_rows();
+    auto slice_rows = _impl->elements_to_access.rows;
+
+    return slice_rows.get_num_of_elements(rows_total);
 }
 
 int32_t table::get_num_cols() const noexcept {
-    return _impl->get_num_cols();
+    auto cols_total = _impl->data_container->get_num_cols();
+    auto slice_cols = _impl->elements_to_access.cols;
+
+    return slice_cols.get_num_of_elements(cols_total);
 }
 
-slice table::row(int32_t idx) const {
+table table::rows(int32_t idx) const {
     // TODO: check that index is correct.
     // How to organize error handling?
-    return slice{ create_slice_impl({idx, idx+1}, {0, -1}) };
+    return create_slice_impl({idx, idx+1}, {0, -1});
 }
 
-slice table::col(int32_t idx) const {
+table table::rows(const range& r) const {
+    // TODO: check that range is correct.
+    // How to organize error handling?
+    return create_slice_impl(r, {0, -1});
+}
+
+table table::cols(int32_t idx) const {
     // TODO: check that index is correct.
     // How to organize error handling?
-    return slice{ create_slice_impl({0, -1}, {idx, idx+1}) };
+    return create_slice_impl({0, -1}, {idx, idx+1});
 }
 
-slice table::rows(const range& r) const {
+table table::cols(const range& r) const {
     // TODO: check that range is correct.
     // How to organize error handling?
-    return slice{ create_slice_impl(r, {0, -1}) };
-}
-slice table::cols(const range& r) const {
-    // TODO: check that range is correct.
-    // How to organize error handling?
-    return slice{ create_slice_impl({0, -1}, r) };
+    return create_slice_impl({0, -1}, r);
 }
 
-slice::pimpl table::create_slice_impl(const range& rows, const range& cols) const noexcept {
-    return slice::pimpl {
-        new detail::slice_impl {
-            .data_owner = _impl,
-            .rows = rows,
-            .cols = cols
+table table::create_slice_impl(const range& rows, const range& cols) const {
+    const auto slice = _impl->elements_to_access;
+    const auto new_rows = intersect_borders(rows, slice.rows, get_num_rows());
+    const auto new_cols = intersect_borders(cols, slice.cols, get_num_cols());
+
+    return table::pimpl {
+        new detail::table_impl {
+            .data_container = _impl->data_container,
+            .elements_to_access = { new_rows, new_cols }
         }
     };
 }

@@ -17,14 +17,14 @@
 #pragma once
 
 #include "onedal/data_management/array.hpp"
-#include "onedal/data_management/slice.hpp"
+#include "onedal/data_management/table.hpp"
 
 namespace dal {
 namespace data_management {
 namespace detail {
 
 template <typename T>
-array<T> create_array(const slice&);
+array<T> create_array(const table&);
 
 } // namespace detail
 } // namespace data_management

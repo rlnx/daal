@@ -18,8 +18,7 @@
 
 #include "onedal/common.hpp"
 #include "onedal/detail/common.hpp"
-#include "onedal/data_management/detail/slicable.hpp"
-#include "onedal/data_management/detail/slice_impl.hpp"
+#include "onedal/data_management/detail/table_data.hpp"
 
 namespace dal {
 namespace data_management {
@@ -30,16 +29,14 @@ namespace detail {
 template <typename T>
 class array_impl {
 public:
-    using slice_ptr = dal::detail::pimpl<slice_impl>;
-
-public:
-    array_impl(const slice_ptr& slice)
-        : _slice(slice) {
-        _data = _slice->data_owner->get_slice_data(*_slice, _data);
+    array_impl(const table_data_ptr& data_origin, const slice& slice)
+        : _data_origin(data_origin),
+          _slice(slice) {
+        _data = _data_origin->get_data_ptr(_slice, _data);
     }
 
     ~array_impl() {
-        _slice->data_owner->release_slice_data(*_slice, _data);
+        _data_origin->release_data_ptr(_slice, _data);
     }
 
     T* get_data_ptr() const noexcept {
@@ -47,7 +44,8 @@ public:
     }
 
 private:
-    slice_ptr _slice;
+    table_data_ptr _data_origin;
+    slice _slice;
     T* _data;
 };
 

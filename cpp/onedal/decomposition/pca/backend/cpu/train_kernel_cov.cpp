@@ -21,6 +21,7 @@
 
 #include "onedal/decomposition/pca/detail/train_types_impl.hpp"
 #include "onedal/decomposition/pca/detail/common_impl.hpp"
+#include "onedal/data_management/detail/table_impl.hpp"
 #include "onedal/data_management/detail/homogen_table_impl.hpp"
 
 namespace dal {
@@ -53,19 +54,25 @@ static train_result train_cov(const default_execution_context& ctx,
 
     daal_pca::ResultPtr result = alg.getResult();
     {
-        using dal::data_management::table;
-        using dal::data_management::data_format;
-        using dal::data_management::detail::homogen_table_impl;
+        namespace dm = dal::data_management;
+        namespace dm_detail = dal::data_management::detail;
 
         auto eigenvectors = result->get(daal_pca::eigenvectors);
 
         daal_dm::BlockDescriptor<Float> desc;
         eigenvectors->getBlockOfRows(0, eigenvectors->getNumberOfRows(), daal_dm::readOnly, desc);
 
-        table::pimpl eigenvectors_table { new homogen_table_impl(desc.getBlockPtr(),
-                                                                eigenvectors->getNumberOfRows(),
-                                                                eigenvectors->getNumberOfColumns(),
-                                                                data_format::colmajor) };
+        dm::table::pimpl eigenvectors_table {
+            new dm_detail::table_impl {
+                .data_container = dm_detail::table_data_ptr {
+                    new dm_detail::homogen_table_impl(desc.getBlockPtr(),
+                                                      eigenvectors->getNumberOfColumns(),
+                                                      eigenvectors->getNumberOfRows(),
+                                                      data_format::colmajor)
+                }
+            }
+        };
+
         model_impl->eigenvectors = eigenvectors_table;
     }
 
