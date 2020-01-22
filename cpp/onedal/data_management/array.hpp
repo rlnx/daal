@@ -26,7 +26,6 @@ namespace detail {
 template <typename T> class array_impl;
 } // namespace detail
 
-
 template <typename T>
 class array {
 public:
@@ -38,6 +37,7 @@ public:
     { }
 
     T* get_host_ptr() const noexcept;
+    std::int32_t get_size() const noexcept;
 
 private:
     pimpl _impl;

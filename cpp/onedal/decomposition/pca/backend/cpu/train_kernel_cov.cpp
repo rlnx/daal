@@ -15,14 +15,15 @@
  *******************************************************************************/
 
 #include "daal/include/algorithms/pca/pca_batch.h"
-#include "onedal/decomposition/pca/backend/cpu/train_kernel.hpp"
 
 #include "onedal/data_management/create_array.hpp"
 
+#include "onedal/data_management/detail/table_impl.hpp"
+#include "onedal/data_management/detail/homogen_table_data.hpp"
+
+#include "onedal/decomposition/pca/backend/cpu/train_kernel.hpp"
 #include "onedal/decomposition/pca/detail/train_types_impl.hpp"
 #include "onedal/decomposition/pca/detail/common_impl.hpp"
-#include "onedal/data_management/detail/table_impl.hpp"
-#include "onedal/data_management/detail/homogen_table_impl.hpp"
 
 namespace dal {
 namespace decomposition {
@@ -65,7 +66,7 @@ static train_result train_cov(const default_execution_context& ctx,
         dm::table::pimpl eigenvectors_table {
             new dm_detail::table_impl {
                 .data_container = dm_detail::table_data_ptr {
-                    new dm_detail::homogen_table_impl(desc.getBlockPtr(),
+                    new dm_detail::homogen_table_data(desc.getBlockPtr(),
                                                       eigenvectors->getNumberOfColumns(),
                                                       eigenvectors->getNumberOfRows(),
                                                       data_format::colmajor)

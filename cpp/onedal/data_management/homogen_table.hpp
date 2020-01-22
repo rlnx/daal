@@ -23,12 +23,12 @@ namespace dal {
 namespace data_management {
 
 namespace detail {
-class homogen_table_impl;
+class homogen_table_data;
 } // namespace detail
 
 class homogen_table : public table {
 public:
-    using pimpl = dal::detail::pimpl<detail::homogen_table_impl>;
+    using pimpl = dal::detail::pimpl<detail::homogen_table_data>;
 
     homogen_table(const homogen_table& t)
         : table(t.get_impl())
@@ -37,8 +37,8 @@ public:
     template<typename DataType>
     homogen_table(const DataType* data, std::int32_t rows, std::int32_t cols, data_format df);
 
-    detail::homogen_table_impl* get_impl_ptr() const noexcept {
-        return reinterpret_cast<detail::homogen_table_impl*>(table::get_impl_ptr());
+    detail::homogen_table_data* get_impl_ptr() const noexcept {
+        return reinterpret_cast<detail::homogen_table_data*>(table::get_impl_ptr());
     }
 };
 

@@ -16,6 +16,7 @@ int main(int argc, char const *argv[]) {
     };
 
     auto table = dal::create_table(data, 5, 3);
+    
     const auto params = pca::params<>()
                             .set_components_count(2)
                             .set_is_deterministic(true);
@@ -35,7 +36,7 @@ int main(int argc, char const *argv[]) {
             auto vec = dal::create_array<float>(eigvec.cols(vector_num));
             const float* vec_data = vec.get_host_ptr();
 
-            for(int i = 0; i < eigvec.get_num_rows(); i++) {
+            for(int i = 0; i < vec.get_size(); i++) {
                 std::cout << vec_data[i] << " ";
             }
             std::cout << std::endl;

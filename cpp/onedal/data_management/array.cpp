@@ -27,6 +27,11 @@ T* array<T>::get_host_ptr() const noexcept {
     return _impl->get_data_ptr();
 }
 
+template <typename T>
+std::int32_t array<T>::get_size() const noexcept {
+    return _impl->get_size();
+}
+
 template class array<float>;
 template class array<double>;
 template class array<int32_t>;

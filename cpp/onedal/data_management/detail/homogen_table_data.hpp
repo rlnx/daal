@@ -26,11 +26,11 @@ namespace dal {
 namespace data_management {
 namespace detail {
 
-class homogen_table_impl : public table_data {
+class homogen_table_data : public table_data {
 public:
     // TODO: figure out about using DataFormat object from public API here
     template <typename DataType>
-    homogen_table_impl(const DataType* data,
+    homogen_table_data(const DataType* data,
                        std::int32_t rows, std::int32_t cols,
                        data_format fmt)
         : table_data(rows, cols),
@@ -39,7 +39,7 @@ public:
           _data_bytes(init_data(data, rows * cols * sizeof(DataType)))
     { }
 
-    ~homogen_table_impl() {
+    ~homogen_table_data() {
         delete[] _data_bytes;
         _data_bytes = nullptr;
     }
