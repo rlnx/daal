@@ -14,41 +14,24 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include "daal/include/algorithms/pca/pca_batch.h"
-#include "onedal/decomposition/pca/backend/cpu/train_kernel.hpp"
+#include "onedal/decomposition/pca/backend/gpu/train_kernel.hpp"
 
 namespace dal {
 namespace decomposition {
 namespace pca {
 namespace backend {
 
-namespace daal_pca = daal::algorithms::pca;
-
-template <typename Float>
-static train_result train_cov(const default_execution_context& ctx,
-                              const params_base& params,
-                              const train_input& input) {
-  daal_pca::Batch<Float, daal_pca::correlationDense> alg;
-  alg.parameter.nComponents = params.get_components_count();
-  alg.parameter.isDeterministic = params.get_is_deterministic();
-
-  // TODO: Wrap input.get_data() into NumericTable and pass to:
-  //       alg.input.set(daal_pca::data, );
-
-  return train_result();
-};
-
-template <typename Float>
-struct train_kernel<Float, method::cov> {
-  train_result operator()(const default_execution_context& ctx,
+template <typename Gpu, typename Float>
+struct train_kernel<Gpu, Float, method::svd> {
+  train_result operator()(const data_parallel_execution_context& ctx,
                           const params_base& params,
                           const train_input& input) const {
-    return train_cov<Float>(ctx, params, input);
+    return train_result();
   }
 };
 
-template struct train_kernel<float, method::cov>;
-template struct train_kernel<double, method::cov>;
+template struct train_kernel<DAL_GPU_ID_, float, method::svd>;
+template struct train_kernel<DAL_GPU_ID_, double, method::svd>;
 
 } // namespace backend
 } // namespace pca

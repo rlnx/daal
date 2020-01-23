@@ -14,40 +14,33 @@
 * limitations under the License.
 *******************************************************************************/
 
-#pragma once
-
-#include "onedal/decomposition/pca/train_types.hpp"
+#include "onedal/execution_context.hpp"
+#include "onedal/decomposition/pca/detail/train_ops.hpp"
+#include "onedal/decomposition/pca/backend/cpu/train_kernel.hpp"
 
 namespace dal {
 namespace decomposition {
 namespace pca {
 namespace detail {
 
-template <typename Context, typename... Options>
-struct train_ops_dispatcher {
-  train_result operator()(const Context&,
-                          const params_base&,
-                          const train_input&) const;
-};
-
-template <typename Params>
-struct train_ops {
-  using float_t = typename Params::float_t;
-  using method_t = typename Params::method_t;
-  using input_t = train_input;
-  using result_t = train_result;
-  using params_base_t = params_base;
-
-  void validate(const Params& params, const train_input& input) const {
-
-  }
-
-  template <typename Context>
-  auto operator()(const Context& ctx, const Params& params, const train_input& input) const {
-    validate(params, input);
-    return train_ops_dispatcher<Context, float_t, method_t>()(ctx, params, input);
+template <typename Float, typename Method>
+struct train_ops_dispatcher<default_execution_context, Float, Method> {
+  train_result operator()(const default_execution_context& ctx,
+                          const params_base& params,
+                          const train_input& input) const {
+    return dal::backend::dispatch(ctx, [&](auto cpu) {
+      return backend::train_kernel<decltype(cpu), Float, Method>()(ctx, params, input);
+    });
   }
 };
+
+#define INSTANTIATE(F, M) \
+  template struct train_ops_dispatcher<default_execution_context, F, M>;
+
+INSTANTIATE(float, method::cov)
+INSTANTIATE(float, method::svd)
+INSTANTIATE(double, method::cov)
+INSTANTIATE(double, method::svd)
 
 } // namespace detail
 } // namespace dal

@@ -24,9 +24,9 @@ namespace decomposition {
 namespace pca {
 namespace backend {
 
-template <typename Cpu, typename Float, typename Method>
+template <typename Gpu, typename Float, typename Method>
 struct train_kernel {
-  train_result operator()(const default_execution_context& ctx,
+  train_result operator()(const data_parallel_execution_context& ctx,
                           const params_base& params,
                           const train_input& input) const;
 };

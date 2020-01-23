@@ -21,6 +21,7 @@
 //--
 */
 #include "algorithms/pca/pca_types.h"
+#include <iostream>
 
 namespace daal
 {

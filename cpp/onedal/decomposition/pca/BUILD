@@ -1,46 +1,41 @@
+package(default_visibility = ["//visibility:public"])
 load("//build/bazel:rules.bzl", "dal_module",
                                 "dal_dpcpp_module")
 
 dal_module(
-  name = "headers",
+  name = "common",
   hdrs = glob(["**/*.hpp"]),
-  visibility = ["//visibility:public"],
-)
-
-dal_module(
-  name = "common_types",
-  srcs = [ "common.cpp", ],
+  srcs = [
+    "common.cpp",
+    "train_types.cpp",
+  ],
   deps = [
-    ":headers",
     "//cpp/onedal:common",
   ],
 )
 
 dal_module(
-  name = "train_types",
-  srcs = [ "train_types.cpp"],
-  deps = [
-    ":common_types",
-  ],
-)
-
-dal_module(
   name = "train_ops",
+  srcs = [
+    "detail/train_ops.cpp",
+  ],
   deps = [
-    ":train_types",
+    ":common",
     "//cpp/onedal/decomposition/pca/backend/cpu:train_kernels",
   ],
-  visibility = ["//visibility:public"],
 )
 
 dal_dpcpp_module(
   name = "train_ops_dp",
-  deps = [
-    ":headers",
-    "//cpp/onedal:common_dp",
-    # "//cpp/onedal/decomposition/pca/backend/gpu:train_kernels",
+  srcs = [
+    "detail/train_ops_dp.cpp",
   ],
-  visibility = ["//visibility:public"],
+  deps = [
+    ":common",
+    "//cpp/onedal:common_dp",
+    "//cpp/onedal/decomposition/pca/backend/cpu:train_kernels",
+    "//cpp/onedal/decomposition/pca/backend/gpu:train_kernels",
+  ],
 )
 
 dal_module(
@@ -48,7 +43,6 @@ dal_module(
   deps = [
     ":train_ops"
   ],
-  visibility = ["//visibility:public"],
 )
 
 dal_dpcpp_module(
@@ -56,5 +50,4 @@ dal_dpcpp_module(
   deps = [
     ":train_ops_dp"
   ],
-  visibility = ["//visibility:public"],
 )

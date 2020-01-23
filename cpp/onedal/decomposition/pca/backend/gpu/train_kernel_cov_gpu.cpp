@@ -14,24 +14,26 @@
  * limitations under the License.
  *******************************************************************************/
 
-#pragma once
-
-#include "onedal/backend/common.hpp"
-#include "onedal/decomposition/pca/train_types.hpp"
+#include "onedal/decomposition/pca/backend/gpu/train_kernel.hpp"
 
 namespace dal {
 namespace decomposition {
 namespace pca {
 namespace backend {
 
-template <typename Cpu, typename Float, typename Method>
-struct train_kernel {
-  train_result operator()(const default_execution_context& ctx,
+template <typename Gpu, typename Float>
+struct train_kernel<Gpu, Float, method::cov> {
+  train_result operator()(const data_parallel_execution_context& ctx,
                           const params_base& params,
-                          const train_input& input) const;
+                          const train_input& input) const {
+    return train_result();
+  }
 };
 
-} // namespace detail
+template struct train_kernel<DAL_GPU_ID_, float, method::cov>;
+template struct train_kernel<DAL_GPU_ID_, double, method::cov>;
+
+} // namespace backend
 } // namespace pca
 } // namespace decomposition
 } // namespace dal

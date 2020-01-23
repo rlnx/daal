@@ -1,21 +1,6 @@
 load("//build/bazel:cc_rules.bzl", "cc_multidef_library",
                                    "cc_shared_lib")
 
-DAAL_FP_TYPES = [
-  "float",
-  "double",
-]
-
-DAAL_CPUS = [
-  "sse2",
-  # "ssse3",
-  # "sse42",
-  # "avx",
-  # "avx2",
-  # "avx512_mic",
-  "avx512",
-]
-
 def _daal_cpu_copts_gcc(cpu):
   march = {
     "sse2":       "nocona",
@@ -68,12 +53,17 @@ def daal_kernel_module(name, hdrs=[], copts=[],
   cc_multidef_library(
     name = name,
     cpus = {
-      "sse2": ["DAAL_CPU=sse2"],
-      "avx512": ["DAAL_CPU=avx512"],
+      "sse2":       [ "DAAL_CPU=sse2"       ],
+      "ssse3":      [ "DAAL_CPU=ssse3"      ],
+      "sse42":      [ "DAAL_CPU=sse42"      ],
+      "avx":        [ "DAAL_CPU=avx"        ],
+      "avx2":       [ "DAAL_CPU=avx2"       ],
+      "avx512_mic": [ "DAAL_CPU=avx512_mic" ],
+      "avx512":     [ "DAAL_CPU=avx512"     ],
     },
     fpts = {
-      "float": ["DAAL_FPTYPE=float"],
-      "double": ["DAAL_FPTYPE=double"],
+      "float":  [ "DAAL_FPTYPE=float"  ],
+      "double": [ "DAAL_FPTYPE=double" ],
     },
     copts = copts + _daal_common_copts_gcc(),
     local_defines = local_defines + _daal_common_defines_gcc(),
@@ -86,6 +76,9 @@ def daal_shared_lib(name, **kwargs):
     name = name,
     **kwargs
   )
+
+
+
 
 def _filter_cpu_cpps(srcs):
   filter_str = '_cpu.cpp'
@@ -147,3 +140,6 @@ def dal_cpu_kernel(name, srcs, cpus=DAL_DEFAULT_CPUS, hdrs=[], deps=[], **kwargs
     deps = cpu_libs_names,
     **kwargs,
   )
+
+def dal_gpu_kernel(**kwargs):
+  dal_module(**kwargs)
