@@ -44,9 +44,9 @@ static train_result train_cov(const default_execution_context& ctx,
 
     auto data = input.get_data();
     auto array = dal::create_array<Float>(data.rows({0, -1}));
-    auto inputNt = daal_dm::HomogenNumericTable<Float>::create(array.get_host_ptr(),
-                                                                data.get_num_cols(),
-                                                                data.get_num_rows());
+    auto inputNt = daal_dm::HomogenNumericTable<Float>::create(array.get_data(),
+                                                               data.get_num_cols(),
+                                                               data.get_num_rows());
     alg.input.set(daal_pca::data, inputNt);
     alg.compute();
 

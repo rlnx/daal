@@ -48,9 +48,9 @@ public:
     virtual double* get_data_ptr(const slice&, double*) const = 0;
     virtual std::int32_t* get_data_ptr(const slice&, std::int32_t*) const = 0;
 
-    virtual void release_data_ptr(const slice&, float*) = 0;
-    virtual void release_data_ptr(const slice&, double*) = 0;
-    virtual void release_data_ptr(const slice&, std::int32_t*) = 0;
+    virtual void release_data_ptr(const slice&, float*, bool need_copy_ptr) = 0;
+    virtual void release_data_ptr(const slice&, double*, bool need_copy_ptr) = 0;
+    virtual void release_data_ptr(const slice&, std::int32_t*, bool need_copy_ptr) = 0;
 
 private:
     std::int32_t _rows;

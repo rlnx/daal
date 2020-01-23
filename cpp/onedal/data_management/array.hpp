@@ -36,7 +36,8 @@ public:
         : _impl(impl)
     { }
 
-    T* get_host_ptr() const noexcept;
+    T* get_data() noexcept;
+    const T* get_data() const noexcept;
     std::int32_t get_size() const noexcept;
 
 private:

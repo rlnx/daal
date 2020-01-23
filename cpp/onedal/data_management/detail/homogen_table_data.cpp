@@ -34,16 +34,16 @@ int32_t* homogen_table_data::get_data_ptr(const slice& s, int32_t*) const {
     return get_slice_impl<int32_t>(s);
 }
 
-void homogen_table_data::release_data_ptr(const slice& s, float* data) {
-    release_slice_impl(s, data);
+void homogen_table_data::release_data_ptr(const slice& s, float* data, bool need_copy_ptr) {
+    release_slice_impl(s, data, need_copy_ptr);
 }
 
-void homogen_table_data::release_data_ptr(const slice& s, double* data) {
-    release_slice_impl(s, data);
+void homogen_table_data::release_data_ptr(const slice& s, double* data, bool need_copy_ptr) {
+    release_slice_impl(s, data, need_copy_ptr);
 }
 
-void homogen_table_data::release_data_ptr(const slice& s, int32_t* data) {
-    release_slice_impl(s, data);
+void homogen_table_data::release_data_ptr(const slice& s, int32_t* data, bool need_copy_ptr) {
+    release_slice_impl(s, data, need_copy_ptr);
 }
 
 struct index_pair {
@@ -64,7 +64,7 @@ struct slice_info {
 
     int32_t ld_data;
 
-    slice_info(const slice& s, int32_t num_rows, int32_t num_cols, const data_format& fmt) 
+    slice_info(const slice& s, int32_t num_rows, int32_t num_cols, const data_format& fmt)
         : size({ s.cols.get_num_of_elements(num_cols), s.rows.get_num_of_elements(num_rows) }),
           offset({ s.cols.start_idx, s.rows.start_idx }),
           step({ s.cols.step, s.rows.step }),
@@ -78,9 +78,9 @@ struct slice_info {
     }
 };
 
-bool need_copy_data(const slice_info& info) {
-    return (info.step.x != 1) || 
-           (info.step.y != 1) || 
+bool need_allocate_ptr(const slice_info& info) {
+    return (info.step.x != 1) ||
+           (info.step.y != 1) ||
            (info.size.y > 1 && info.size.x != info.ld_data);
 }
 
@@ -91,7 +91,7 @@ DataType* homogen_table_data::get_slice_impl(const slice& s) const {
     if (_type_rt == dal::detail::make_type_rt<DataType>()) {
         DataType* data = reinterpret_cast<DataType*>(_data_bytes);
 
-        if (need_copy_data(info) == true) {
+        if (need_allocate_ptr(info) == true) {
             DataType* out_array = new DataType[info.size.x * info.size.y];
             for (int y = 0; y < info.size.y; y++) {
                 for (int x = 0; x < info.size.x; x++) {
@@ -114,14 +114,15 @@ DataType* homogen_table_data::get_slice_impl(const slice& s) const {
 }
 
 template <typename DataType>
-void homogen_table_data::release_slice_impl(const slice& s, DataType* data) {
+void homogen_table_data::release_slice_impl(const slice& s, DataType* data, bool need_copy_ptr) {
     slice_info info { s, get_num_rows(), get_num_cols(), get_data_format() };
 
     if (_type_rt == dal::detail::make_type_rt<DataType>()) {
+        const bool need_release_ptr = need_allocate_ptr(info);
 
-        if (need_copy_data(info) == true) {
+        if (need_copy_ptr && need_release_ptr) {
             DataType* dest = reinterpret_cast<DataType*>(_data_bytes);
-    
+
             for (int y = 0; y < info.size.y; y++) {
                 for (int x = 0; x < info.size.x; x++) {
                     const int32_t data_x = x*info.step.x + info.offset.x;
@@ -132,11 +133,11 @@ void homogen_table_data::release_slice_impl(const slice& s, DataType* data) {
                     dest[data_y*ld_data + data_x] = data[y*ld_out + x];
                 }
             }
-
-            delete[] data;
         }
-        else {
-            // TODO: think about case where data must be readonly
+
+        if (need_release_ptr) {
+            delete[] data;
+            data = nullptr;
         }
     }
     // TODO: implement conversion

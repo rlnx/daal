@@ -33,13 +33,19 @@ public:
         : _data_origin(data_origin),
           _slice(slice) {
         _data = _data_origin->get_data_ptr(_slice, _data);
+        _need_update_origin = false;
     }
 
     ~array_impl() {
-        _data_origin->release_data_ptr(_slice, _data);
+        _data_origin->release_data_ptr(_slice, _data, _need_update_origin);
     }
 
-    T* get_data_ptr() const noexcept {
+    T* get_data_ptr() noexcept {
+        _need_update_origin = true;
+        return _data;
+    }
+
+    const T* get_data_ptr() const noexcept {
         return _data;
     }
 
@@ -54,6 +60,7 @@ private:
     table_data_ptr _data_origin;
     slice _slice;
     T* _data;
+    bool _need_update_origin;
 };
 
 } // namespace detail

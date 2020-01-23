@@ -16,7 +16,7 @@ int main(int argc, char const *argv[]) {
     };
 
     auto table = dal::create_table(data, 5, 3);
-    
+
     const auto params = pca::params<>()
                             .set_components_count(2)
                             .set_is_deterministic(true);
@@ -24,7 +24,7 @@ int main(int argc, char const *argv[]) {
     const auto model = dal::train(params, table).get_model();
 
     {
-        auto eigvec = model.get_eigenvectors();
+        const auto eigvec = model.get_eigenvectors();
         std::cout << "eigenvectors "
                   << "[" << eigvec.get_num_rows()
                   << "x" << eigvec.get_num_cols()
@@ -33,8 +33,8 @@ int main(int argc, char const *argv[]) {
         for (int vector_num = 0; vector_num < eigvec.get_num_cols(); vector_num++) {
             std::cout << "(" << vector_num << "): ";
 
-            auto vec = dal::create_array<float>(eigvec.cols(vector_num));
-            const float* vec_data = vec.get_host_ptr();
+            const auto vec = dal::create_array<float>(eigvec.cols(vector_num));
+            const float* vec_data = vec.get_data();
 
             for(int i = 0; i < vec.get_size(); i++) {
                 std::cout << vec_data[i] << " ";

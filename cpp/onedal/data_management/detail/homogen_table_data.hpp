@@ -56,9 +56,9 @@ public:
     virtual double* get_data_ptr(const slice&, double*) const override;
     virtual std::int32_t* get_data_ptr(const slice&, std::int32_t*) const override;
 
-    virtual void release_data_ptr(const slice&, float*) override;
-    virtual void release_data_ptr(const slice&, double*) override;
-    virtual void release_data_ptr(const slice&, std::int32_t*) override;
+    virtual void release_data_ptr(const slice&, float*, bool need_copy_ptr) override;
+    virtual void release_data_ptr(const slice&, double*, bool need_copy_ptr) override;
+    virtual void release_data_ptr(const slice&, std::int32_t*, bool need_copy_ptr) override;
 
 private:
     template <typename DataType>
@@ -74,7 +74,7 @@ private:
     DataType* get_slice_impl(const slice&) const;
 
     template <typename DataType>
-    void release_slice_impl(const slice&, DataType*);
+    void release_slice_impl(const slice&, DataType*, bool need_copy_ptr);
 
 private:
     data_format _fmt;
