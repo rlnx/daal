@@ -16,22 +16,27 @@
 
 #pragma once
 
-#include <stdint.h>
-
-#include <memory>
-#include <utility>
-#include <type_traits>
-
 #include "onedal/common.hpp"
+#include "onedal/detail/table_data.hpp"
 
 namespace dal {
 namespace detail {
 
-template <typename T>
-using shared = std::shared_ptr<T>;
+class table_impl {
+public:
+    table_data_ptr data_container;
+    range2d elements_to_access;
 
-template <typename T>
-using pimpl = shared<T>;
+    table_impl(const table_data_ptr& cnt, const range2d& s)
+        : data_container(cnt),
+          elements_to_access(s)
+    { }
 
-}  // namespace detail
-}  // namespace dal
+    table_impl(const table_data_ptr& cnt)
+        : data_container(cnt),
+          elements_to_access({ .x = {0, -1}, .y = {0, -1} })
+    { }
+};
+
+} // namespace detail
+} // namespace dal

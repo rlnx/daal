@@ -16,46 +16,41 @@
 
 #pragma once
 
-#include "onedal/array.hpp"
 #include "onedal/common.hpp"
-#include "onedal/data_types.hpp"
 #include "onedal/detail/common.hpp"
 
 namespace dal {
-
 namespace detail {
-class table_impl;
-} // namespace detail
 
-class table : public base {
+class table_data : public base {
 public:
-    using pimpl = dal::detail::pimpl<detail::table_impl>;
-
-public:
-    table(const table& table)
-        : _impl(table._impl)
+    table_data(std::int64_t rows, std::int64_t cols)
+        : _rows(rows)
+        , _cols(cols)
     { }
 
-    table(const pimpl& impl)
-        : _impl(impl)
-    { }
-
-    std::int64_t get_num_rows() const noexcept;
-    std::int64_t get_num_cols() const noexcept;
-
-    detail::table_impl* get_impl_ptr() const noexcept {
-        return _impl.get();
+    virtual std::int64_t get_num_rows() const noexcept {
+        return _rows;
     }
 
-    const pimpl& get_impl() const noexcept {
-        return _impl;
+    virtual std::int64_t get_num_cols() const noexcept {
+        return _cols;
     }
+
+    virtual float* get_data_ptr(const range2d&, float*) const = 0;
+    virtual double* get_data_ptr(const range2d&, double*) const = 0;
+    virtual std::int32_t* get_data_ptr(const range2d&, std::int32_t*) const = 0;
+
+    virtual void release_data_ptr(const range2d&, float*, bool need_copy_ptr) = 0;
+    virtual void release_data_ptr(const range2d&, double*, bool need_copy_ptr) = 0;
+    virtual void release_data_ptr(const range2d&, std::int32_t*, bool need_copy_ptr) = 0;
 
 private:
-    pimpl _impl;
+    std::int64_t _rows;
+    std::int64_t _cols;
 };
 
-template <typename T, access_mode Mode>
-array<T> flatten(const table& t, const range2d& r);
+using table_data_ptr = dal::detail::shared<table_data>;
 
+} // namespace detail
 } // namespace dal

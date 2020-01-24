@@ -31,7 +31,7 @@ class train_input : public base {
  public:
   train_input(const table& data);
 
-  auto get_data() const -> table;
+  table get_data() const;
 
   auto& set_data(const table& data) {
     set_data_impl(data);
@@ -45,12 +45,15 @@ class train_input : public base {
 
 class train_result {
  public:
-  train_result();
+  using pimpl = dal::detail::pimpl<detail::train_result_impl>;
+
+ public:
+  train_result(const pimpl& impl);
 
   auto get_model() const -> model;
-  auto get_eigenvalues() const -> table;
-  auto get_eigenvectors() const -> table;
-  auto get_explained_variance() const -> table;
+  table get_eigenvalues() const;
+  table get_eigenvectors() const;
+  table get_explained_variance() const;
 
  private:
   dal::detail::pimpl<detail::train_result_impl> impl_;

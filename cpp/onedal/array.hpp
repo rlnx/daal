@@ -16,22 +16,30 @@
 
 #pragma once
 
-#include <stdint.h>
-
-#include <memory>
-#include <utility>
-#include <type_traits>
-
 #include "onedal/common.hpp"
+#include "onedal/detail/common.hpp"
 
 namespace dal {
+
 namespace detail {
+template <typename T> class array_impl;
+} // namespace detail
 
 template <typename T>
-using shared = std::shared_ptr<T>;
+class array {
+public:
+    using pimpl = dal::detail::pimpl< detail::array_impl<T> >;
 
-template <typename T>
-using pimpl = shared<T>;
+public:
+    array(const pimpl& impl)
+        : _impl(impl)
+    { }
 
-}  // namespace detail
-}  // namespace dal
+    T* get_pointer() const noexcept;
+    std::int64_t get_size() const noexcept;
+
+private:
+    pimpl _impl;
+};
+
+} // namespace dal

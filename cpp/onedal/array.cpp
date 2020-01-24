@@ -14,24 +14,27 @@
  * limitations under the License.
  *******************************************************************************/
 
-#pragma once
+#include "onedal/array.hpp"
+#include "onedal/detail/array_impl.hpp"
 
-#include <stdint.h>
-
-#include <memory>
-#include <utility>
-#include <type_traits>
-
-#include "onedal/common.hpp"
+using std::int32_t;
+using std::int64_t;
 
 namespace dal {
-namespace detail {
 
 template <typename T>
-using shared = std::shared_ptr<T>;
+T* array<T>::get_pointer() const noexcept {
+    const auto& arr_impl = *_impl;
+    return arr_impl.get_data_ptr();
+}
 
 template <typename T>
-using pimpl = shared<T>;
+int64_t array<T>::get_size() const noexcept {
+    return _impl->get_size();
+}
 
-}  // namespace detail
-}  // namespace dal
+template class array<float>;
+template class array<double>;
+template class array<int32_t>;
+
+} // namespace dal

@@ -15,26 +15,11 @@
 *******************************************************************************/
 
 #include "onedal/decomposition/pca/train_types.hpp"
+#include "onedal/decomposition/pca/detail/train_types_impl.hpp"
 
 namespace dal {
 namespace decomposition {
 namespace pca {
-
-class detail::train_input_impl : public base {
- public:
-  train_input_impl(const table& data)
-      : data(data) {}
-
-  table data;
-};
-
-class detail::train_result_impl : public base {
- public:
-  model trained_model;
-  table eigenvalues;
-  table eigenvectors;
-  table explained_variance;
-};
 
 using detail::train_input_impl;
 using detail::train_result_impl;
@@ -50,8 +35,8 @@ void train_input::set_data_impl(const table& data) {
   impl_->data = data;
 }
 
-train_result::train_result()
-    : impl_(new train_result_impl()) {}
+train_result::train_result(const pimpl& impl)
+    : impl_(impl) {}
 
 auto train_result::get_model() const -> model {
   return impl_->trained_model;

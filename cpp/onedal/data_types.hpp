@@ -16,22 +16,16 @@
 
 #pragma once
 
-#include <stdint.h>
-
-#include <memory>
-#include <utility>
-#include <type_traits>
-
-#include "onedal/common.hpp"
-
 namespace dal {
-namespace detail {
 
-template <typename T>
-using shared = std::shared_ptr<T>;
+enum class access_mode {
+    read,
+    write
+};
 
-template <typename T>
-using pimpl = shared<T>;
+enum class data_format {
+    rowmajor,
+    colmajor
+};
 
-}  // namespace detail
-}  // namespace dal
+} // namespace dal

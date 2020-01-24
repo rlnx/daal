@@ -16,10 +16,11 @@
 
 #pragma once
 
-#include "onedal/table.hpp"
 #include "onedal/detail/common.hpp"
+#include "onedal/table.hpp"
 
 namespace dal {
+
 namespace decomposition {
 namespace pca {
 
@@ -43,10 +44,10 @@ class params_base : public base {
 
   params_base();
 
-  std::int32_t get_components_count() const;
+  std::int64_t get_components_count() const;
   bool get_is_deterministic() const;
 
-  void set_components_count(std::int32_t value);
+  void set_components_count(std::int64_t value);
   void set_is_deterministic(bool value);
 
  private:
@@ -60,7 +61,7 @@ class params : public params_base {
   using float_t  = Float;
   using method_t = Method;
 
-  auto& set_components_count(int32_t value) {
+  auto& set_components_count(int64_t value) {
     params_base::set_components_count(value);
     return *this;
   }
@@ -72,12 +73,15 @@ class params : public params_base {
 };
 
 class model : public base {
- public:
-  model();
+public:
+  using pimpl = dal::detail::pimpl<detail::model_impl>;
+
+public:
+  model(const pimpl& impl);
 
   table get_eigenvectors() const;
 
- private:
+private:
   dal::detail::pimpl<detail::model_impl> impl_;
 };
 

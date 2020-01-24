@@ -14,27 +14,35 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include "onedal/execution_context.hpp"
+#pragma once
+
+#include "onedal/table.hpp"
 
 namespace dal {
 
-class detail::default_execution_context_impl : public base {
+namespace detail {
+class homogen_table_data;
+} // namespace detail
+
+class homogen_table : public table {
 public:
-    cpu_extensions cpu_extensions_mask = cpu_extensions::avx;
+    using pimpl = dal::detail::pimpl<detail::homogen_table_data>;
+
+    homogen_table(const homogen_table& t)
+        : table(t.get_impl())
+    { }
+
+    template<typename DataType>
+    homogen_table(const DataType* data, std::int64_t rows, std::int64_t cols, data_format df);
+
+    detail::homogen_table_data* get_impl_ptr() const noexcept {
+        return reinterpret_cast<detail::homogen_table_data*>(table::get_impl_ptr());
+    }
 };
 
-using detail::default_execution_context_impl;
-
-default_execution_context::default_execution_context()
-  : impl_(new default_execution_context_impl()) {}
-
-void default_execution_context::set_enabled_cpu_extensions_impl(
-    const cpu_extensions& extensions) noexcept {
-    impl_->cpu_extensions_mask = extensions;
-}
-
-cpu_extensions default_execution_context::get_enabled_cpu_extensions() const noexcept {
-    return impl_->cpu_extensions_mask;
-}
+template <typename DataType>
+homogen_table create_table(const DataType* data,
+                           std::int64_t rows, std::int64_t cols,
+                           data_format df = data_format::rowmajor);
 
 } // namespace dal

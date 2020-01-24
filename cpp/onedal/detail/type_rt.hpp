@@ -15,23 +15,34 @@
  *******************************************************************************/
 
 #pragma once
-
-#include <stdint.h>
-
-#include <memory>
-#include <utility>
-#include <type_traits>
-
-#include "onedal/common.hpp"
+#include "onedal/integral_types.hpp"
 
 namespace dal {
 namespace detail {
 
-template <typename T>
-using shared = std::shared_ptr<T>;
+enum class type_rt {
+    i32,
+    f32,
+    f64
+};
 
-template <typename T>
-using pimpl = shared<T>;
+template <typename DataType>
+inline type_rt make_type_rt();
 
-}  // namespace detail
-}  // namespace dal
+template <>
+inline type_rt make_type_rt<std::int32_t>() {
+    return type_rt::i32;
+}
+
+template <>
+inline type_rt make_type_rt<float>() {
+    return type_rt::f32;
+}
+
+template <>
+inline type_rt make_type_rt<double>() {
+    return type_rt::f64;
+}
+
+} // namespace detail
+} // namespace dal

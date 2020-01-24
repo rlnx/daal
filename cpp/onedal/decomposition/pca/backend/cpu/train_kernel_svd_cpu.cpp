@@ -26,7 +26,7 @@ struct train_kernel<Cpu, Float, method::svd> {
   train_result operator()(const default_execution_context& ctx,
                           const params_base& params,
                           const train_input& input) const {
-    return train_result();
+    return train_result(nullptr);
   }
 };
 

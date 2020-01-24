@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2014-2019 Intel Corporation
+ * Copyright 2020 Intel Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,34 +30,34 @@ class default_execution_context_impl;
 } // namespace detail
 
 enum class cpu_extensions : uint64_t {
-  none   = 0U,
-  sse2   = 1U << 0,
-  ssse3  = 1U << 1,
-  sse42  = 1U << 2,
-  avx    = 1U << 3,
-  avx2   = 1U << 4,
-  avx512 = 1U << 5
+    none   = 0U,
+    sse2   = 1U << 0,
+    ssse3  = 1U << 1,
+    sse42  = 1U << 2,
+    avx    = 1U << 3,
+    avx2   = 1U << 4,
+    avx512 = 1U << 5
 };
 
 class default_execution_context : public base {
- public:
-  using tag_t = detail::execution_context_tag;
-  default_execution_context();
+public:
+    using tag_t = detail::execution_context_tag;
+    default_execution_context();
 
-  cpu_extensions get_enabled_cpu_extensions() const noexcept;
+    cpu_extensions get_enabled_cpu_extensions() const noexcept;
 
-  auto &set_enabled_cpu_extensions(const cpu_extensions& extensions) noexcept {
-    set_enabled_cpu_extensions_impl(extensions);
-    return *this;
-  }
+    auto &set_enabled_cpu_extensions(const cpu_extensions& extensions) noexcept {
+        set_enabled_cpu_extensions_impl(extensions);
+        return *this;
+    }
 
- private:
-  void set_enabled_cpu_extensions_impl(const cpu_extensions& extensions) noexcept;
-  dal::detail::pimpl<detail::default_execution_context_impl> impl_;
+private:
+    void set_enabled_cpu_extensions_impl(const cpu_extensions& extensions) noexcept;
+    dal::detail::pimpl<detail::default_execution_context_impl> impl_;
 };
 
 inline auto make_context() {
-  return default_execution_context();
+    return default_execution_context();
 }
 
 } // namespace dal

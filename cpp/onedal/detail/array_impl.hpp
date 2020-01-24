@@ -16,46 +16,44 @@
 
 #pragma once
 
-#include "onedal/array.hpp"
 #include "onedal/common.hpp"
-#include "onedal/data_types.hpp"
 #include "onedal/detail/common.hpp"
+#include "onedal/detail/table_data.hpp"
 
 namespace dal {
-
 namespace detail {
-class table_impl;
-} // namespace detail
 
-class table : public base {
+// TODO: this is particular array impl for slices,
+// rename it
+template <typename T>
+class array_impl {
 public:
-    using pimpl = dal::detail::pimpl<detail::table_impl>;
-
-public:
-    table(const table& table)
-        : _impl(table._impl)
-    { }
-
-    table(const pimpl& impl)
-        : _impl(impl)
-    { }
-
-    std::int64_t get_num_rows() const noexcept;
-    std::int64_t get_num_cols() const noexcept;
-
-    detail::table_impl* get_impl_ptr() const noexcept {
-        return _impl.get();
+    array_impl(const table_data_ptr& data_origin, const range2d& slice)
+        : _data_origin(data_origin),
+          _slice(slice) {
+        _data = _data_origin->get_data_ptr(_slice, _data);
     }
 
-    const pimpl& get_impl() const noexcept {
-        return _impl;
+    ~array_impl() {
+        _data_origin->release_data_ptr(_slice, _data, true);
+    }
+
+    T* get_data_ptr() const noexcept {
+        return _data;
+    }
+
+    std::int64_t get_size() const noexcept {
+        std::int64_t num_rows = _slice.x.get_num_of_elements(_data_origin->get_num_rows());
+        std::int64_t num_cols = _slice.y.get_num_of_elements(_data_origin->get_num_cols());
+
+        return num_rows * num_cols;
     }
 
 private:
-    pimpl _impl;
+    table_data_ptr _data_origin;
+    range2d _slice;
+    T* _data;
 };
 
-template <typename T, access_mode Mode>
-array<T> flatten(const table& t, const range2d& r);
-
+} // namespace detail
 } // namespace dal

@@ -14,22 +14,12 @@
 * limitations under the License.
 *******************************************************************************/
 
-#include "onedal/decomposition/pca/common.hpp"
+#include "onedal/decomposition/pca/detail/common_impl.hpp"
+#include "onedal/detail/table_impl.hpp"
 
 namespace dal {
 namespace decomposition {
 namespace pca {
-
-class detail::params_impl : public base {
- public:
-  std::int32_t components_count = -1;
-  bool is_deterministic = false;
-};
-
-class detail::model_impl : public base {
- public:
-  table eigenvectors;
-};
 
 using detail::params_impl;
 using detail::model_impl;
@@ -37,7 +27,7 @@ using detail::model_impl;
 params_base::params_base()
   : impl_(new params_impl()) { }
 
-std::int32_t params_base::get_components_count() const {
+std::int64_t params_base::get_components_count() const {
   return impl_->components_count;
 }
 
@@ -45,7 +35,7 @@ bool params_base::get_is_deterministic() const {
   return impl_->is_deterministic;
 }
 
-void params_base::set_components_count(std::int32_t value) {
+void params_base::set_components_count(std::int64_t value) {
   impl_->components_count = value;
 }
 
@@ -53,8 +43,8 @@ void params_base::set_is_deterministic(bool value) {
   impl_->is_deterministic = value;
 }
 
-model::model()
-  : impl_(new model_impl()) { }
+model::model(const pimpl& impl)
+  : impl_(impl) { }
 
 table model::get_eigenvectors() const {
   return impl_->eigenvectors;

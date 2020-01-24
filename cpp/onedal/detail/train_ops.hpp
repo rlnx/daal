@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2014-2019 Intel Corporation
+ * Copyright 2020 Intel Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,32 +28,32 @@ template <typename Context, typename Params, typename Head, typename... Tail>
 auto train_dispatch_by_input(const Context& ctx,
                              const Params& params,
                              Head&& head, Tail&&... tail) {
-  using tag_t = typename Params::tag_t;
-  using ops_t = train_ops<Params, tag_t>;
-  using input_t = typename ops_t::input_t;
+    using tag_t = typename Params::tag_t;
+    using ops_t = train_ops<Params, tag_t>;
+    using input_t = typename ops_t::input_t;
 
-  if constexpr (std::is_same_v<std::decay_t<Head>, input_t>) {
-    return ops_t()(ctx, params, std::forward<Head>(head),
-                                std::forward<Tail>(tail)...);
-  }
-  else {
-    const auto input = input_t { std::forward<Head>(head),
-                                 std::forward<Tail>(tail)... };
-    return ops_t()(ctx, params, input);
-  }
+    if constexpr (std::is_same_v<std::decay_t<Head>, input_t>) {
+        return ops_t()(ctx, params, std::forward<Head>(head),
+                                    std::forward<Tail>(tail)...);
+    }
+    else {
+        const auto input = input_t { std::forward<Head>(head),
+                                    std::forward<Tail>(tail)... };
+        return ops_t()(ctx, params, input);
+    }
 };
 
 template <typename Head, typename... Tail>
 auto train_dispatch_by_ctx(Head&& head, Tail&&... tail) {
-  using tag_t = typename std::decay_t<Head>::tag_t;
-  if constexpr (std::is_same_v<tag_t, detail::execution_context_tag>) {
-    return train_dispatch_by_input(head, std::forward<Tail>(tail)...);
-  }
-  else {
-    return train_dispatch_by_input(default_execution_context(),
-                                   std::forward<Head>(head),
-                                   std::forward<Tail>(tail)...);
-  }
+    using tag_t = typename std::decay_t<Head>::tag_t;
+    if constexpr (std::is_same_v<tag_t, detail::execution_context_tag>) {
+        return train_dispatch_by_input(head, std::forward<Tail>(tail)...);
+    }
+    else {
+        return train_dispatch_by_input(default_execution_context(),
+                                    std::forward<Head>(head),
+                                    std::forward<Tail>(tail)...);
+    }
 };
 
 } // namespace detail

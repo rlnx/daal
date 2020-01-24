@@ -16,6 +16,7 @@ dal_dpcpp_module(
   visibility = ["//visibility:public"],
 )
 
+# TODO: no difference between public and private headers
 dal_module(
   name = "common",
   srcs = glob(["**/*.cpp"], exclude=["**/*_dp.cpp"]),
