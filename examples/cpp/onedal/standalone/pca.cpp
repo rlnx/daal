@@ -22,10 +22,10 @@ std::ostream &operator <<(std::ostream& stream, const dal::table& table) {
 int main(int argc, char const *argv[]) {
     using namespace dal::decomposition;
 
-    const std::int64_t row_count = 5;
-    const std::int64_t column_count = 3;
+    constexpr std::int64_t row_count = 5;
+    constexpr std::int64_t column_count = 3;
 
-    float data[] = {
+    const float data[] = {
         1.f,  2.f,  3.f,
         1.f,  -1.f, 0.f,
         4.f,  5.f,  6.f,
@@ -33,7 +33,7 @@ int main(int argc, char const *argv[]) {
         -4.f, 3.f,  0.f
     };
 
-    auto table = dal::create_table(data, row_count, column_count);
+    const auto table = dal::create_table(data, row_count, column_count);
 
     const auto params = pca::params()
         .set_components_count(2)
