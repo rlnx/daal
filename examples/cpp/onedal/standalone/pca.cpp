@@ -25,11 +25,11 @@ int main(int argc, char const *argv[]) {
     {
         const auto eigvec = model.get_eigenvectors();
         std::cout << "eigenvectors "
-                  << "[" << eigvec.get_num_rows()
-                  << "x" << eigvec.get_num_cols()
+                  << "[" << eigvec.get_row_count()
+                  << "x" << eigvec.get_column_count()
                   << "]:" << std::endl;
 
-        for (int vector_num = 0; vector_num < eigvec.get_num_cols(); vector_num++) {
+        for (int vector_num = 0; vector_num < eigvec.get_column_count(); vector_num++) {
             std::cout << "(" << vector_num << "): ";
 
             auto eigvec_array = dal::flatten<float, dal::access_mode::read>(

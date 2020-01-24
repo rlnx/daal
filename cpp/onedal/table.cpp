@@ -23,14 +23,14 @@ using std::int64_t;
 
 namespace dal {
 
-int64_t table::get_num_rows() const noexcept {
+int64_t table::get_row_count() const noexcept {
     auto rows_total = _impl->data_container->get_num_rows();
     auto slice_rows = _impl->elements_to_access.x;
 
     return slice_rows.get_num_of_elements(rows_total);
 }
 
-int64_t table::get_num_cols() const noexcept {
+int64_t table::get_column_count() const noexcept {
     auto cols_total = _impl->data_container->get_num_cols();
     auto slice_cols = _impl->elements_to_access.y;
 

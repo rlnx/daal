@@ -40,8 +40,8 @@ public:
         : _impl(impl)
     { }
 
-    std::int64_t get_num_rows() const noexcept;
-    std::int64_t get_num_cols() const noexcept;
+    std::int64_t get_row_count() const noexcept;
+    std::int64_t get_column_count() const noexcept;
 
     detail::table_impl* get_impl_ptr() const noexcept {
         return _impl.get();

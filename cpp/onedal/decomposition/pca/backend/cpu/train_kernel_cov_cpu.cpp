@@ -45,8 +45,8 @@ struct train_kernel<Cpu, Float, method::cov> {
     auto data = input.get_data();
     auto array = dal::flatten<Float, dal::access_mode::read>(data, dal::row_range({0, -1}));
     auto inputNt = daal_dm::HomogenNumericTable<Float>::create(array.get_pointer(),
-                                                               data.get_num_cols(),
-                                                               data.get_num_rows());
+                                                               data.get_column_count(),
+                                                               data.get_row_count());
     alg.input.set(daal_pca::data, inputNt);
     alg.compute();
 
