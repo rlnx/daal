@@ -11,8 +11,7 @@ std::ostream &operator <<(std::ostream& stream, const dal::table& table) {
             std::cout << std::setw(10)
                       << std::setiosflags(std::ios::fixed)
                       << std::setprecision(3)
-                      << x[i * table.get_column_count() + j]
-                      << " ";
+                      << x[i * table.get_column_count() + j];
         }
         std::cout << std::endl;
     }
