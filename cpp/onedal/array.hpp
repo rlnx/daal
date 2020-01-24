@@ -38,6 +38,10 @@ public:
     T* get_pointer() const noexcept;
     std::int64_t get_size() const noexcept;
 
+    const T& operator [](std::int64_t index) const {
+        return get_pointer()[index];
+    }
+
 private:
     pimpl _impl;
 };
