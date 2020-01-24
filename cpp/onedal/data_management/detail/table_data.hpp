@@ -31,16 +31,16 @@ public:
 
 class table_data : public base {
 public:
-    table_data(std::int32_t rows, std::int32_t cols)
+    table_data(std::int64_t rows, std::int64_t cols)
         : _rows(rows)
         , _cols(cols)
     { }
 
-    virtual std::int32_t get_num_rows() const noexcept {
+    virtual std::int64_t get_num_rows() const noexcept {
         return _rows;
     }
 
-    virtual std::int32_t get_num_cols() const noexcept {
+    virtual std::int64_t get_num_cols() const noexcept {
         return _cols;
     }
 
@@ -53,8 +53,8 @@ public:
     virtual void release_data_ptr(const slice&, std::int32_t*, bool need_copy_ptr) = 0;
 
 private:
-    std::int32_t _rows;
-    std::int32_t _cols;
+    std::int64_t _rows;
+    std::int64_t _cols;
 };
 
 using table_data_ptr = dal::detail::shared<table_data>;

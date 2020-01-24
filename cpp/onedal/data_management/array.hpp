@@ -38,7 +38,7 @@ public:
 
     T* get_data() noexcept;
     const T* get_data() const noexcept;
-    std::int32_t get_size() const noexcept;
+    std::int64_t get_size() const noexcept;
 
 private:
     pimpl _impl;

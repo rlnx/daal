@@ -16,62 +16,48 @@
 
 #include "onedal/data_management/table.hpp"
 #include "onedal/data_management/detail/table_impl.hpp"
+#include "onedal/data_management/detail/array_impl.hpp"
 
 using std::int32_t;
+using std::int64_t;
 
 namespace dal {
 namespace data_management {
 
-int32_t table::get_num_rows() const noexcept {
+int64_t table::get_num_rows() const noexcept {
     auto rows_total = _impl->data_container->get_num_rows();
     auto slice_rows = _impl->elements_to_access.rows;
 
     return slice_rows.get_num_of_elements(rows_total);
 }
 
-int32_t table::get_num_cols() const noexcept {
+int64_t table::get_num_cols() const noexcept {
     auto cols_total = _impl->data_container->get_num_cols();
     auto slice_cols = _impl->elements_to_access.cols;
 
     return slice_cols.get_num_of_elements(cols_total);
 }
 
-table table::rows(int32_t idx) const {
-    // TODO: check that index is correct.
-    // How to organize error handling?
-    return create_slice_impl({idx, idx+1}, {0, -1});
-}
+template <typename T, access_mode Mode>
+array<T> flatten(const table& t, const range2d& r) {
+    auto* t_impl_ptr = t.get_impl_ptr();
 
-table table::rows(const range& r) const {
-    // TODO: check that range is correct.
-    // How to organize error handling?
-    return create_slice_impl(r, {0, -1});
-}
-
-table table::cols(int32_t idx) const {
-    // TODO: check that index is correct.
-    // How to organize error handling?
-    return create_slice_impl({0, -1}, {idx, idx+1});
-}
-
-table table::cols(const range& r) const {
-    // TODO: check that range is correct.
-    // How to organize error handling?
-    return create_slice_impl({0, -1}, r);
-}
-
-table table::create_slice_impl(const range& rows, const range& cols) const {
-    const auto slice = _impl->elements_to_access;
-    const auto new_rows = intersect_borders(rows, slice.rows, get_num_rows());
-    const auto new_cols = intersect_borders(cols, slice.cols, get_num_cols());
-
-    return table::pimpl {
-        new detail::table_impl {
-            .data_container = _impl->data_container,
-            .elements_to_access = { new_rows, new_cols }
-        }
+    typename array<T>::pimpl a_impl {
+        new detail::array_impl<T>(t_impl_ptr->data_container,
+        { .rows = r.row_range, .cols = r.col_range })
     };
+
+    return a_impl;
 }
+
+template array<float> flatten<float, access_mode::read>(const table&, const range2d&);
+template array<float> flatten<float, access_mode::write>(const table&, const range2d&);
+
+template array<double> flatten<double, access_mode::read>(const table&, const range2d&);
+template array<double> flatten<double, access_mode::write>(const table&, const range2d&);
+
+template array<int32_t> flatten<int32_t, access_mode::read>(const table&, const range2d&);
+template array<int32_t> flatten<int32_t, access_mode::write>(const table&, const range2d&);
 
 } // namespace data_management
 } // namespace dal

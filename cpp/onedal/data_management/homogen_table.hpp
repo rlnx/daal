@@ -35,7 +35,7 @@ public:
     { }
 
     template<typename DataType>
-    homogen_table(const DataType* data, std::int32_t rows, std::int32_t cols, data_format df);
+    homogen_table(const DataType* data, std::int64_t rows, std::int64_t cols, data_format df);
 
     detail::homogen_table_data* get_impl_ptr() const noexcept {
         return reinterpret_cast<detail::homogen_table_data*>(table::get_impl_ptr());

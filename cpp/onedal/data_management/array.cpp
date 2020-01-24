@@ -18,6 +18,7 @@
 #include "onedal/data_management/detail/array_impl.hpp"
 
 using std::int32_t;
+using std::int64_t;
 
 namespace dal {
 namespace data_management {
@@ -34,7 +35,7 @@ const T* array<T>::get_data() const noexcept {
 }
 
 template <typename T>
-std::int32_t array<T>::get_size() const noexcept {
+int64_t array<T>::get_size() const noexcept {
     return _impl->get_size();
 }
 

@@ -17,6 +17,7 @@
 #include "onedal/data_management/detail/homogen_table_data.hpp"
 
 using std::int32_t;
+using std::int64_t;
 
 namespace dal {
 namespace data_management {
@@ -47,11 +48,11 @@ void homogen_table_data::release_data_ptr(const slice& s, int32_t* data, bool ne
 }
 
 struct index_pair {
-    int32_t x;
-    int32_t y;
+    int64_t x;
+    int64_t y;
 
     void swap() {
-        int32_t tmp = x;
+        int64_t tmp = x;
         x = y;
         y = tmp;
     }
@@ -62,9 +63,9 @@ struct slice_info {
     index_pair offset;
     index_pair step;
 
-    int32_t ld_data;
+    int64_t ld_data;
 
-    slice_info(const slice& s, int32_t num_rows, int32_t num_cols, const data_format& fmt)
+    slice_info(const slice& s, int64_t num_rows, int64_t num_cols, const data_format& fmt)
         : size({ s.cols.get_num_of_elements(num_cols), s.rows.get_num_of_elements(num_rows) }),
           offset({ s.cols.start_idx, s.rows.start_idx }),
           step({ s.cols.step, s.rows.step }),
@@ -95,10 +96,10 @@ DataType* homogen_table_data::get_slice_impl(const slice& s) const {
             DataType* out_array = new DataType[info.size.x * info.size.y];
             for (int y = 0; y < info.size.y; y++) {
                 for (int x = 0; x < info.size.x; x++) {
-                    const int32_t data_x = x*info.step.x + info.offset.x;
-                    const int32_t data_y = y*info.step.y + info.offset.y;
-                    const int32_t ld_out = info.size.x;
-                    const int32_t ld_data = info.ld_data;
+                    const int64_t data_x = x*info.step.x + info.offset.x;
+                    const int64_t data_y = y*info.step.y + info.offset.y;
+                    const int64_t ld_out = info.size.x;
+                    const int64_t ld_data = info.ld_data;
 
                     out_array[y*ld_out + x] = data[data_y*ld_data + data_x];
                 }
@@ -125,10 +126,10 @@ void homogen_table_data::release_slice_impl(const slice& s, DataType* data, bool
 
             for (int y = 0; y < info.size.y; y++) {
                 for (int x = 0; x < info.size.x; x++) {
-                    const int32_t data_x = x*info.step.x + info.offset.x;
-                    const int32_t data_y = y*info.step.y + info.offset.y;
-                    const int32_t ld_out = info.size.x;
-                    const int32_t ld_data = info.ld_data;
+                    const int64_t data_x = x*info.step.x + info.offset.x;
+                    const int64_t data_y = y*info.step.y + info.offset.y;
+                    const int64_t ld_out = info.size.x;
+                    const int64_t ld_data = info.ld_data;
 
                     dest[data_y*ld_data + data_x] = data[y*ld_out + x];
                 }

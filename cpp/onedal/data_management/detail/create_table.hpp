@@ -26,8 +26,8 @@ namespace detail {
 
 template <typename DataType>
 homogen_table create_table(const DataType* data,
-                          std::int32_t rows, std::int32_t cols,
-                          data_format df = data_format::rowmajor);
+                           std::int64_t rows, std::int64_t cols,
+                           data_format df = data_format::rowmajor);
 
 } // namespace detail
 } // namespace data_management

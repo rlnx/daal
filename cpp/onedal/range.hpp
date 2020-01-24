@@ -23,19 +23,20 @@ namespace dal {
   // "simple" and "complex" types
 class range {
 public:
-    std::int32_t start_idx;
-    std::int32_t end_idx;
-    std::int32_t step;
+    std::int64_t start_idx;
+    std::int64_t end_idx;
+    std::int64_t step;
 
-    range(std::int32_t start,
-          std::int32_t end,
-          std::int32_t step = 1)
+public:
+    range(std::int64_t start,
+          std::int64_t end,
+          std::int64_t step = 1)
         : start_idx(start),
           end_idx(end),
           step(step)
     { }
 
-    std::int32_t get_num_of_elements(std::int32_t end_of_parent) const noexcept {
+    std::int64_t get_num_of_elements(std::int64_t end_of_parent) const noexcept {
         // TODO: handle error if (end_of_parent + end_idx) < 0
         auto final_row = (end_idx < 0) ? end_of_parent + end_idx + 1 : end_idx;
 
@@ -43,7 +44,13 @@ public:
     }
 };
 
-inline range intersect_borders(const range& r1, const range& r2, std::int32_t end_of_parent) {
+class range2d {
+public:
+    range row_range;
+    range col_range;
+};
+
+inline range intersect_borders(const range& r1, const range& r2, std::int64_t end_of_parent) {
     // TODO: do not work if steps are not equal to one
     // TODO: move to detail?
     auto r1_end = r1.end_idx > 0 ? r1.end_idx - end_of_parent - 1 : r1.end_idx;
@@ -52,6 +59,14 @@ inline range intersect_borders(const range& r1, const range& r2, std::int32_t en
     const auto start = r1.start_idx > r2.start_idx ? r1.start_idx : r2.start_idx;
     const auto end = r1_end < r2_end ? r1_end : r2_end;
     return { start, end };
+}
+
+inline range2d row_range(const range& r) {
+    return { r, {0, -1} };
+}
+
+inline range2d column_range(const range& r) {
+    return { {0, -1}, r };
 }
 
 } // namespace dal

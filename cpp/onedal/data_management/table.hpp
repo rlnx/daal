@@ -17,6 +17,8 @@
 #pragma once
 
 #include "onedal/common.hpp"
+#include "onedal/access_mode.hpp"
+#include "onedal/data_management/array.hpp"
 #include "onedal/detail/common.hpp"
 
 namespace dal {
@@ -39,15 +41,8 @@ public:
         : _impl(impl)
     { }
 
-    std::int32_t get_num_rows() const noexcept;
-    std::int32_t get_num_cols() const noexcept;
-
-    // TODO: access to the slice affects new allocation
-    // of table_impl in the heap. Is it too valuable for performance?
-    table rows(std::int32_t idx) const;
-    table rows(const range& r) const;
-    table cols(std::int32_t idx) const;
-    table cols(const range& r) const;
+    std::int64_t get_num_rows() const noexcept;
+    std::int64_t get_num_cols() const noexcept;
 
     detail::table_impl* get_impl_ptr() const noexcept {
         return _impl.get();
@@ -58,11 +53,11 @@ public:
     }
 
 private:
-    table create_slice_impl(const range& rows, const range& cols) const;
-
-private:
     pimpl _impl;
 };
+
+template <typename T, access_mode Mode>
+array<T> flatten(const table& t, const range2d& r);
 
 } // namespace data_management
 } // namespace dal

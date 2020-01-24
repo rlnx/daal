@@ -43,7 +43,7 @@ static train_result train_cov(const default_execution_context& ctx,
     // TODO: algorithm.parameter.resultsToCompute = pca::mean | pca::variance | pca::eigenvalue;
 
     auto data = input.get_data();
-    auto array = dal::create_array<Float>(data.rows({0, -1}));
+    auto array = dal::data_management::flatten<Float, dal::access_mode::read>(data, dal::row_range({0, -1}));
     auto inputNt = daal_dm::HomogenNumericTable<Float>::create(array.get_data(),
                                                                data.get_num_cols(),
                                                                data.get_num_rows());

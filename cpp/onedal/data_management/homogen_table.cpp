@@ -19,20 +19,21 @@
 #include "onedal/data_management/detail/table_impl.hpp"
 
 using std::int32_t;
+using std::int64_t;
 
 namespace dal {
 namespace data_management {
 
 template<typename DataType>
-homogen_table::homogen_table(const DataType* data, int32_t rows, int32_t cols, data_format df)
+homogen_table::homogen_table(const DataType* data, int64_t rows, int64_t cols, data_format df)
     : table(table::pimpl(new detail::table_impl {
         .data_container = detail::table_data_ptr { new detail::homogen_table_data(data, rows, cols, df) }
     }))
 { }
 
-template homogen_table::homogen_table<float>(const float* data, int32_t rows, int32_t cols, data_format df);
-template homogen_table::homogen_table<double>(const double* data, int32_t rows, int32_t cols, data_format df);
-template homogen_table::homogen_table<std::int32_t>(const std::int32_t* data, int32_t rows, int32_t cols, data_format df);
+template homogen_table::homogen_table<float>(const float* data, int64_t rows, int64_t cols, data_format df);
+template homogen_table::homogen_table<double>(const double* data, int64_t rows, int64_t cols, data_format df);
+template homogen_table::homogen_table<int32_t>(const std::int32_t* data, int64_t rows, int64_t cols, data_format df);
 
 } // namespace data_management
 } // namespace dal

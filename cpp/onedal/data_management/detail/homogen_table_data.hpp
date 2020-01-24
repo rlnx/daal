@@ -31,7 +31,7 @@ public:
     // TODO: figure out about using DataFormat object from public API here
     template <typename DataType>
     homogen_table_data(const DataType* data,
-                       std::int32_t rows, std::int32_t cols,
+                       std::int64_t rows, std::int64_t cols,
                        data_format fmt)
         : table_data(rows, cols),
           _fmt(fmt),

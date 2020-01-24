@@ -49,9 +49,9 @@ public:
         return _data;
     }
 
-    std::int32_t get_size() const noexcept {
-        std::int32_t num_rows = _slice.rows.get_num_of_elements(_data_origin->get_num_rows());
-        std::int32_t num_cols = _slice.cols.get_num_of_elements(_data_origin->get_num_cols());
+    std::int64_t get_size() const noexcept {
+        std::int64_t num_rows = _slice.rows.get_num_of_elements(_data_origin->get_num_rows());
+        std::int64_t num_cols = _slice.cols.get_num_of_elements(_data_origin->get_num_cols());
 
         return num_rows * num_cols;
     }

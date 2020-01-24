@@ -14,21 +14,13 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include "onedal/data_management/homogen_table.hpp"
+#pragma once
 
 namespace dal {
-namespace data_management {
-namespace detail {
 
-template <typename DataType>
-homogen_table create_table(const DataType* data, std::int64_t rows, std::int64_t cols, data_format df) {
-    return homogen_table(data, rows, cols, df);
-}
+enum class access_mode {
+    read,
+    write
+};
 
-template homogen_table create_table<float>(const float* data, int64_t rows, int64_t cols, data_format df);
-template homogen_table create_table<double>(const double* data, int64_t rows, int64_t cols, data_format df);
-template homogen_table create_table<std::int32_t>(const std::int32_t* data, int64_t rows, int64_t cols, data_format df);
-
-} // namespace detail
-} // namespace data_management
 } // namespace dal

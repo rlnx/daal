@@ -11,7 +11,7 @@ namespace detail {
 
 class params_impl : public base {
  public:
-  std::int32_t components_count = -1;
+  std::int64_t components_count = -1;
   bool is_deterministic = false;
 };
 
