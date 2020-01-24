@@ -30,7 +30,7 @@ template <typename DataType>
 inline type_rt make_type_rt();
 
 template <>
-inline type_rt make_type_rt<std::int64_t>() {
+inline type_rt make_type_rt<std::int32_t>() {
     return type_rt::i32;
 }
 
