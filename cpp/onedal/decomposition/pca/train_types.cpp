@@ -17,8 +17,6 @@
 #include "onedal/decomposition/pca/train_types.hpp"
 #include "onedal/decomposition/pca/detail/train_types_impl.hpp"
 
-using namespace dal::data_management;
-
 namespace dal {
 namespace decomposition {
 namespace pca {

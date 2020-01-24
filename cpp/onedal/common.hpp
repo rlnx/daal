@@ -16,7 +16,8 @@
 
 #pragma once
 
-#include "onedal/range.hpp"
+#include "onedal/ranges.hpp"
+#include "onedal/integral_types.hpp"
 
 namespace dal {
 

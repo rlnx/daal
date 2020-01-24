@@ -18,12 +18,11 @@
 
 #include <cstring>
 
-#include "onedal/data_management/data_format.hpp"
-#include "onedal/data_management/detail/table_data.hpp"
+#include "onedal/data_types.hpp"
+#include "onedal/detail/table_data.hpp"
 #include "onedal/detail/type_rt.hpp"
 
 namespace dal {
-namespace data_management {
 namespace detail {
 
 class homogen_table_data : public table_data {
@@ -52,13 +51,13 @@ public:
         return _fmt;
     }
 
-    virtual float* get_data_ptr(const slice&, float*) const override;
-    virtual double* get_data_ptr(const slice&, double*) const override;
-    virtual std::int32_t* get_data_ptr(const slice&, std::int32_t*) const override;
+    virtual float* get_data_ptr(const range2d&, float*) const override;
+    virtual double* get_data_ptr(const range2d&, double*) const override;
+    virtual std::int32_t* get_data_ptr(const range2d&, std::int32_t*) const override;
 
-    virtual void release_data_ptr(const slice&, float*, bool need_copy_ptr) override;
-    virtual void release_data_ptr(const slice&, double*, bool need_copy_ptr) override;
-    virtual void release_data_ptr(const slice&, std::int32_t*, bool need_copy_ptr) override;
+    virtual void release_data_ptr(const range2d&, float*, bool need_copy_ptr) override;
+    virtual void release_data_ptr(const range2d&, double*, bool need_copy_ptr) override;
+    virtual void release_data_ptr(const range2d&, std::int32_t*, bool need_copy_ptr) override;
 
 private:
     template <typename DataType>
@@ -71,10 +70,10 @@ private:
     }
 
     template <typename DataType>
-    DataType* get_slice_impl(const slice&) const;
+    DataType* get_slice_impl(const range2d&) const;
 
     template <typename DataType>
-    void release_slice_impl(const slice&, DataType*, bool need_copy_ptr);
+    void release_slice_impl(const range2d&, DataType*, bool need_copy_ptr);
 
 private:
     data_format _fmt;
@@ -85,5 +84,4 @@ private:
 };
 
 } // namespace detail
-} // namespace data_management
 } // namespace dal

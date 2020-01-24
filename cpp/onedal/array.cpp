@@ -14,18 +14,27 @@
  * limitations under the License.
  *******************************************************************************/
 
-#pragma once
+#include "onedal/array.hpp"
+#include "onedal/detail/array_impl.hpp"
 
-#include "onedal/data_management/array.hpp"
-#include "onedal/data_management/table.hpp"
+using std::int32_t;
+using std::int64_t;
 
 namespace dal {
-namespace data_management {
-namespace detail {
 
 template <typename T>
-array<T> create_array(const table&);
+T* array<T>::get_pointer() const noexcept {
+    const auto& arr_impl = *_impl;
+    return arr_impl.get_data_ptr();
+}
 
-} // namespace detail
-} // namespace data_management
+template <typename T>
+int64_t array<T>::get_size() const noexcept {
+    return _impl->get_size();
+}
+
+template class array<float>;
+template class array<double>;
+template class array<int32_t>;
+
 } // namespace dal

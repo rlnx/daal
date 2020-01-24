@@ -16,11 +16,46 @@
 
 #pragma once
 
+#include "onedal/array.hpp"
+#include "onedal/common.hpp"
+#include "onedal/data_types.hpp"
+#include "onedal/detail/common.hpp"
+
 namespace dal {
 
-enum class access_mode {
-    read,
-    write
+namespace detail {
+class table_impl;
+} // namespace detail
+
+class table : public base {
+public:
+    using pimpl = dal::detail::pimpl<detail::table_impl>;
+
+public:
+    table(const table& table)
+        : _impl(table._impl)
+    { }
+
+    table(const pimpl& impl)
+        : _impl(impl)
+    { }
+
+    std::int64_t get_num_rows() const noexcept;
+    std::int64_t get_num_cols() const noexcept;
+
+    detail::table_impl* get_impl_ptr() const noexcept {
+        return _impl.get();
+    }
+
+    const pimpl& get_impl() const noexcept {
+        return _impl;
+    }
+
+private:
+    pimpl _impl;
 };
+
+template <typename T, access_mode Mode>
+array<T> flatten(const table& t, const range2d& r);
 
 } // namespace dal

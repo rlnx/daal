@@ -16,13 +16,16 @@
 
 #pragma once
 
-#include "onedal/data_management/detail/create_table.hpp"
-
 namespace dal {
 
-template <typename... Args>
-auto create_table(Args&&... args) {
-    return data_management::detail::create_table(std::forward<Args>(args)...);
-}
+enum class access_mode {
+    read,
+    write
+};
+
+enum class data_format {
+    rowmajor,
+    colmajor
+};
 
 } // namespace dal

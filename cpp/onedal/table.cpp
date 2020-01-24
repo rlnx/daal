@@ -14,26 +14,25 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include "onedal/data_management/table.hpp"
-#include "onedal/data_management/detail/table_impl.hpp"
-#include "onedal/data_management/detail/array_impl.hpp"
+#include "onedal/table.hpp"
+#include "onedal/detail/table_impl.hpp"
+#include "onedal/detail/array_impl.hpp"
 
 using std::int32_t;
 using std::int64_t;
 
 namespace dal {
-namespace data_management {
 
 int64_t table::get_num_rows() const noexcept {
     auto rows_total = _impl->data_container->get_num_rows();
-    auto slice_rows = _impl->elements_to_access.rows;
+    auto slice_rows = _impl->elements_to_access.x;
 
     return slice_rows.get_num_of_elements(rows_total);
 }
 
 int64_t table::get_num_cols() const noexcept {
     auto cols_total = _impl->data_container->get_num_cols();
-    auto slice_cols = _impl->elements_to_access.cols;
+    auto slice_cols = _impl->elements_to_access.y;
 
     return slice_cols.get_num_of_elements(cols_total);
 }
@@ -43,8 +42,7 @@ array<T> flatten(const table& t, const range2d& r) {
     auto* t_impl_ptr = t.get_impl_ptr();
 
     typename array<T>::pimpl a_impl {
-        new detail::array_impl<T>(t_impl_ptr->data_container,
-        { .rows = r.row_range, .cols = r.col_range })
+        new detail::array_impl<T>(t_impl_ptr->data_container, r)
     };
 
     return a_impl;
@@ -59,5 +57,4 @@ template array<double> flatten<double, access_mode::write>(const table&, const r
 template array<int32_t> flatten<int32_t, access_mode::read>(const table&, const range2d&);
 template array<int32_t> flatten<int32_t, access_mode::write>(const table&, const range2d&);
 
-} // namespace data_management
 } // namespace dal

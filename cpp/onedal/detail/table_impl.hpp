@@ -14,21 +14,29 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include "onedal/data_management/homogen_table.hpp"
+#pragma once
+
+#include "onedal/common.hpp"
+#include "onedal/detail/table_data.hpp"
 
 namespace dal {
-namespace data_management {
 namespace detail {
 
-template <typename DataType>
-homogen_table create_table(const DataType* data, std::int64_t rows, std::int64_t cols, data_format df) {
-    return homogen_table(data, rows, cols, df);
-}
+class table_impl {
+public:
+    table_data_ptr data_container;
+    range2d elements_to_access;
 
-template homogen_table create_table<float>(const float* data, int64_t rows, int64_t cols, data_format df);
-template homogen_table create_table<double>(const double* data, int64_t rows, int64_t cols, data_format df);
-template homogen_table create_table<std::int32_t>(const std::int32_t* data, int64_t rows, int64_t cols, data_format df);
+    table_impl(const table_data_ptr& cnt, const range2d& s)
+        : data_container(cnt),
+          elements_to_access(s)
+    { }
+
+    table_impl(const table_data_ptr& cnt)
+        : data_container(cnt),
+          elements_to_access({ .x = {0, -1}, .y = {0, -1} })
+    { }
+};
 
 } // namespace detail
-} // namespace data_management
 } // namespace dal

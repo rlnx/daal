@@ -20,29 +20,37 @@
 #include "onedal/detail/common.hpp"
 
 namespace dal {
-namespace data_management {
-
 namespace detail {
-template <typename T> class array_impl;
-} // namespace detail
 
-template <typename T>
-class array {
+class table_data : public base {
 public:
-    using pimpl = dal::detail::pimpl< detail::array_impl<T> >;
-
-public:
-    array(const pimpl& impl)
-        : _impl(impl)
+    table_data(std::int64_t rows, std::int64_t cols)
+        : _rows(rows)
+        , _cols(cols)
     { }
 
-    T* get_data() noexcept;
-    const T* get_data() const noexcept;
-    std::int64_t get_size() const noexcept;
+    virtual std::int64_t get_num_rows() const noexcept {
+        return _rows;
+    }
+
+    virtual std::int64_t get_num_cols() const noexcept {
+        return _cols;
+    }
+
+    virtual float* get_data_ptr(const range2d&, float*) const = 0;
+    virtual double* get_data_ptr(const range2d&, double*) const = 0;
+    virtual std::int32_t* get_data_ptr(const range2d&, std::int32_t*) const = 0;
+
+    virtual void release_data_ptr(const range2d&, float*, bool need_copy_ptr) = 0;
+    virtual void release_data_ptr(const range2d&, double*, bool need_copy_ptr) = 0;
+    virtual void release_data_ptr(const range2d&, std::int32_t*, bool need_copy_ptr) = 0;
 
 private:
-    pimpl _impl;
+    std::int64_t _rows;
+    std::int64_t _cols;
 };
 
-} // namespace data_management
+using table_data_ptr = dal::detail::shared<table_data>;
+
+} // namespace detail
 } // namespace dal

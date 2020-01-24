@@ -2,8 +2,6 @@
 
 #include "onedal/decomposition/pca/common.hpp"
 
-using namespace dal::data_management;
-
 namespace dal {
 namespace decomposition {
 namespace pca {

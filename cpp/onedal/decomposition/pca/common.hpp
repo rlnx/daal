@@ -17,7 +17,7 @@
 #pragma once
 
 #include "onedal/detail/common.hpp"
-#include "onedal/data_management/table.hpp"
+#include "onedal/table.hpp"
 
 namespace dal {
 
@@ -79,7 +79,7 @@ public:
 public:
   model(const pimpl& impl);
 
-  data_management::table get_eigenvectors() const;
+  table get_eigenvectors() const;
 
 private:
   dal::detail::pimpl<detail::model_impl> impl_;

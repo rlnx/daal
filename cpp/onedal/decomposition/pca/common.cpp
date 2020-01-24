@@ -15,9 +15,7 @@
 *******************************************************************************/
 
 #include "onedal/decomposition/pca/detail/common_impl.hpp"
-#include "onedal/data_management/detail/table_impl.hpp"
-
-using namespace dal::data_management;
+#include "onedal/detail/table_impl.hpp"
 
 namespace dal {
 namespace decomposition {

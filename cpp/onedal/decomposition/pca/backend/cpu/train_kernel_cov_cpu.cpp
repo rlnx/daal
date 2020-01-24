@@ -14,16 +14,15 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include <iostream>
-
 #include "daal/include/algorithms/pca/pca_batch.h"
+
+
+#include "onedal/detail/table_impl.hpp"
+#include "onedal/detail/homogen_table_data.hpp"
+
 #include "onedal/decomposition/pca/backend/cpu/train_kernel.hpp"
-
-#include "onedal/data_management/create_array.hpp"
-
 #include "onedal/decomposition/pca/detail/train_types_impl.hpp"
 #include "onedal/decomposition/pca/detail/common_impl.hpp"
-#include "onedal/data_management/detail/homogen_table_impl.hpp"
 
 namespace dal {
 namespace decomposition {
@@ -44,31 +43,35 @@ struct train_kernel<Cpu, Float, method::cov> {
     // TODO: algorithm.parameter.resultsToCompute = pca::mean | pca::variance | pca::eigenvalue;
 
     auto data = input.get_data();
-    auto array = dal::create_array<Float>(data.rows({0, -1}));
-    auto inputNt = daal_dm::HomogenNumericTable<Float>::create(array.get_host_ptr(),
-                                                              data.get_num_cols(),
-                                                              data.get_num_rows());
+    auto array = dal::flatten<Float, dal::access_mode::read>(data, dal::row_range({0, -1}));
+    auto inputNt = daal_dm::HomogenNumericTable<Float>::create(array.get_pointer(),
+                                                               data.get_num_cols(),
+                                                               data.get_num_rows());
     alg.input.set(daal_pca::data, inputNt);
     alg.compute();
 
-    model::Pimpl model_impl { new detail::model_impl() };
-    train_result::Pimpl result_impl { new detail::train_result_impl() };
+    model::pimpl model_impl { new detail::model_impl() };
+    train_result::pimpl result_impl { new detail::train_result_impl() };
 
     daal_pca::ResultPtr result = alg.getResult();
     {
-      using dal::data_management::Table;
-      using dal::data_management::detail::HomogenTableImpl;
+        auto eigenvectors = result->get(daal_pca::eigenvectors);
 
-      auto eigenvectors = result->get(daal_pca::eigenvectors);
+        daal_dm::BlockDescriptor<Float> desc;
+        eigenvectors->getBlockOfRows(0, eigenvectors->getNumberOfRows(), daal_dm::readOnly, desc);
 
-      daal_dm::BlockDescriptor<Float> desc;
-      eigenvectors->getBlockOfRows(0, eigenvectors->getNumberOfRows(), daal_dm::readOnly, desc);
+        table::pimpl eigenvectors_table {
+            new dal::detail::table_impl {
+                .data_container = dal::detail::table_data_ptr {
+                    new dal::detail::homogen_table_data(desc.getBlockPtr(),
+                                                        eigenvectors->getNumberOfColumns(),
+                                                        eigenvectors->getNumberOfRows(),
+                                                        data_format::colmajor)
+                }
+            }
+        };
 
-      Table::Pimpl eigenvectors_table { new HomogenTableImpl(desc.getBlockPtr(),
-                                                            eigenvectors->getNumberOfRows(),
-                                                            eigenvectors->getNumberOfColumns(),
-                                                            dal::data_management::DataFormat::colmajor) };
-      model_impl->eigenvectors = eigenvectors_table;
+        model_impl->eigenvectors = eigenvectors_table;
     }
 
     result_impl->trained_model = model_impl;

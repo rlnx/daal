@@ -18,10 +18,9 @@
 
 #include "onedal/common.hpp"
 #include "onedal/detail/common.hpp"
-#include "onedal/data_management/detail/table_data.hpp"
+#include "onedal/detail/table_data.hpp"
 
 namespace dal {
-namespace data_management {
 namespace detail {
 
 // TODO: this is particular array impl for slices,
@@ -29,40 +28,32 @@ namespace detail {
 template <typename T>
 class array_impl {
 public:
-    array_impl(const table_data_ptr& data_origin, const slice& slice)
+    array_impl(const table_data_ptr& data_origin, const range2d& slice)
         : _data_origin(data_origin),
           _slice(slice) {
         _data = _data_origin->get_data_ptr(_slice, _data);
-        _need_update_origin = false;
     }
 
     ~array_impl() {
-        _data_origin->release_data_ptr(_slice, _data, _need_update_origin);
+        _data_origin->release_data_ptr(_slice, _data, true);
     }
 
-    T* get_data_ptr() noexcept {
-        _need_update_origin = true;
-        return _data;
-    }
-
-    const T* get_data_ptr() const noexcept {
+    T* get_data_ptr() const noexcept {
         return _data;
     }
 
     std::int64_t get_size() const noexcept {
-        std::int64_t num_rows = _slice.rows.get_num_of_elements(_data_origin->get_num_rows());
-        std::int64_t num_cols = _slice.cols.get_num_of_elements(_data_origin->get_num_cols());
+        std::int64_t num_rows = _slice.x.get_num_of_elements(_data_origin->get_num_rows());
+        std::int64_t num_cols = _slice.y.get_num_of_elements(_data_origin->get_num_cols());
 
         return num_rows * num_cols;
     }
 
 private:
     table_data_ptr _data_origin;
-    slice _slice;
+    range2d _slice;
     T* _data;
-    bool _need_update_origin;
 };
 
 } // namespace detail
-} // namespace data_management
 } // namespace dal

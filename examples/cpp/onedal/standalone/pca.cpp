@@ -1,9 +1,7 @@
 #include <iostream>
 
 #include "onedal/decomposition/pca.hpp"
-#include "onedal/data_management/table.hpp"
-#include "onedal/data_management/create_table.hpp"
-#include "onedal/data_management/create_array.hpp"
+#include "onedal/homogen_table.hpp"
 
 int main(int argc, char const *argv[]) {
     using namespace dal::decomposition;
@@ -34,11 +32,10 @@ int main(int argc, char const *argv[]) {
         for (int vector_num = 0; vector_num < eigvec.get_num_cols(); vector_num++) {
             std::cout << "(" << vector_num << "): ";
 
-            auto eigvec_array = dal::data_management::flatten<float, dal::access_mode::read>(
+            auto eigvec_array = dal::flatten<float, dal::access_mode::read>(
                 eigvec, dal::column_range({vector_num, vector_num+1}));
 
-            // float *eigvec_ptr = eigvec_array.get_pointer();
-            float *eigvec_ptr = eigvec_array.get_data();
+            float *eigvec_ptr = eigvec_array.get_pointer();
 
             for(int i = 0; i < eigvec_array.get_size(); i++) {
                 std::cout << eigvec_ptr[i] << " ";

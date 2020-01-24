@@ -14,15 +14,14 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include "onedal/data_management/homogen_table.hpp"
-#include "onedal/data_management/detail/homogen_table_data.hpp"
-#include "onedal/data_management/detail/table_impl.hpp"
+#include "onedal/homogen_table.hpp"
+#include "onedal/detail/homogen_table_data.hpp"
+#include "onedal/detail/table_impl.hpp"
 
 using std::int32_t;
 using std::int64_t;
 
 namespace dal {
-namespace data_management {
 
 template<typename DataType>
 homogen_table::homogen_table(const DataType* data, int64_t rows, int64_t cols, data_format df)
@@ -31,9 +30,17 @@ homogen_table::homogen_table(const DataType* data, int64_t rows, int64_t cols, d
     }))
 { }
 
+template <typename DataType>
+homogen_table create_table(const DataType* data, std::int64_t rows, std::int64_t cols, data_format df) {
+    return homogen_table(data, rows, cols, df);
+}
+
 template homogen_table::homogen_table<float>(const float* data, int64_t rows, int64_t cols, data_format df);
 template homogen_table::homogen_table<double>(const double* data, int64_t rows, int64_t cols, data_format df);
 template homogen_table::homogen_table<int32_t>(const std::int32_t* data, int64_t rows, int64_t cols, data_format df);
 
-} // namespace data_management
+template homogen_table create_table<float>(const float* data, int64_t rows, int64_t cols, data_format df);
+template homogen_table create_table<double>(const double* data, int64_t rows, int64_t cols, data_format df);
+template homogen_table create_table<std::int32_t>(const std::int32_t* data, int64_t rows, int64_t cols, data_format df);
+
 } // namespace dal

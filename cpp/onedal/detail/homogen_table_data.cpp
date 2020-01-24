@@ -14,36 +14,35 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include "onedal/data_management/detail/homogen_table_data.hpp"
+#include "onedal/detail/homogen_table_data.hpp"
 
 using std::int32_t;
 using std::int64_t;
 
 namespace dal {
-namespace data_management {
 namespace detail {
 
-float* homogen_table_data::get_data_ptr(const slice& s, float*) const {
+float* homogen_table_data::get_data_ptr(const range2d& s, float*) const {
     return get_slice_impl<float>(s);
 }
 
-double* homogen_table_data::get_data_ptr(const slice& s, double*) const {
+double* homogen_table_data::get_data_ptr(const range2d& s, double*) const {
     return get_slice_impl<double>(s);
 }
 
-int32_t* homogen_table_data::get_data_ptr(const slice& s, int32_t*) const {
+int32_t* homogen_table_data::get_data_ptr(const range2d& s, int32_t*) const {
     return get_slice_impl<int32_t>(s);
 }
 
-void homogen_table_data::release_data_ptr(const slice& s, float* data, bool need_copy_ptr) {
+void homogen_table_data::release_data_ptr(const range2d& s, float* data, bool need_copy_ptr) {
     release_slice_impl(s, data, need_copy_ptr);
 }
 
-void homogen_table_data::release_data_ptr(const slice& s, double* data, bool need_copy_ptr) {
+void homogen_table_data::release_data_ptr(const range2d& s, double* data, bool need_copy_ptr) {
     release_slice_impl(s, data, need_copy_ptr);
 }
 
-void homogen_table_data::release_data_ptr(const slice& s, int32_t* data, bool need_copy_ptr) {
+void homogen_table_data::release_data_ptr(const range2d& s, int32_t* data, bool need_copy_ptr) {
     release_slice_impl(s, data, need_copy_ptr);
 }
 
@@ -61,32 +60,27 @@ struct index_pair {
 struct slice_info {
     index_pair size;
     index_pair offset;
-    index_pair step;
 
     int64_t ld_data;
 
-    slice_info(const slice& s, int64_t num_rows, int64_t num_cols, const data_format& fmt)
-        : size({ s.cols.get_num_of_elements(num_cols), s.rows.get_num_of_elements(num_rows) }),
-          offset({ s.cols.start_idx, s.rows.start_idx }),
-          step({ s.cols.step, s.rows.step }),
+    slice_info(const range2d& s, int64_t num_rows, int64_t num_cols, const data_format& fmt)
+        : size({ s.y.get_num_of_elements(num_cols), s.x.get_num_of_elements(num_rows) }),
+          offset({ s.y.start_idx, s.x.start_idx }),
           ld_data(num_cols){
         if (fmt == data_format::colmajor) {
             size.swap();
             offset.swap();
-            step.swap();
             ld_data = num_rows;
         }
     }
 };
 
 bool need_allocate_ptr(const slice_info& info) {
-    return (info.step.x != 1) ||
-           (info.step.y != 1) ||
-           (info.size.y > 1 && info.size.x != info.ld_data);
+    return (info.size.y > 1 && info.size.x != info.ld_data);
 }
 
 template <typename DataType>
-DataType* homogen_table_data::get_slice_impl(const slice& s) const {
+DataType* homogen_table_data::get_slice_impl(const range2d& s) const {
     slice_info info { s, get_num_rows(), get_num_cols(), get_data_format() };
 
     if (_type_rt == dal::detail::make_type_rt<DataType>()) {
@@ -96,8 +90,8 @@ DataType* homogen_table_data::get_slice_impl(const slice& s) const {
             DataType* out_array = new DataType[info.size.x * info.size.y];
             for (int y = 0; y < info.size.y; y++) {
                 for (int x = 0; x < info.size.x; x++) {
-                    const int64_t data_x = x*info.step.x + info.offset.x;
-                    const int64_t data_y = y*info.step.y + info.offset.y;
+                    const int64_t data_x = x + info.offset.x;
+                    const int64_t data_y = y + info.offset.y;
                     const int64_t ld_out = info.size.x;
                     const int64_t ld_data = info.ld_data;
 
@@ -115,7 +109,7 @@ DataType* homogen_table_data::get_slice_impl(const slice& s) const {
 }
 
 template <typename DataType>
-void homogen_table_data::release_slice_impl(const slice& s, DataType* data, bool need_copy_ptr) {
+void homogen_table_data::release_slice_impl(const range2d& s, DataType* data, bool need_copy_ptr) {
     slice_info info { s, get_num_rows(), get_num_cols(), get_data_format() };
 
     if (_type_rt == dal::detail::make_type_rt<DataType>()) {
@@ -126,8 +120,8 @@ void homogen_table_data::release_slice_impl(const slice& s, DataType* data, bool
 
             for (int y = 0; y < info.size.y; y++) {
                 for (int x = 0; x < info.size.x; x++) {
-                    const int64_t data_x = x*info.step.x + info.offset.x;
-                    const int64_t data_y = y*info.step.y + info.offset.y;
+                    const int64_t data_x = x + info.offset.x;
+                    const int64_t data_y = y + info.offset.y;
                     const int64_t ld_out = info.size.x;
                     const int64_t ld_data = info.ld_data;
 
@@ -145,5 +139,4 @@ void homogen_table_data::release_slice_impl(const slice& s, DataType* data, bool
 }
 
 } // namespace detail
-} // namespace data_management
 } // namespace dal

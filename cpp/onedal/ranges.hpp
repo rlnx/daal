@@ -19,40 +19,33 @@
 
 namespace dal {
 
-  // TODO: think of how to semantically distinguish
-  // "simple" and "complex" types
 class range {
 public:
     std::int64_t start_idx;
     std::int64_t end_idx;
-    std::int64_t step;
 
 public:
     range(std::int64_t start,
-          std::int64_t end,
-          std::int64_t step = 1)
+          std::int64_t end)
         : start_idx(start),
-          end_idx(end),
-          step(step)
+          end_idx(end)
     { }
 
     std::int64_t get_num_of_elements(std::int64_t end_of_parent) const noexcept {
         // TODO: handle error if (end_of_parent + end_idx) < 0
         auto final_row = (end_idx < 0) ? end_of_parent + end_idx + 1 : end_idx;
 
-        return (final_row - start_idx - 1) / step + 1;
+        return (final_row - start_idx - 1) + 1;
     }
 };
 
 class range2d {
 public:
-    range row_range;
-    range col_range;
+    range x;
+    range y;
 };
 
 inline range intersect_borders(const range& r1, const range& r2, std::int64_t end_of_parent) {
-    // TODO: do not work if steps are not equal to one
-    // TODO: move to detail?
     auto r1_end = r1.end_idx > 0 ? r1.end_idx - end_of_parent - 1 : r1.end_idx;
     auto r2_end = r2.end_idx > 0 ? r2.end_idx - end_of_parent - 1 : r2.end_idx;
 
@@ -67,6 +60,10 @@ inline range2d row_range(const range& r) {
 
 inline range2d column_range(const range& r) {
     return { {0, -1}, r };
+}
+
+inline range2d row_column_range(const range& row_range, const range& column_range) {
+    return { row_range, column_range };
 }
 
 } // namespace dal
