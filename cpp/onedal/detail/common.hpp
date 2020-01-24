@@ -33,5 +33,22 @@ using shared = std::shared_ptr<T>;
 template <typename T>
 using pimpl = shared<T>;
 
+struct pimpl_accessor {
+  template <typename Object>
+  auto& operator()(Object&& object) const {
+    return object._impl;
+  }
+};
+
+template <typename Impl, typename Object>
+Impl& get_impl(Object&& object) {
+  return static_cast<Impl&>(pimpl_accessor()(object).get());
+}
+
+template <typename Object>
+typename Object::pimpl get_impl_ptr(const Object& object) {
+  return pimpl_accessor()(object);
+}
+
 }  // namespace detail
 }  // namespace dal

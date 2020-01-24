@@ -16,26 +16,25 @@
 
 #pragma once
 
-#include "onedal/common.hpp"
-#include "onedal/detail/common.hpp"
-#include "onedal/detail/table_data.hpp"
+#include "onedal/detail/deleters.hpp"
+#include "onedal/detail/table_impl.hpp"
 
 namespace dal {
 namespace detail {
 
-// TODO: this is particular array impl for slices,
-// rename it
 template <typename T>
 class array_impl {
 public:
-    array_impl(const table_data_ptr& data_origin, const range2d& slice)
-        : _data_origin(data_origin),
-          _slice(slice) {
-        _data = _data_origin->get_data_ptr(_slice, _data);
-    }
+    template <typename Deleter>
+    array_impl(T* data, std::int64_t size, Deleter d)
+        : _data(data),
+          _size(size),
+          _deleter(shared<deleter_iface>(new deleter_container<Deleter>(d)))
+    { }
 
     ~array_impl() {
-        _data_origin->release_data_ptr(_slice, _data, true);
+        _deleter->operator()((void*)_data);
+        _data = nullptr;
     }
 
     T* get_data_ptr() const noexcept {
@@ -43,16 +42,13 @@ public:
     }
 
     std::int64_t get_size() const noexcept {
-        std::int64_t num_rows = _slice.x.get_num_of_elements(_data_origin->get_num_rows());
-        std::int64_t num_cols = _slice.y.get_num_of_elements(_data_origin->get_num_cols());
-
-        return num_rows * num_cols;
+        return _size;
     }
 
 private:
-    table_data_ptr _data_origin;
-    range2d _slice;
     T* _data;
+    std::int64_t _size;
+    shared<deleter_iface> _deleter;
 };
 
 } // namespace detail

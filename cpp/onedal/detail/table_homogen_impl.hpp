@@ -19,26 +19,25 @@
 #include <cstring>
 
 #include "onedal/data_types.hpp"
-#include "onedal/detail/table_data.hpp"
+#include "onedal/detail/table_impl.hpp"
 #include "onedal/detail/type_rt.hpp"
 
 namespace dal {
 namespace detail {
 
-class homogen_table_data : public table_data {
+class table_homogen_impl : public table_impl {
 public:
-    // TODO: figure out about using DataFormat object from public API here
     template <typename DataType>
-    homogen_table_data(const DataType* data,
+    table_homogen_impl(const DataType* data,
                        std::int64_t rows, std::int64_t cols,
                        data_format fmt)
-        : table_data(rows, cols),
+        : table_impl(rows, cols),
           _fmt(fmt),
           _type_rt(dal::detail::make_type_rt<DataType>()),
           _data_bytes(init_data(data, rows * cols * sizeof(DataType)))
     { }
 
-    ~homogen_table_data() {
+    ~table_homogen_impl() {
         delete[] _data_bytes;
         _data_bytes = nullptr;
     }

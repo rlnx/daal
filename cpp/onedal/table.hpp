@@ -43,16 +43,10 @@ public:
     std::int64_t get_row_count() const noexcept;
     std::int64_t get_column_count() const noexcept;
 
-    detail::table_impl* get_impl_ptr() const noexcept {
-        return _impl.get();
-    }
-
-    const pimpl& get_impl() const noexcept {
-        return _impl;
-    }
-
 private:
     pimpl _impl;
+
+    friend detail::pimpl_accessor;
 };
 
 template <typename T, access_mode Mode>

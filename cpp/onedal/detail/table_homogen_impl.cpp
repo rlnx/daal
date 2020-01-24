@@ -14,7 +14,7 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include "onedal/detail/homogen_table_data.hpp"
+#include "onedal/detail/table_homogen_impl.hpp"
 
 using std::int32_t;
 using std::int64_t;
@@ -22,27 +22,27 @@ using std::int64_t;
 namespace dal {
 namespace detail {
 
-float* homogen_table_data::get_data_ptr(const range2d& s, float*) const {
+float* table_homogen_impl::get_data_ptr(const range2d& s, float*) const {
     return get_slice_impl<float>(s);
 }
 
-double* homogen_table_data::get_data_ptr(const range2d& s, double*) const {
+double* table_homogen_impl::get_data_ptr(const range2d& s, double*) const {
     return get_slice_impl<double>(s);
 }
 
-int32_t* homogen_table_data::get_data_ptr(const range2d& s, int32_t*) const {
+int32_t* table_homogen_impl::get_data_ptr(const range2d& s, int32_t*) const {
     return get_slice_impl<int32_t>(s);
 }
 
-void homogen_table_data::release_data_ptr(const range2d& s, float* data, bool need_copy_ptr) {
+void table_homogen_impl::release_data_ptr(const range2d& s, float* data, bool need_copy_ptr) {
     release_slice_impl(s, data, need_copy_ptr);
 }
 
-void homogen_table_data::release_data_ptr(const range2d& s, double* data, bool need_copy_ptr) {
+void table_homogen_impl::release_data_ptr(const range2d& s, double* data, bool need_copy_ptr) {
     release_slice_impl(s, data, need_copy_ptr);
 }
 
-void homogen_table_data::release_data_ptr(const range2d& s, int32_t* data, bool need_copy_ptr) {
+void table_homogen_impl::release_data_ptr(const range2d& s, int32_t* data, bool need_copy_ptr) {
     release_slice_impl(s, data, need_copy_ptr);
 }
 
@@ -80,7 +80,7 @@ bool need_allocate_ptr(const slice_info& info) {
 }
 
 template <typename DataType>
-DataType* homogen_table_data::get_slice_impl(const range2d& s) const {
+DataType* table_homogen_impl::get_slice_impl(const range2d& s) const {
     slice_info info { s, get_num_rows(), get_num_cols(), get_data_format() };
 
     if (_type_rt == dal::detail::make_type_rt<DataType>()) {
@@ -109,7 +109,7 @@ DataType* homogen_table_data::get_slice_impl(const range2d& s) const {
 }
 
 template <typename DataType>
-void homogen_table_data::release_slice_impl(const range2d& s, DataType* data, bool need_copy_ptr) {
+void table_homogen_impl::release_slice_impl(const range2d& s, DataType* data, bool need_copy_ptr) {
     slice_info info { s, get_num_rows(), get_num_cols(), get_data_format() };
 
     if (_type_rt == dal::detail::make_type_rt<DataType>()) {

@@ -17,26 +17,40 @@
 #pragma once
 
 #include "onedal/common.hpp"
-#include "onedal/detail/table_data.hpp"
+#include "onedal/detail/common.hpp"
 
 namespace dal {
 namespace detail {
 
-class table_impl {
+class table_impl : public base {
 public:
-    table_data_ptr data_container;
-    range2d elements_to_access;
-
-    table_impl(const table_data_ptr& cnt, const range2d& s)
-        : data_container(cnt),
-          elements_to_access(s)
+    table_impl(std::int64_t rows, std::int64_t cols)
+        : _rows(rows)
+        , _cols(cols)
     { }
 
-    table_impl(const table_data_ptr& cnt)
-        : data_container(cnt),
-          elements_to_access({ .x = {0, -1}, .y = {0, -1} })
-    { }
+    virtual std::int64_t get_num_rows() const noexcept {
+        return _rows;
+    }
+
+    virtual std::int64_t get_num_cols() const noexcept {
+        return _cols;
+    }
+
+    virtual float* get_data_ptr(const range2d&, float*) const = 0;
+    virtual double* get_data_ptr(const range2d&, double*) const = 0;
+    virtual std::int32_t* get_data_ptr(const range2d&, std::int32_t*) const = 0;
+
+    virtual void release_data_ptr(const range2d&, float*, bool need_copy_ptr) = 0;
+    virtual void release_data_ptr(const range2d&, double*, bool need_copy_ptr) = 0;
+    virtual void release_data_ptr(const range2d&, std::int32_t*, bool need_copy_ptr) = 0;
+
+private:
+    std::int64_t _rows;
+    std::int64_t _cols;
 };
+
+using table_impl_ptr = dal::detail::shared<table_impl>;
 
 } // namespace detail
 } // namespace dal

@@ -16,9 +16,7 @@
 
 #include "daal/include/algorithms/pca/pca_batch.h"
 
-
-#include "onedal/detail/table_impl.hpp"
-#include "onedal/detail/homogen_table_data.hpp"
+#include "onedal/detail/table_homogen_impl.hpp"
 
 #include "onedal/decomposition/pca/backend/cpu/train_kernel.hpp"
 #include "onedal/decomposition/pca/detail/train_types_impl.hpp"
@@ -61,14 +59,12 @@ struct train_kernel<Cpu, Float, method::cov> {
         eigenvectors->getBlockOfRows(0, eigenvectors->getNumberOfRows(), daal_dm::readOnly, desc);
 
         table::pimpl eigenvectors_table {
-            new dal::detail::table_impl {
-                .data_container = dal::detail::table_data_ptr {
-                    new dal::detail::homogen_table_data(desc.getBlockPtr(),
+                dal::detail::table_impl_ptr {
+                    new dal::detail::table_homogen_impl(desc.getBlockPtr(),
                                                         eigenvectors->getNumberOfColumns(),
                                                         eigenvectors->getNumberOfRows(),
                                                         data_format::colmajor)
                 }
-            }
         };
 
         model_impl->eigenvectors = eigenvectors_table;

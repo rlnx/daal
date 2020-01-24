@@ -16,33 +16,31 @@
 
 #pragma once
 
-#include "onedal/table.hpp"
+#include "onedal/common.hpp"
+#include "onedal/detail/common.hpp"
 
 namespace dal {
-
 namespace detail {
-class homogen_table_data;
-} // namespace detail
 
-class homogen_table : public table {
+class deleter_iface : public base {
 public:
-    using pimpl = dal::detail::pimpl<detail::homogen_table_data>;
-
-    homogen_table(const homogen_table& t)
-        : table(t.get_impl())
-    { }
-
-    template<typename DataType>
-    homogen_table(const DataType* data, std::int64_t rows, std::int64_t cols, data_format df);
-
-    detail::homogen_table_data* get_impl_ptr() const noexcept {
-        return reinterpret_cast<detail::homogen_table_data*>(table::get_impl_ptr());
-    }
+    virtual void operator()(void * ptr) = 0;
 };
 
-template <typename DataType>
-homogen_table create_table(const DataType* data,
-                           std::int64_t rows, std::int64_t cols,
-                           data_format df = data_format::rowmajor);
+// TODO: custom operator() for concrete type from T
+template <typename T>
+class deleter_container : public deleter_iface {
+public:
+    deleter_container(const T& impl)
+        : _impl(impl)
+    { }
 
+    virtual void operator()(void* ptr) override {
+        _impl(ptr);
+    }
+private:
+    T _impl;
+};
+
+} // namespace detail
 } // namespace dal
