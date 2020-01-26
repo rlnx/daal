@@ -41,7 +41,7 @@ struct train_kernel<Cpu, Float, method::cov> {
     // TODO: algorithm.parameter.resultsToCompute = pca::mean | pca::variance | pca::eigenvalue;
 
     auto data = input.get_data();
-    auto array = dal::flatten<Float, dal::access_mode::read>(data, dal::row_range({0, -1}));
+    auto array = dal::flatten<Float, dal::access_mode::read>(data, {0, -1}, {0, -1});
     auto inputNt = daal_dm::HomogenNumericTable<Float>::create(array.get_pointer(),
                                                                data.get_column_count(),
                                                                data.get_row_count());

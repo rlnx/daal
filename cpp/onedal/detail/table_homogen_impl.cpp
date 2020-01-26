@@ -22,28 +22,28 @@ using std::int64_t;
 namespace dal {
 namespace detail {
 
-float* table_homogen_impl::get_data_ptr(const range2d& s, float*) const {
-    return get_slice_impl<float>(s);
+float* table_homogen_impl::get_data_ptr(const range& rows, const range& columns, float*) const {
+    return get_slice_impl<float>(rows, columns);
 }
 
-double* table_homogen_impl::get_data_ptr(const range2d& s, double*) const {
-    return get_slice_impl<double>(s);
+double* table_homogen_impl::get_data_ptr(const range& rows, const range& columns, double*) const {
+    return get_slice_impl<double>(rows, columns);
 }
 
-int32_t* table_homogen_impl::get_data_ptr(const range2d& s, int32_t*) const {
-    return get_slice_impl<int32_t>(s);
+int32_t* table_homogen_impl::get_data_ptr(const range& rows, const range& columns, int32_t*) const {
+    return get_slice_impl<int32_t>(rows, columns);
 }
 
-void table_homogen_impl::release_data_ptr(const range2d& s, float* data, bool need_copy_ptr) {
-    release_slice_impl(s, data, need_copy_ptr);
+void table_homogen_impl::release_data_ptr(const range& rows, const range& columns, float* data, bool need_copy_ptr) {
+    release_slice_impl(rows, columns, data, need_copy_ptr);
 }
 
-void table_homogen_impl::release_data_ptr(const range2d& s, double* data, bool need_copy_ptr) {
-    release_slice_impl(s, data, need_copy_ptr);
+void table_homogen_impl::release_data_ptr(const range& rows, const range& columns, double* data, bool need_copy_ptr) {
+    release_slice_impl(rows, columns, data, need_copy_ptr);
 }
 
-void table_homogen_impl::release_data_ptr(const range2d& s, int32_t* data, bool need_copy_ptr) {
-    release_slice_impl(s, data, need_copy_ptr);
+void table_homogen_impl::release_data_ptr(const range& rows, const range& columns, int32_t* data, bool need_copy_ptr) {
+    release_slice_impl(rows, columns, data, need_copy_ptr);
 }
 
 struct index_pair {
@@ -63,9 +63,9 @@ struct slice_info {
 
     int64_t ld_data;
 
-    slice_info(const range2d& s, int64_t num_rows, int64_t num_cols, const data_format& fmt)
-        : size({ s.y.get_num_of_elements(num_cols), s.x.get_num_of_elements(num_rows) }),
-          offset({ s.y.start_idx, s.x.start_idx }),
+    slice_info(const range& rows, const range& columns, int64_t num_rows, int64_t num_cols, const data_format& fmt)
+        : size({ columns.get_num_of_elements(num_cols), rows.get_num_of_elements(num_rows) }),
+          offset({ columns.start_idx, rows.start_idx }),
           ld_data(num_cols){
         if (fmt == data_format::colmajor) {
             size.swap();
@@ -80,8 +80,8 @@ bool need_allocate_ptr(const slice_info& info) {
 }
 
 template <typename DataType>
-DataType* table_homogen_impl::get_slice_impl(const range2d& s) const {
-    slice_info info { s, get_num_rows(), get_num_cols(), get_data_format() };
+DataType* table_homogen_impl::get_slice_impl(const range& rows, const range& columns) const {
+    slice_info info { rows, columns, get_num_rows(), get_num_cols(), get_data_format() };
 
     if (_type_rt == dal::detail::make_type_rt<DataType>()) {
         DataType* data = reinterpret_cast<DataType*>(_data_bytes);
@@ -109,8 +109,8 @@ DataType* table_homogen_impl::get_slice_impl(const range2d& s) const {
 }
 
 template <typename DataType>
-void table_homogen_impl::release_slice_impl(const range2d& s, DataType* data, bool need_copy_ptr) {
-    slice_info info { s, get_num_rows(), get_num_cols(), get_data_format() };
+void table_homogen_impl::release_slice_impl(const range& rows, const range& columns, DataType* data, bool need_copy_ptr) {
+    slice_info info { rows, columns, get_num_rows(), get_num_cols(), get_data_format() };
 
     if (_type_rt == dal::detail::make_type_rt<DataType>()) {
         const bool need_release_ptr = need_allocate_ptr(info);

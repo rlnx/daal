@@ -50,11 +50,11 @@ private:
 };
 
 template <typename T, access_mode Mode>
-array<T> flatten(const table& t, const range2d& r);
+array<T> flatten(const table& t, const range& rows, const range& columns);
 
 template <typename T, access_mode Mode>
 array<T> flatten(const table& t) {
-    return flatten<T, Mode>(t, row_range({0, t.get_row_count()}));
+    return flatten<T, Mode>(t, {0, -1}, {0, -1});
 }
 
 } // namespace dal

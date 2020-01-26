@@ -37,13 +37,13 @@ public:
         return _cols;
     }
 
-    virtual float* get_data_ptr(const range2d&, float*) const = 0;
-    virtual double* get_data_ptr(const range2d&, double*) const = 0;
-    virtual std::int32_t* get_data_ptr(const range2d&, std::int32_t*) const = 0;
+    virtual float* get_data_ptr(const range& rows, const range& columns, float*) const = 0;
+    virtual double* get_data_ptr(const range& rows, const range& columns, double*) const = 0;
+    virtual std::int32_t* get_data_ptr(const range& rows, const range& columns, std::int32_t*) const = 0;
 
-    virtual void release_data_ptr(const range2d&, float*, bool need_copy_ptr) = 0;
-    virtual void release_data_ptr(const range2d&, double*, bool need_copy_ptr) = 0;
-    virtual void release_data_ptr(const range2d&, std::int32_t*, bool need_copy_ptr) = 0;
+    virtual void release_data_ptr(const range& rows, const range& columns, float*, bool need_copy_ptr) = 0;
+    virtual void release_data_ptr(const range& rows, const range& columns, double*, bool need_copy_ptr) = 0;
+    virtual void release_data_ptr(const range& rows, const range& columns, std::int32_t*, bool need_copy_ptr) = 0;
 
 private:
     std::int64_t _rows;

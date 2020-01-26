@@ -50,13 +50,13 @@ public:
         return _fmt;
     }
 
-    virtual float* get_data_ptr(const range2d&, float*) const override;
-    virtual double* get_data_ptr(const range2d&, double*) const override;
-    virtual std::int32_t* get_data_ptr(const range2d&, std::int32_t*) const override;
+    virtual float* get_data_ptr(const range& rows, const range& columns, float*) const override;
+    virtual double* get_data_ptr(const range& rows, const range& columns, double*) const override;
+    virtual std::int32_t* get_data_ptr(const range& rows, const range& columns, std::int32_t*) const override;
 
-    virtual void release_data_ptr(const range2d&, float*, bool need_copy_ptr) override;
-    virtual void release_data_ptr(const range2d&, double*, bool need_copy_ptr) override;
-    virtual void release_data_ptr(const range2d&, std::int32_t*, bool need_copy_ptr) override;
+    virtual void release_data_ptr(const range& rows, const range& columns, float*, bool need_copy_ptr) override;
+    virtual void release_data_ptr(const range& rows, const range& columns, double*, bool need_copy_ptr) override;
+    virtual void release_data_ptr(const range& rows, const range& columns, std::int32_t*, bool need_copy_ptr) override;
 
 private:
     template <typename DataType>
@@ -69,10 +69,10 @@ private:
     }
 
     template <typename DataType>
-    DataType* get_slice_impl(const range2d&) const;
+    DataType* get_slice_impl(const range&, const range&) const;
 
     template <typename DataType>
-    void release_slice_impl(const range2d&, DataType*, bool need_copy_ptr);
+    void release_slice_impl(const range&, const range&, DataType*, bool need_copy_ptr);
 
 private:
     data_format _fmt;
