@@ -57,4 +57,9 @@ array<T> flatten(const table& t) {
     return flatten<T, Mode>(t, {0, -1}, {0, -1});
 }
 
+template <typename T, access_mode Mode>
+array<T> flatten(const table& t, const range& rows) {
+    return flatten<T, Mode>(t, rows, {0, -1});
+}
+
 } // namespace dal
