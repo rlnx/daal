@@ -23,9 +23,4 @@ enum class access_mode {
     write
 };
 
-enum class data_format {
-    rowmajor,
-    colmajor
-};
-
 } // namespace dal

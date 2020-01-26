@@ -49,12 +49,6 @@ void table_homogen_impl::release_data_ptr(const range& rows, const range& column
 struct index_pair {
     int64_t x;
     int64_t y;
-
-    void swap() {
-        int64_t tmp = x;
-        x = y;
-        y = tmp;
-    }
 };
 
 struct slice_info {
@@ -63,15 +57,10 @@ struct slice_info {
 
     int64_t ld_data;
 
-    slice_info(const range& rows, const range& columns, int64_t num_rows, int64_t num_cols, const data_format& fmt)
+    slice_info(const range& rows, const range& columns, int64_t num_rows, int64_t num_cols)
         : size({ columns.get_num_of_elements(num_cols), rows.get_num_of_elements(num_rows) }),
           offset({ columns.start_idx, rows.start_idx }),
           ld_data(num_cols){
-        if (fmt == data_format::colmajor) {
-            size.swap();
-            offset.swap();
-            ld_data = num_rows;
-        }
     }
 };
 
@@ -81,7 +70,7 @@ bool need_allocate_ptr(const slice_info& info) {
 
 template <typename DataType>
 DataType* table_homogen_impl::get_slice_impl(const range& rows, const range& columns) const {
-    slice_info info { rows, columns, get_num_rows(), get_num_cols(), get_data_format() };
+    slice_info info { rows, columns, get_num_rows(), get_num_cols() };
 
     if (_type_rt == dal::detail::make_type_rt<DataType>()) {
         DataType* data = reinterpret_cast<DataType*>(_data_bytes);
@@ -110,7 +99,7 @@ DataType* table_homogen_impl::get_slice_impl(const range& rows, const range& col
 
 template <typename DataType>
 void table_homogen_impl::release_slice_impl(const range& rows, const range& columns, DataType* data, bool need_copy_ptr) {
-    slice_info info { rows, columns, get_num_rows(), get_num_cols(), get_data_format() };
+    slice_info info { rows, columns, get_num_rows(), get_num_cols() };
 
     if (_type_rt == dal::detail::make_type_rt<DataType>()) {
         const bool need_release_ptr = need_allocate_ptr(info);

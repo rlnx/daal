@@ -29,7 +29,7 @@ public:
     using pimpl = dal::detail::pimpl<detail::table_homogen_impl>;
 
     template<typename DataType>
-    table_homogen(const DataType* data, std::int64_t rows, std::int64_t cols, data_format df);
+    table_homogen(const DataType* data, std::int64_t rows, std::int64_t cols);
 
 private:
     friend detail::pimpl_accessor;
@@ -37,7 +37,6 @@ private:
 
 template <typename DataType>
 table_homogen make_table(const DataType* data,
-                         std::int64_t rows, std::int64_t cols,
-                         data_format df = data_format::rowmajor);
+                         std::int64_t rows, std::int64_t cols);
 
 } // namespace dal

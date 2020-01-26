@@ -23,21 +23,21 @@ using std::int64_t;
 namespace dal {
 
 template<typename DataType>
-table_homogen::table_homogen(const DataType* data, int64_t rows, int64_t cols, data_format df)
-    : table(detail::table_impl_ptr { new detail::table_homogen_impl(data, rows, cols, df) })
+table_homogen::table_homogen(const DataType* data, int64_t rows, int64_t cols)
+    : table(detail::table_impl_ptr { new detail::table_homogen_impl(data, rows, cols) })
 { }
 
 template <typename DataType>
-table_homogen make_table(const DataType* data, std::int64_t rows, std::int64_t cols, data_format df) {
-    return table_homogen(data, rows, cols, df);
+table_homogen make_table(const DataType* data, std::int64_t rows, std::int64_t cols) {
+    return table_homogen(data, rows, cols);
 }
 
-template table_homogen::table_homogen<float>(const float* data, int64_t rows, int64_t cols, data_format df);
-template table_homogen::table_homogen<double>(const double* data, int64_t rows, int64_t cols, data_format df);
-template table_homogen::table_homogen<int32_t>(const int32_t* data, int64_t rows, int64_t cols, data_format df);
+template table_homogen::table_homogen<float>(const float* data, int64_t rows, int64_t cols);
+template table_homogen::table_homogen<double>(const double* data, int64_t rows, int64_t cols);
+template table_homogen::table_homogen<int32_t>(const int32_t* data, int64_t rows, int64_t cols);
 
-template table_homogen make_table<float>(const float* data, int64_t rows, int64_t cols, data_format df);
-template table_homogen make_table<double>(const double* data, int64_t rows, int64_t cols, data_format df);
-template table_homogen make_table<int32_t>(const int32_t* data, int64_t rows, int64_t cols, data_format df);
+template table_homogen make_table<float>(const float* data, int64_t rows, int64_t cols);
+template table_homogen make_table<double>(const double* data, int64_t rows, int64_t cols);
+template table_homogen make_table<int32_t>(const int32_t* data, int64_t rows, int64_t cols);
 
 } // namespace dal

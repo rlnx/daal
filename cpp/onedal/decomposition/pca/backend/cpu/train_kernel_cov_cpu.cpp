@@ -62,8 +62,7 @@ struct train_kernel<Cpu, Float, method::cov> {
                 dal::detail::table_impl_ptr {
                     new dal::detail::table_homogen_impl(desc.getBlockPtr(),
                                                         eigenvectors->getNumberOfColumns(),
-                                                        eigenvectors->getNumberOfRows(),
-                                                        data_format::colmajor)
+                                                        eigenvectors->getNumberOfRows())
                 }
         };
 
