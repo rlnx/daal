@@ -25,15 +25,24 @@ namespace detail {
 template <typename T>
 class array_impl {
 public:
+    using deleter_ptr = shared<deleter_iface<T>>;
+
+public:
     template <typename Deleter>
     array_impl(T* data, std::int64_t size, Deleter d)
         : _data(data),
           _size(size),
-          _deleter(shared<deleter_iface>(new deleter_container<Deleter>(d)))
+          _deleter(new deleter_container<Deleter, T>(d))
+    { }
+
+    array_impl(T* data, std::int64_t size, const deleter_ptr& d)
+        : _data(data),
+          _size(size),
+          _deleter(d)
     { }
 
     ~array_impl() {
-        _deleter->operator()((void*)_data);
+        _deleter->operator()(_data);
         _data = nullptr;
     }
 
@@ -48,7 +57,7 @@ public:
 private:
     T* _data;
     std::int64_t _size;
-    shared<deleter_iface> _deleter;
+    deleter_ptr _deleter;
 };
 
 } // namespace detail

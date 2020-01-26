@@ -18,6 +18,7 @@
 
 #include "onedal/common.hpp"
 #include "onedal/detail/common.hpp"
+#include "onedal/detail/deleters.hpp"
 
 namespace dal {
 
@@ -35,12 +36,27 @@ public:
         : _impl(impl)
     { }
 
+    array(T* data, std::int64_t size);
+
+    template <typename Deleter>
+    array(T* data, std::int64_t size, Deleter d)
+        : array(data, size, new detail::deleter_container<Deleter, T>(d))
+    { }
+
     T* get_pointer() const noexcept;
     std::int64_t get_size() const noexcept;
 
     const T& operator [](std::int64_t index) const {
+        // TODO: is this method really important? Pointer access occurs every call
+        // TODO: if no check of index, mark as noexcept
         return get_pointer()[index];
     }
+
+private:
+    using deleter_ptr = detail::shared<detail::deleter_iface<T>>;
+
+private:
+    array(T* data, std::int64_t size, const deleter_ptr& deleter);
 
 private:
     pimpl _impl;

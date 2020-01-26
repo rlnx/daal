@@ -23,6 +23,18 @@ using std::int64_t;
 namespace dal {
 
 template <typename T>
+array<T>::array(T* data, std::int64_t size)
+    : _impl(new detail::array_impl<T>(data, size, deleter_ptr{ new detail::empty_deleter<T>() })) 
+//TODO: check data size
+{ }
+
+template <typename T>
+array<T>::array(T* data, std::int64_t size, const deleter_ptr& deleter)
+    : _impl(new detail::array_impl<T>(data, size, deleter)) 
+//TODO: check data size
+{ }
+
+template <typename T>
 T* array<T>::get_pointer() const noexcept {
     return _impl->get_data_ptr();
 }

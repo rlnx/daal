@@ -43,8 +43,8 @@ array<T> flatten(const table& t, const range2d& r) {
 
     typename array<T>::pimpl a_impl {
         new detail::array_impl<T>(data, row_count*col_count,
-        [t_impl, r](void* ptr) {
-            t_impl->release_data_ptr(r, (T*)ptr, Mode == access_mode::write);
+        [t_impl, r](T* ptr) {
+            t_impl->release_data_ptr(r, ptr, Mode == access_mode::write);
         })
     };
 

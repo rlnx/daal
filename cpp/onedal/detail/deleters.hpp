@@ -16,30 +16,37 @@
 
 #pragma once
 
-#include "onedal/common.hpp"
+#include "onedal/data_types.hpp"
 #include "onedal/detail/common.hpp"
 
 namespace dal {
 namespace detail {
 
+template <typename T>
 class deleter_iface : public base {
 public:
-    virtual void operator()(void * ptr) = 0;
+    virtual void operator()(T* ptr) = 0;
 };
 
-// TODO: custom operator() for concrete type from T
-template <typename T>
-class deleter_container : public deleter_iface {
+template <typename Deleter, typename T>
+class deleter_container : public deleter_iface<T> {
 public:
-    deleter_container(const T& impl)
+    deleter_container(const Deleter& impl)
         : _impl(impl)
     { }
 
-    virtual void operator()(void* ptr) override {
+    virtual void operator()(T* ptr) override {
         _impl(ptr);
     }
 private:
-    T _impl;
+    Deleter _impl;
+};
+
+template <typename T>
+class empty_deleter : public deleter_iface<T> {
+public:
+    virtual void operator()(T* ptr) override 
+    { }
 };
 
 } // namespace detail
