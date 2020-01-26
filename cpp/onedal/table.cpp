@@ -36,7 +36,7 @@ array<T> flatten(const table& t, const range& rows, const range& columns) {
     auto t_impl = detail::get_impl_ptr(t);
 
     T* data = nullptr;
-    data = t_impl->get_data_ptr(rows, columns, data);
+    data = t_impl->get_data_ptr({ rows, columns }, data);
 
     int64_t row_count = rows.get_num_of_elements(t_impl->get_num_rows());
     int64_t col_count = columns.get_num_of_elements(t_impl->get_num_cols());
@@ -44,7 +44,7 @@ array<T> flatten(const table& t, const range& rows, const range& columns) {
     typename array<T>::pimpl a_impl {
         new detail::array_impl<T>(data, row_count*col_count,
         [t_impl, rows, columns](T* ptr) {
-            t_impl->release_data_ptr(rows, columns, ptr, Mode == access_mode::write);
+            t_impl->release_data_ptr({ rows, columns }, ptr, Mode == access_mode::write);
         })
     };
 
