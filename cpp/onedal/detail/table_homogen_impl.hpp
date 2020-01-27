@@ -18,7 +18,7 @@
 
 #include <cstring>
 
-#include "onedal/data_types.hpp"
+#include "onedal/types_data.hpp"
 #include "onedal/detail/table_impl.hpp"
 #include "onedal/detail/type_rt.hpp"
 

@@ -30,11 +30,11 @@ public:
         , _cols(cols)
     { }
 
-    virtual std::int64_t get_num_rows() const noexcept {
+    std::int64_t get_num_rows() const noexcept {
         return _rows;
     }
 
-    virtual std::int64_t get_num_cols() const noexcept {
+    std::int64_t get_num_cols() const noexcept {
         return _cols;
     }
 

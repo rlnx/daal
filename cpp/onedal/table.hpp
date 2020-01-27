@@ -18,7 +18,7 @@
 
 #include "onedal/array.hpp"
 #include "onedal/common.hpp"
-#include "onedal/data_types.hpp"
+#include "onedal/types_data.hpp"
 #include "onedal/detail/common.hpp"
 
 namespace dal {

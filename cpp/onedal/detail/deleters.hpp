@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "onedal/data_types.hpp"
+#include "onedal/types_data.hpp"
 #include "onedal/detail/common.hpp"
 
 namespace dal {
@@ -45,7 +45,7 @@ private:
 template <typename T>
 class empty_deleter : public deleter_iface<T> {
 public:
-    virtual void operator()(T* ptr) override 
+    virtual void operator()(T* ptr) override
     { }
 };
 

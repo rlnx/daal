@@ -46,7 +46,7 @@ Impl& get_impl(Object&& object) {
 }
 
 template <typename Object>
-typename Object::pimpl get_impl_ptr(const Object& object) {
+auto& get_impl_ptr(const Object& object) {
   return pimpl_accessor()(object);
 }
 

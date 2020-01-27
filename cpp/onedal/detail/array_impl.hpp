@@ -42,7 +42,7 @@ public:
     { }
 
     ~array_impl() {
-        _deleter->operator()(_data);
+        (*_deleter)(_data);
         _data = nullptr;
     }
 

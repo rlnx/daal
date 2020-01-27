@@ -15,9 +15,15 @@
  *******************************************************************************/
 
 #pragma once
-#include "onedal/integral_types.hpp"
+
+#include "onedal/types_integral.hpp"
 
 namespace dal {
+
+enum class access_mode {
+    read,
+    write
+};
 
 class range {
 public:
