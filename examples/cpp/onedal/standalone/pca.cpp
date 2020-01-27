@@ -34,7 +34,7 @@ int main(int argc, char const *argv[]) {
 
     const auto table = dal::make_table(data, row_count, column_count);
 
-    const auto params = pca::params<>()
+    const auto params = pca::params()
         .set_components_count(2)
         .set_is_deterministic(true);
 
