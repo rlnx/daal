@@ -14,11 +14,11 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include "daal/include/algorithms/pca/pca_batch.h"
 #include "daal/algorithms/kernel/pca/pca_dense_correlation_batch_kernel.h"
 
+#include "onedal/backend/interop/common.hpp"
+#include "onedal/backend/interop/table_conversion.hpp"
 #include "onedal/detail/table_homogen_impl.hpp"
-#include "onedal/detail/interop/common.hpp"
 
 #include "onedal/decomposition/pca/backend/cpu/train_kernel.hpp"
 #include "onedal/decomposition/pca/detail/train_types_impl.hpp"
@@ -35,6 +35,8 @@ namespace backend {
 namespace daal_pca = daal::algorithms::pca;
 namespace daal_cov = daal::algorithms::covariance;
 namespace daal_dm  = daal::data_management;
+
+namespace interop = dal::backend::interop;
 
 template <typename Cpu, typename Float>
 struct train_kernel<Cpu, Float, method::cov> {
