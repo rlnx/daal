@@ -13,39 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
+#pragma once
 
-#include "onedal/array.hpp"
-#include "onedal/detail/array_impl.hpp"
-
-using std::int32_t;
-using std::int64_t;
+#include "onedal/common.hpp"
 
 namespace dal {
 
 template <typename T>
-array<T>::array(T* data, std::int64_t size)
-    : impl_(new detail::array_impl<T>(data, size, deleter_ptr{ new detail::empty_deleter<T>() }))
-//TODO: check data size
-{ }
+using shared = std::shared_ptr<T>;
 
 template <typename T>
-array<T>::array(T* data, std::int64_t size, const deleter_ptr& deleter)
-    : impl_(new detail::array_impl<T>(data, size, deleter))
-//TODO: check data size
-{ }
+class deleter_iface : public base {
+public:
+    virtual void operator()(T* ptr) = 0;
+};
+
+template <typename Deleter, typename T>
+class deleter_container : public deleter_iface<T> {
+public:
+    deleter_container(const Deleter& impl)
+        : impl_(impl)
+    { }
+
+    virtual void operator()(T* ptr) override {
+        impl_(ptr);
+    }
+private:
+    Deleter impl_;
+};
 
 template <typename T>
-T* array<T>::get_pointer() const noexcept {
-    return impl_->get_data_ptr();
-}
-
-template <typename T>
-int64_t array<T>::get_size() const noexcept {
-    return impl_->get_size();
-}
-
-template class array<float>;
-template class array<double>;
-template class array<int32_t>;
+class empty_deleter : public deleter_iface<T> {
+public:
+    virtual void operator()(T* ptr) override
+    { }
+};
 
 } // namespace dal

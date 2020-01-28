@@ -18,6 +18,8 @@
 
 #include "onedal/types_integral.hpp"
 
+#include <memory>
+
 namespace dal {
 
 class base {

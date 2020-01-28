@@ -15,8 +15,9 @@
  *******************************************************************************/
 
 #include "onedal/table.hpp"
+
+#include "onedal/array.hpp"
 #include "onedal/detail/table_impl.hpp"
-#include "onedal/detail/array_impl.hpp"
 
 using std::int32_t;
 using std::int64_t;
@@ -41,14 +42,13 @@ array<T> flatten(const table& t, const range& rows, const range& columns) {
     int64_t row_count = rows.get_num_of_elements(t_impl->get_num_rows());
     int64_t col_count = columns.get_num_of_elements(t_impl->get_num_cols());
 
-    typename array<T>::pimpl a_impl {
-        new detail::array_impl<T>(data, row_count*col_count,
+    return {
+        data,
+        row_count * col_count,
         [t_impl, rows, columns](T* ptr) {
-            t_impl->release_data_ptr({ rows, columns }, ptr, Mode == access_mode::write);
-        })
+            t_impl->release_data_ptr({rows, columns}, ptr, Mode == access_mode::write);
+        }
     };
-
-    return a_impl;
 }
 
 template array<float> flatten<float, access_mode::read>(const table&, const range& rows, const range& columns);

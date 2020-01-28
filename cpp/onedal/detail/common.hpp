@@ -16,19 +16,10 @@
 
 #pragma once
 
-#include <stdint.h>
-
-#include <memory>
-#include <utility>
-#include <type_traits>
-
-#include "onedal/common.hpp"
+#include "onedal/memory.hpp"
 
 namespace dal {
 namespace detail {
-
-template <typename T>
-using shared = std::shared_ptr<T>;
 
 template <typename T>
 using pimpl = shared<T>;

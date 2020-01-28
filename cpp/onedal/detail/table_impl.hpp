@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "onedal/common.hpp"
+#include "onedal/memory.hpp"
 #include "onedal/detail/common.hpp"
 #include "onedal/detail/helpers.hpp"
 
@@ -51,7 +51,7 @@ private:
     std::int64_t cols_;
 };
 
-using table_impl_ptr = dal::detail::shared<table_impl>;
+using table_impl_ptr = dal::shared<table_impl>;
 
 } // namespace detail
 } // namespace dal

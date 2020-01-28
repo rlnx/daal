@@ -17,49 +17,40 @@
 #pragma once
 
 #include "onedal/common.hpp"
+#include "onedal/memory.hpp"
 #include "onedal/detail/common.hpp"
-#include "onedal/detail/deleters.hpp"
 
 namespace dal {
-
-namespace detail {
-template <typename T> class array_impl;
-} // namespace detail
 
 template <typename T>
 class array {
 public:
-    using pimpl = dal::detail::pimpl< detail::array_impl<T> >;
-
-public:
-    array(const pimpl& impl)
-        : impl_(impl)
+    array(const shared<T>& data, std::int64_t size)
+        : data_(data),
+          size_(size)
     { }
-
-    array(T* data, std::int64_t size);
 
     template <typename Deleter>
     array(T* data, std::int64_t size, Deleter d)
-        : array(data, size, new detail::deleter_container<Deleter, T>(d))
+        : data_(data, d),
+          size_(size)
     { }
 
-    T* get_pointer() const noexcept;
-    std::int64_t get_size() const noexcept;
+    T* get_pointer() const noexcept {
+        return data_.get();
+    }
 
-    const T& operator [](std::int64_t index) const {
-        // TODO: is this method really important? Pointer access occurs every call
-        // TODO: if no check of index, mark as noexcept
+    std::int64_t get_size() const noexcept {
+        return size_;
+    }
+
+    const T& operator [](std::int64_t index) const noexcept {
         return get_pointer()[index];
     }
 
 private:
-    using deleter_ptr = detail::shared<detail::deleter_iface<T>>;
-
-private:
-    array(T* data, std::int64_t size, const deleter_ptr& deleter);
-
-private:
-    pimpl impl_;
+    shared<T> data_;
+    std::int64_t size_;
 };
 
 } // namespace dal
