@@ -14,51 +14,35 @@
 * limitations under the License.
 *******************************************************************************/
 
-#pragma once
-
-#include "onedal/linear_model/logistic_regression/estimator.hpp"
+#include "onedal/execution_context.hpp"
+#include "onedal/backend/dispatcher.hpp"
+#include "onedal/linear_model/logistic_regression/detail/train_ops.hpp"
+#include "onedal/linear_model/logistic_regression/backend/cpu/train_kernel.hpp"
 
 namespace dal {
 namespace linear_model {
 namespace logistic_regression {
-
 namespace detail {
-class train_input_impl;
-class train_result_impl;
+
+template <typename Float, typename Method>
+struct train_ops_dispatcher<default_execution_context, Float, Method> {
+  train_result operator()(const default_execution_context& ctx,
+                          const estimator_base& estimator,
+                          const train_input& input) const {
+    return dal::backend::dispatch(ctx, [&](auto cpu) {
+        return train_result{};
+    //   return backend::train_kernel<decltype(cpu), Float, Method>()(ctx, params, input);
+    });
+  }
+};
+
+#define INSTANTIATE(F, M) \
+  template struct train_ops_dispatcher<default_execution_context, F, M>;
+
+INSTANTIATE(float, method::solver)
+INSTANTIATE(double, method::solver)
+
 } // namespace detail
-
-class train_input : public base {
-  public:
-    explicit train_input(const table& data,
-                         const table& labels);
-
-    auto& set_data(const table& data) {
-        set_data_impl(data);
-        return *this;
-    }
-
-    auto& set_labels(const table& labels) {
-        set_labels_impl(labels);
-        return *this;
-    }
-
-  private:
-    void set_data_impl(const table& data);
-    void set_labels_impl(const table& lables);
-
-    dal::detail::pimpl<detail::train_input_impl> impl_;
-};
-
-class train_result : public base {
-  public:
-    train_result();
-
-    model get_model() const;
-
-  private:
-    dal::detail::pimpl<detail::train_result_impl> impl_;
-};
-
 } // namespace logistic_regression
 } // namespace linear_model
 } // namespace dal

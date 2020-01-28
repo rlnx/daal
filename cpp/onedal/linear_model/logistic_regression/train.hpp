@@ -16,4 +16,16 @@
 
 #pragma once
 
-#include "onedal/linear_model/logistic_regression/estimator.hpp"
+#include "onedal/train.hpp"
+#include "onedal/linear_model/logistic_regression/train_types.hpp"
+#include "onedal/linear_model/logistic_regression/detail/train_ops.hpp"
+
+namespace dal {
+namespace detail {
+
+template <typename Params>
+struct train_ops<Params, linear_model::logistic_regression::detail::tag>
+  : linear_model::logistic_regression::detail::train_ops<Params> {};
+
+} // namespace detail
+} // namespace dal

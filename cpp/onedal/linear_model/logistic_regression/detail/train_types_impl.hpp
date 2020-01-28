@@ -21,44 +21,24 @@
 namespace dal {
 namespace linear_model {
 namespace logistic_regression {
-
 namespace detail {
-class train_input_impl;
-class train_result_impl;
+
+class train_input_impl : public base {
+  public:
+    explicit train_input_impl(const table& data,
+                              const table& labels)
+        : data(data), labels(labels) {}
+
+    table data;
+    table labels;
+};
+
+class train_result_impl : public base {
+  public:
+    model trained_model;
+};
+
 } // namespace detail
-
-class train_input : public base {
-  public:
-    explicit train_input(const table& data,
-                         const table& labels);
-
-    auto& set_data(const table& data) {
-        set_data_impl(data);
-        return *this;
-    }
-
-    auto& set_labels(const table& labels) {
-        set_labels_impl(labels);
-        return *this;
-    }
-
-  private:
-    void set_data_impl(const table& data);
-    void set_labels_impl(const table& lables);
-
-    dal::detail::pimpl<detail::train_input_impl> impl_;
-};
-
-class train_result : public base {
-  public:
-    train_result();
-
-    model get_model() const;
-
-  private:
-    dal::detail::pimpl<detail::train_result_impl> impl_;
-};
-
 } // namespace logistic_regression
 } // namespace linear_model
 } // namespace dal

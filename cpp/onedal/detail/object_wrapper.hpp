@@ -71,7 +71,7 @@ class object_wrapper {
 
 template <typename Object>
 object_wrapper wrap_object(Object&& object) {
-    return object_wrapper<Object>(object);
+    return object_wrapper(object);
 }
 
 template <typename Object>

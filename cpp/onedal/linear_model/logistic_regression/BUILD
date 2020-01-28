@@ -3,19 +3,30 @@ load("//build/bazel:rules.bzl", "dal_module",
                                 "dal_dpcpp_module")
 
 dal_module(
-  name = "common",
+  name = "estimator",
   hdrs = glob(["**/*.hpp"]),
-  # srcs = [
-  #   "common.cpp",
-  # ],
+  srcs = [
+    "estimator.cpp",
+    "train_types.cpp",
+  ],
   deps = [
     "//cpp/onedal:common",
   ],
 )
 
 dal_module(
+  name = "train_ops",
+  srcs = [
+    "detail/train_ops.cpp",
+  ],
+  deps = [
+    ":estimator",
+  ],
+)
+
+dal_module(
   name = "logistic_regression",
   deps = [
-    ":common"
+    ":train_ops",
   ],
 )

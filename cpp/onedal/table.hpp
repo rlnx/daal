@@ -29,14 +29,8 @@ class table_impl;
 
 class table : public base {
 public:
-<<<<<<< HEAD
-=======
-    using pimpl = dal::detail::pimpl<detail::table_impl>;
-
-public:
     table() = default;
 
->>>>>>> Add logictic regression placeholder
     table(const table& table)
         : impl_(table.impl_)
     { }
