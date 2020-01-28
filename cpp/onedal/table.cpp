@@ -24,11 +24,11 @@ using std::int64_t;
 namespace dal {
 
 int64_t table::get_row_count() const noexcept {
-    return _impl->get_num_rows();
+    return impl_->get_num_rows();
 }
 
 int64_t table::get_column_count() const noexcept {
-    return _impl->get_num_cols();
+    return impl_->get_num_cols();
 }
 
 template <typename T, access_mode Mode>

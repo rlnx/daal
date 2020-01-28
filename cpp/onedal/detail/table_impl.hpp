@@ -26,16 +26,16 @@ namespace detail {
 class table_impl : public base {
 public:
     table_impl(std::int64_t rows, std::int64_t cols)
-        : _rows(rows)
-        , _cols(cols)
+        : rows_(rows)
+        , cols_(cols)
     { }
 
     std::int64_t get_num_rows() const noexcept {
-        return _rows;
+        return rows_;
     }
 
     std::int64_t get_num_cols() const noexcept {
-        return _cols;
+        return cols_;
     }
 
     virtual float*        get_data_ptr(const table_range&, float*) const = 0;
@@ -47,8 +47,8 @@ public:
     virtual void release_data_ptr(const table_range&, std::int32_t*, bool need_copy_ptr) = 0;
 
 private:
-    std::int64_t _rows;
-    std::int64_t _cols;
+    std::int64_t rows_;
+    std::int64_t cols_;
 };
 
 using table_impl_ptr = dal::detail::shared<table_impl>;

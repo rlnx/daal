@@ -31,17 +31,17 @@ public:
     table_homogen_impl(const DataType* data,
                        std::int64_t rows, std::int64_t cols)
         : table_impl(rows, cols),
-          _type_rt(dal::detail::make_type_rt<DataType>()),
-          _data_bytes(init_data(data, rows * cols * sizeof(DataType)))
+          type_rt_(dal::detail::make_type_rt<DataType>()),
+          data_bytes_(init_data(data, rows * cols * sizeof(DataType)))
     { }
 
     ~table_homogen_impl() {
-        delete[] _data_bytes;
-        _data_bytes = nullptr;
+        delete[] data_bytes_;
+        data_bytes_ = nullptr;
     }
 
     dal::detail::type_rt get_type() const noexcept {
-        return _type_rt;
+        return type_rt_;
     }
 
     virtual float*        get_data_ptr(const table_range&, float*) const override;
@@ -69,10 +69,10 @@ private:
     void release_slice_impl(const table_range&, DataType*, bool need_copy_ptr);
 
 private:
-    dal::detail::type_rt _type_rt;
+    dal::detail::type_rt type_rt_;
 
-    char* _data_bytes;
-    bool _is_data_copied;
+    char* data_bytes_;
+    bool is_data_copied_;
 };
 
 } // namespace detail

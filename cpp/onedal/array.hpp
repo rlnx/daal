@@ -33,7 +33,7 @@ public:
 
 public:
     array(const pimpl& impl)
-        : _impl(impl)
+        : impl_(impl)
     { }
 
     array(T* data, std::int64_t size);
@@ -59,7 +59,7 @@ private:
     array(T* data, std::int64_t size, const deleter_ptr& deleter);
 
 private:
-    pimpl _impl;
+    pimpl impl_;
 };
 
 } // namespace dal

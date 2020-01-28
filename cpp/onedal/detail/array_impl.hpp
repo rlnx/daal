@@ -30,34 +30,34 @@ public:
 public:
     template <typename Deleter>
     array_impl(T* data, std::int64_t size, Deleter d)
-        : _data(data),
-          _size(size),
-          _deleter(new deleter_container<Deleter, T>(d))
+        : data_(data),
+          size_(size),
+          deleter_(new deleter_container<Deleter, T>(d))
     { }
 
     array_impl(T* data, std::int64_t size, const deleter_ptr& d)
-        : _data(data),
-          _size(size),
-          _deleter(d)
+        : data_(data),
+          size_(size),
+          deleter_(d)
     { }
 
     ~array_impl() {
-        (*_deleter)(_data);
-        _data = nullptr;
+        (*deleter_)(data_);
+        data_ = nullptr;
     }
 
     T* get_data_ptr() const noexcept {
-        return _data;
+        return data_;
     }
 
     std::int64_t get_size() const noexcept {
-        return _size;
+        return size_;
     }
 
 private:
-    T* _data;
-    std::int64_t _size;
-    deleter_ptr _deleter;
+    T* data_;
+    std::int64_t size_;
+    deleter_ptr deleter_;
 };
 
 } // namespace detail

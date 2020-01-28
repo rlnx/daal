@@ -32,14 +32,14 @@ template <typename Deleter, typename T>
 class deleter_container : public deleter_iface<T> {
 public:
     deleter_container(const Deleter& impl)
-        : _impl(impl)
+        : impl_(impl)
     { }
 
     virtual void operator()(T* ptr) override {
-        _impl(ptr);
+        impl_(ptr);
     }
 private:
-    Deleter _impl;
+    Deleter impl_;
 };
 
 template <typename T>

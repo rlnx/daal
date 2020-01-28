@@ -72,8 +72,8 @@ template <typename DataType>
 DataType* table_homogen_impl::get_slice_impl(const table_range& r) const {
     slice_info info { r, get_num_rows(), get_num_cols() };
 
-    if (_type_rt == dal::detail::make_type_rt<DataType>()) {
-        DataType* data = reinterpret_cast<DataType*>(_data_bytes);
+    if (type_rt_ == dal::detail::make_type_rt<DataType>()) {
+        DataType* data = reinterpret_cast<DataType*>(data_bytes_);
 
         if (need_allocate_ptr(info) == true) {
             DataType* out_array = new DataType[info.size.x * info.size.y];
@@ -101,11 +101,11 @@ template <typename DataType>
 void table_homogen_impl::release_slice_impl(const table_range& r, DataType* data, bool need_copy_ptr) {
     slice_info info { r, get_num_rows(), get_num_cols() };
 
-    if (_type_rt == dal::detail::make_type_rt<DataType>()) {
+    if (type_rt_ == dal::detail::make_type_rt<DataType>()) {
         const bool need_release_ptr = need_allocate_ptr(info);
 
         if (need_copy_ptr && need_release_ptr) {
-            DataType* dest = reinterpret_cast<DataType*>(_data_bytes);
+            DataType* dest = reinterpret_cast<DataType*>(data_bytes_);
 
             for (int y = 0; y < info.size.y; y++) {
                 for (int x = 0; x < info.size.x; x++) {

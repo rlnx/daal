@@ -38,9 +38,9 @@ namespace daal_dm  = daal::data_management;
 
 template <typename Cpu, typename Float>
 struct train_kernel<Cpu, Float, method::cov> {
-  train_result operator()(const default_execution_context& ctx,
-                          const params_base& params,
-                          const train_input& input) const {
+    train_result operator()(const default_execution_context& ctx,
+                            const params_base& params,
+                            const train_input& input) const {
         const auto data = input.get_data();
 
         const std::int64_t col_count = data.get_column_count();

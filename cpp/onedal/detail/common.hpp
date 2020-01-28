@@ -36,7 +36,7 @@ using pimpl = shared<T>;
 struct pimpl_accessor {
   template <typename Object>
   auto& operator()(Object&& object) const {
-    return object._impl;
+    return object.impl_;
   }
 };
 

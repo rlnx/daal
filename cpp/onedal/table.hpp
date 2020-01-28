@@ -33,18 +33,18 @@ public:
 
 public:
     table(const table& table)
-        : _impl(table._impl)
+        : impl_(table.impl_)
     { }
 
     table(const pimpl& impl)
-        : _impl(impl)
+        : impl_(impl)
     { }
 
     std::int64_t get_row_count() const noexcept;
     std::int64_t get_column_count() const noexcept;
 
 private:
-    pimpl _impl;
+    pimpl impl_;
 
     friend detail::pimpl_accessor;
 };
