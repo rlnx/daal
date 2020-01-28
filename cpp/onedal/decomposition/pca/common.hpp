@@ -74,15 +74,20 @@ class params : public params_base {
 
 class model : public base {
 public:
-  using pimpl = dal::detail::pimpl<detail::model_impl>;
-
-public:
-  model(const pimpl& impl);
-
   table get_eigenvectors() const;
 
 private:
+  using pimpl = dal::detail::pimpl<detail::model_impl>;
+
+private:
+  model(const pimpl& impl)
+      : impl_(impl) { }
+
+private:
   dal::detail::pimpl<detail::model_impl> impl_;
+
+private:
+  friend dal::detail::pimpl_accessor;
 };
 
 } // namespace pca

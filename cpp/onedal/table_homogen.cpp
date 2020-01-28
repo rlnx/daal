@@ -20,15 +20,18 @@
 using std::int32_t;
 using std::int64_t;
 
+using namespace dal::detail;
+
 namespace dal {
 
 template<typename DataType>
 table_homogen::table_homogen(const DataType* data, int64_t rows, int64_t cols)
-    : table(detail::table_impl_ptr { new detail::table_homogen_impl(data, rows, cols) })
+    : table(make_from_pimpl<table>(shared<table_impl> {
+        new table_homogen_impl(data, rows, cols) }))
 { }
 
 template <typename DataType>
-table_homogen make_table(const DataType* data, std::int64_t rows, std::int64_t cols) {
+table_homogen make_table(const DataType* data, int64_t rows,int64_t cols) {
     return table_homogen(data, rows, cols);
 }
 

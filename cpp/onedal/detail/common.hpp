@@ -25,20 +25,30 @@ template <typename T>
 using pimpl = shared<T>;
 
 struct pimpl_accessor {
-  template <typename Object>
-  auto& operator()(Object&& object) const {
-    return object.impl_;
-  }
+    template <typename Object>
+    auto& get_pimpl(Object&& object) const {
+        return object.impl_;
+    }
+
+    template <typename Object>
+    auto make_from_pimpl(typename Object::pimpl const& impl) {
+        return Object { impl };
+    }
 };
 
 template <typename Impl, typename Object>
 Impl& get_impl(Object&& object) {
-  return static_cast<Impl&>(pimpl_accessor()(object).get());
+    return static_cast<Impl&>(pimpl_accessor().get_pimpl(object).get());
 }
 
 template <typename Object>
 auto& get_impl_ptr(const Object& object) {
-  return pimpl_accessor()(object);
+    return pimpl_accessor().get_pimpl(object);
+}
+
+template <typename Object, typename Pimpl>
+Object make_from_pimpl(const Pimpl& impl) {
+    return pimpl_accessor().template make_from_pimpl<Object>(impl);
 }
 
 }  // namespace detail

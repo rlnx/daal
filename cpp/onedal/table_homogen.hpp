@@ -26,13 +26,8 @@ class table_homogen_impl;
 
 class table_homogen : public table {
 public:
-    using pimpl = dal::detail::pimpl<detail::table_homogen_impl>;
-
     template<typename DataType>
     table_homogen(const DataType* data, std::int64_t rows, std::int64_t cols);
-
-private:
-    friend detail::pimpl_accessor;
 };
 
 template <typename DataType>

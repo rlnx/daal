@@ -73,7 +73,7 @@ struct train_kernel<Cpu, Float, method::cov> {
         shared<train_result_impl> result { new train_result_impl() };
         result->trained_model = model;
 
-        return result;
+        return dal::detail::make_from_pimpl<train_result>(result);
     }
 };
 

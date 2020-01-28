@@ -45,18 +45,22 @@ class train_input : public base {
 
 class train_result {
  public:
-  using pimpl = dal::detail::pimpl<detail::train_result_impl>;
-
- public:
-  train_result(const pimpl& impl);
-
   auto get_model() const -> model;
   table get_eigenvalues() const;
   table get_eigenvectors() const;
   table get_explained_variance() const;
 
  private:
+  using pimpl = dal::detail::pimpl<detail::train_result_impl>;
+
+ private:
+  train_result(const pimpl& impl);
+
+ private:
   dal::detail::pimpl<detail::train_result_impl> impl_;
+
+ private:
+  friend dal::detail::pimpl_accessor;
 };
 
 } // namespace pca

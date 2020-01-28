@@ -15,7 +15,7 @@ class params_impl : public base {
 
 class model_impl : public base {
  public:
-  table::pimpl eigenvectors;
+  shared<dal::detail::table_impl> eigenvectors;
 };
 
 } // namespace detail

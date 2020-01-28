@@ -14,6 +14,7 @@
 * limitations under the License.
 *******************************************************************************/
 
+#include "onedal/detail/common.hpp"
 #include "onedal/decomposition/pca/train_types.hpp"
 #include "onedal/decomposition/pca/detail/train_types_impl.hpp"
 
@@ -39,19 +40,19 @@ train_result::train_result(const pimpl& impl)
     : impl_(impl) {}
 
 auto train_result::get_model() const -> model {
-  return impl_->trained_model;
+  return dal::detail::make_from_pimpl<model>(impl_->trained_model);
 }
 
 auto train_result::get_eigenvalues() const -> table {
-  return impl_->eigenvalues;
+  return dal::detail::make_from_pimpl<table>(impl_->eigenvalues);
 }
 
 auto train_result::get_eigenvectors() const -> table {
-  return impl_->eigenvectors;
+  return dal::detail::make_from_pimpl<table>(impl_->eigenvectors);
 }
 
 auto train_result::get_explained_variance() const -> table {
-  return impl_->explained_variance;
+  return dal::detail::make_from_pimpl<table>(impl_->explained_variance);
 }
 
 } // namespace pca

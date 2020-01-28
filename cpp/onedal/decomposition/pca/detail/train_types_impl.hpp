@@ -17,10 +17,10 @@ class train_input_impl : public base {
 
 class train_result_impl : public base {
  public:
-  model::pimpl trained_model;
-  table::pimpl eigenvalues;
-  table::pimpl eigenvectors;
-  table::pimpl explained_variance;
+  shared<model_impl> trained_model;
+  shared<dal::detail::table_impl> eigenvalues;
+  shared<dal::detail::table_impl> eigenvectors;
+  shared<dal::detail::table_impl> explained_variance;
 };
 
 } // namespace detail

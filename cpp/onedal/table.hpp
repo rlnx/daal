@@ -29,23 +29,25 @@ class table_impl;
 
 class table : public base {
 public:
-    using pimpl = dal::detail::pimpl<detail::table_impl>;
-
-public:
     table(const table& table)
         : impl_(table.impl_)
-    { }
-
-    table(const pimpl& impl)
-        : impl_(impl)
     { }
 
     std::int64_t get_row_count() const noexcept;
     std::int64_t get_column_count() const noexcept;
 
 private:
+    using pimpl = dal::detail::pimpl<detail::table_impl>;
+
+private:
+    table(const pimpl& impl)
+        : impl_(impl)
+    { }
+
+private:
     pimpl impl_;
 
+private:
     friend detail::pimpl_accessor;
 };
 
