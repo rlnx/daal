@@ -9,3 +9,13 @@ cc_binary(
     "//cpp/daal:threading_tbb",
   ],
 )
+
+cc_binary(
+  name = "logistic_regression",
+  srcs = ["logistic_regression.cpp"],
+  copts = COMMON_COPTS,
+  deps = [
+    "//cpp/onedal/linear_model/logistic_regression",
+    "//cpp/daal:threading_tbb",
+  ],
+)
