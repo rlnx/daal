@@ -44,6 +44,18 @@ class estimator_base : public base {
 
     estimator_base();
 
+    double get_penalty_l1() const;
+
+    void set_penalty_l1(double penalty_l1);
+
+    double get_penalty_l2() const;
+
+    void set_penalty_l2(double penalty_l2);
+
+    bool get_intercept_flag() const;
+
+    void set_intercept_flag(bool intercept_flag);
+
   protected:
     explicit estimator_base(const dal::detail::object_wrapper& solver);
 
@@ -66,6 +78,21 @@ class estimator : public estimator_base {
 
     explicit estimator(const solver_t &solver)
         : estimator_base(dal::detail::wrap_object(solver)) {}
+
+    auto& set_penalty_l1(double penalty_l1) {
+        estimator_base::set_penalty_l1(penalty_l1);
+        return *this;
+    }
+
+    auto& set_penalty_l2(double penalty_l2) {
+        estimator_base::set_penalty_l2(penalty_l2);
+        return *this;
+    }
+
+    auto& set_intercept_flag(bool intercept_flag) {
+        estimator_base::set_intercept_flag(intercept_flag);
+        return *this;
+    }
 
     const solver_t& get_solver() const {
         return dal::detail::unwrap_object<solver_t>(estimator_base::get_solver());

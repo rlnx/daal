@@ -29,6 +29,9 @@ class estimator_impl {
     explicit estimator_impl(const dal::detail::object_wrapper& solver)
         : solver(solver) {}
 
+    double penalty_l1 = 0;
+    double penalty_l2 = 0;
+    bool intercept_flag = false;
     dal::detail::object_wrapper solver;
 };
 

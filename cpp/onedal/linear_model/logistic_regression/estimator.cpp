@@ -29,6 +29,30 @@ estimator_base::estimator_base()
 estimator_base::estimator_base(const dal::detail::object_wrapper& solver)
     : impl_(new estimator_impl{solver}) {}
 
+double estimator_base::get_penalty_l1() const {
+    return impl_->penalty_l1;
+}
+
+void estimator_base::set_penalty_l1(double penalty_l1) {
+    impl_->penalty_l1 = penalty_l1;
+}
+
+double estimator_base::get_penalty_l2() const {
+    return impl_->penalty_l2;
+}
+
+void estimator_base::set_penalty_l2(double penalty_l2) {
+    impl_->penalty_l2 = penalty_l2;
+}
+
+bool estimator_base::get_intercept_flag() const {
+    return impl_->intercept_flag;
+}
+
+void estimator_base::set_intercept_flag(bool intercept_flag) {
+    impl_->intercept_flag = intercept_flag;
+}
+
 const dal::detail::object_wrapper& estimator_base::get_solver() const {
     return impl_->solver;
 }
