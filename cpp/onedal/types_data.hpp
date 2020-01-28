@@ -15,9 +15,15 @@
  *******************************************************************************/
 
 #pragma once
-#include "onedal/integral_types.hpp"
+
+#include "onedal/types_integral.hpp"
 
 namespace dal {
+
+enum class access_mode {
+    read,
+    write
+};
 
 class range {
 public:
@@ -39,12 +45,6 @@ public:
     }
 };
 
-class range2d {
-public:
-    range x;
-    range y;
-};
-
 inline range intersect_borders(const range& r1, const range& r2, std::int64_t end_of_parent) {
     auto r1_end = r1.end_idx > 0 ? r1.end_idx - end_of_parent - 1 : r1.end_idx;
     auto r2_end = r2.end_idx > 0 ? r2.end_idx - end_of_parent - 1 : r2.end_idx;
@@ -52,18 +52,6 @@ inline range intersect_borders(const range& r1, const range& r2, std::int64_t en
     const auto start = r1.start_idx > r2.start_idx ? r1.start_idx : r2.start_idx;
     const auto end = r1_end < r2_end ? r1_end : r2_end;
     return { start, end };
-}
-
-inline range2d row_range(const range& r) {
-    return { r, {0, -1} };
-}
-
-inline range2d column_range(const range& r) {
-    return { {0, -1}, r };
-}
-
-inline range2d row_column_range(const range& row_range, const range& column_range) {
-    return { row_range, column_range };
 }
 
 } // namespace dal

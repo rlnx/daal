@@ -1,7 +1,7 @@
 #include <iomanip>
 #include <iostream>
 
-#include "onedal/homogen_table.hpp"
+#include "onedal/table_homogen.hpp"
 #include "onedal/decomposition/pca.hpp"
 
 std::ostream &operator <<(std::ostream& stream, const dal::table& table) {
@@ -32,7 +32,7 @@ int main(int argc, char const *argv[]) {
         -4.f, 3.f,  0.f
     };
 
-    const auto table = dal::create_table(data, row_count, column_count);
+    const auto table = dal::make_table(data, row_count, column_count);
 
     const auto params = pca::params()
         .set_components_count(2)

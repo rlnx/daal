@@ -14,27 +14,24 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include "onedal/array.hpp"
-#include "onedal/detail/array_impl.hpp"
+#pragma once
 
-using std::int32_t;
-using std::int64_t;
+#include "onedal/table.hpp"
 
 namespace dal {
 
-template <typename T>
-T* array<T>::get_pointer() const noexcept {
-    const auto& arr_impl = *_impl;
-    return arr_impl.get_data_ptr();
-}
+namespace detail {
+class table_homogen_impl;
+} // namespace detail
 
-template <typename T>
-int64_t array<T>::get_size() const noexcept {
-    return _impl->get_size();
-}
+class table_homogen : public table {
+public:
+    template<typename DataType>
+    table_homogen(const DataType* data, std::int64_t rows, std::int64_t cols);
+};
 
-template class array<float>;
-template class array<double>;
-template class array<int32_t>;
+template <typename DataType>
+table_homogen make_table(const DataType* data,
+                         std::int64_t rows, std::int64_t cols);
 
 } // namespace dal

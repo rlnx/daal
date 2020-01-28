@@ -18,7 +18,7 @@
 
 #include "onedal/array.hpp"
 #include "onedal/common.hpp"
-#include "onedal/data_types.hpp"
+#include "onedal/types_data.hpp"
 #include "onedal/detail/common.hpp"
 
 namespace dal {
@@ -29,38 +29,39 @@ class table_impl;
 
 class table : public base {
 public:
-    using pimpl = dal::detail::pimpl<detail::table_impl>;
-
-public:
     table(const table& table)
-        : _impl(table._impl)
-    { }
-
-    table(const pimpl& impl)
-        : _impl(impl)
+        : impl_(table.impl_)
     { }
 
     std::int64_t get_row_count() const noexcept;
     std::int64_t get_column_count() const noexcept;
 
-    detail::table_impl* get_impl_ptr() const noexcept {
-        return _impl.get();
-    }
-
-    const pimpl& get_impl() const noexcept {
-        return _impl;
-    }
+private:
+    using pimpl = dal::detail::pimpl<detail::table_impl>;
 
 private:
-    pimpl _impl;
+    table(const pimpl& impl)
+        : impl_(impl)
+    { }
+
+private:
+    pimpl impl_;
+
+private:
+    friend detail::pimpl_accessor;
 };
 
 template <typename T, access_mode Mode>
-array<T> flatten(const table& t, const range2d& r);
+array<T> flatten(const table& t, const range& rows, const range& columns);
 
 template <typename T, access_mode Mode>
 array<T> flatten(const table& t) {
-    return flatten<T, Mode>(t, row_range({0, t.get_row_count()}));
+    return flatten<T, Mode>(t, {0, -1}, {0, -1});
+}
+
+template <typename T, access_mode Mode>
+array<T> flatten(const table& t, const range& rows) {
+    return flatten<T, Mode>(t, rows, {0, -1});
 }
 
 } // namespace dal

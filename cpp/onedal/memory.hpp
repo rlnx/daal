@@ -13,36 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-
 #pragma once
 
-#include "onedal/table.hpp"
+#include "onedal/common.hpp"
 
 namespace dal {
 
-namespace detail {
-class homogen_table_data;
-} // namespace detail
+template <typename T>
+using shared = std::shared_ptr<T>;
 
-class homogen_table : public table {
+template <typename T>
+class deleter_iface : public base {
 public:
-    using pimpl = dal::detail::pimpl<detail::homogen_table_data>;
-
-    homogen_table(const homogen_table& t)
-        : table(t.get_impl())
-    { }
-
-    template<typename DataType>
-    homogen_table(const DataType* data, std::int64_t rows, std::int64_t cols, data_format df);
-
-    detail::homogen_table_data* get_impl_ptr() const noexcept {
-        return reinterpret_cast<detail::homogen_table_data*>(table::get_impl_ptr());
-    }
+    virtual void operator()(T* ptr) = 0;
 };
 
-template <typename DataType>
-homogen_table create_table(const DataType* data,
-                           std::int64_t rows, std::int64_t cols,
-                           data_format df = data_format::rowmajor);
+template <typename Deleter, typename T>
+class deleter_container : public deleter_iface<T> {
+public:
+    deleter_container(const Deleter& impl)
+        : impl_(impl)
+    { }
+
+    virtual void operator()(T* ptr) override {
+        impl_(ptr);
+    }
+private:
+    Deleter impl_;
+};
+
+template <typename T>
+class empty_deleter : public deleter_iface<T> {
+public:
+    virtual void operator()(T* ptr) override
+    { }
+};
 
 } // namespace dal

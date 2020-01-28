@@ -43,11 +43,8 @@ void params_base::set_is_deterministic(bool value) {
   impl_->is_deterministic = value;
 }
 
-model::model(const pimpl& impl)
-  : impl_(impl) { }
-
 table model::get_eigenvectors() const {
-  return impl_->eigenvectors;
+  return dal::detail::make_from_pimpl<table>(impl_->eigenvectors);
 }
 
 } // namespace pca

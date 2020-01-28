@@ -38,7 +38,7 @@ auto train_dispatch_by_input(const Context& ctx,
     }
     else {
         const auto input = input_t { std::forward<Head>(head),
-                                    std::forward<Tail>(tail)... };
+                                     std::forward<Tail>(tail)... };
         return ops_t()(ctx, params, input);
     }
 };

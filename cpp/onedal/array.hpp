@@ -17,33 +17,40 @@
 #pragma once
 
 #include "onedal/common.hpp"
+#include "onedal/memory.hpp"
 #include "onedal/detail/common.hpp"
 
 namespace dal {
 
-namespace detail {
-template <typename T> class array_impl;
-} // namespace detail
-
 template <typename T>
 class array {
 public:
-    using pimpl = dal::detail::pimpl< detail::array_impl<T> >;
-
-public:
-    array(const pimpl& impl)
-        : _impl(impl)
+    array(const shared<T>& data, std::int64_t size)
+        : data_(data),
+          size_(size)
     { }
 
-    T* get_pointer() const noexcept;
-    std::int64_t get_size() const noexcept;
+    template <typename Deleter>
+    array(T* data, std::int64_t size, Deleter d)
+        : data_(data, d),
+          size_(size)
+    { }
 
-    const T& operator [](std::int64_t index) const {
+    T* get_pointer() const noexcept {
+        return data_.get();
+    }
+
+    std::int64_t get_size() const noexcept {
+        return size_;
+    }
+
+    const T& operator [](std::int64_t index) const noexcept {
         return get_pointer()[index];
     }
 
 private:
-    pimpl _impl;
+    shared<T> data_;
+    std::int64_t size_;
 };
 
 } // namespace dal

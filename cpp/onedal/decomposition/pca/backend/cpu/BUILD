@@ -7,6 +7,7 @@ dal_cpu_kernel(
   hdrs = glob(["*.hpp"]),
   srcs = glob(["train_*.cpp"]),
   deps = [
+    "//cpp/onedal/backend/interop",
     "//cpp/onedal/decomposition/pca:common",
     "//cpp/daal/algorithms/kernel/pca",
   ],

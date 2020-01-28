@@ -15,8 +15,9 @@
  *******************************************************************************/
 
 #include "onedal/table.hpp"
+
+#include "onedal/array.hpp"
 #include "onedal/detail/table_impl.hpp"
-#include "onedal/detail/array_impl.hpp"
 
 using std::int32_t;
 using std::int64_t;
@@ -24,37 +25,39 @@ using std::int64_t;
 namespace dal {
 
 int64_t table::get_row_count() const noexcept {
-    auto rows_total = _impl->data_container->get_num_rows();
-    auto slice_rows = _impl->elements_to_access.x;
-
-    return slice_rows.get_num_of_elements(rows_total);
+    return impl_->get_num_rows();
 }
 
 int64_t table::get_column_count() const noexcept {
-    auto cols_total = _impl->data_container->get_num_cols();
-    auto slice_cols = _impl->elements_to_access.y;
-
-    return slice_cols.get_num_of_elements(cols_total);
+    return impl_->get_num_cols();
 }
 
 template <typename T, access_mode Mode>
-array<T> flatten(const table& t, const range2d& r) {
-    auto* t_impl_ptr = t.get_impl_ptr();
+array<T> flatten(const table& t, const range& rows, const range& columns) {
+    auto t_impl = detail::get_impl_ptr(t);
 
-    typename array<T>::pimpl a_impl {
-        new detail::array_impl<T>(t_impl_ptr->data_container, r)
+    T* data = nullptr;
+    data = t_impl->get_data_ptr({ rows, columns }, data);
+
+    int64_t row_count = rows.get_num_of_elements(t_impl->get_num_rows());
+    int64_t col_count = columns.get_num_of_elements(t_impl->get_num_cols());
+
+    return {
+        data,
+        row_count * col_count,
+        [t_impl, rows, columns](T* ptr) {
+            t_impl->release_data_ptr({rows, columns}, ptr, Mode == access_mode::write);
+        }
     };
-
-    return a_impl;
 }
 
-template array<float> flatten<float, access_mode::read>(const table&, const range2d&);
-template array<float> flatten<float, access_mode::write>(const table&, const range2d&);
+template array<float> flatten<float, access_mode::read>(const table&, const range& rows, const range& columns);
+template array<float> flatten<float, access_mode::write>(const table&, const range& rows, const range& columns);
 
-template array<double> flatten<double, access_mode::read>(const table&, const range2d&);
-template array<double> flatten<double, access_mode::write>(const table&, const range2d&);
+template array<double> flatten<double, access_mode::read>(const table&, const range& rows, const range& columns);
+template array<double> flatten<double, access_mode::write>(const table&, const range& rows, const range& columns);
 
-template array<int32_t> flatten<int32_t, access_mode::read>(const table&, const range2d&);
-template array<int32_t> flatten<int32_t, access_mode::write>(const table&, const range2d&);
+template array<int32_t> flatten<int32_t, access_mode::read>(const table&, const range& rows, const range& columns);
+template array<int32_t> flatten<int32_t, access_mode::write>(const table&, const range& rows, const range& columns);
 
 } // namespace dal
