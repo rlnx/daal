@@ -26,13 +26,16 @@ namespace detail {
 
 class estimator_impl {
   public:
-    explicit estimator_impl(const dal::detail::object_wrapper& solver)
-        : solver(solver) {}
+    explicit estimator_impl(const dal::detail::object_wrapper& solver,
+                            const dal::detail::object_wrapper& random_generator)
+        : solver(solver),
+          random_generator(random_generator) {}
 
     double penalty_l1 = 0;
     double penalty_l2 = 0;
     bool intercept_flag = false;
     dal::detail::object_wrapper solver;
+    dal::detail::object_wrapper random_generator;
 };
 
 } // namespace detail

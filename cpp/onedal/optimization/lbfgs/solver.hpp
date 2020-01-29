@@ -67,6 +67,7 @@ class solver_base : public base {
     dal::detail::pimpl<detail::solver_impl> impl_;
 };
 
+template <typename Float = float>
 class solver : public solver_base {
   public:
     auto& set_m(std::int64_t m) {

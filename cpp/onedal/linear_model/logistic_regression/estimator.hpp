@@ -17,8 +17,10 @@
 #pragma once
 
 #include "onedal/table.hpp"
+#include "onedal/random/mt19937.hpp"
+#include "onedal/optimization/lbfgs.hpp"
+
 #include "onedal/detail/object_wrapper.hpp"
-#include "onedal/optimization/lbfgs/solver.hpp"
 
 namespace dal {
 namespace linear_model {
@@ -40,28 +42,30 @@ class estimator_base : public base {
     using tag_t = detail::tag;
     using float_t = float;
     using method_t = method::by_default;
-    using solver_t = optimization::lbfgs::solver;
-
-    estimator_base();
+    using solver_t = optimization::lbfgs::solver<>;
+    using random_generator_t = random::mt19937::generator;
 
     double get_penalty_l1() const;
 
-    void set_penalty_l1(double penalty_l1);
-
     double get_penalty_l2() const;
-
-    void set_penalty_l2(double penalty_l2);
 
     bool get_intercept_flag() const;
 
+  protected:
+    estimator_base(const dal::detail::object_wrapper& solver,
+                   const dal::detail::object_wrapper& random_generator);
+
+    void set_penalty_l1(double penalty_l1);
+
+    void set_penalty_l2(double penalty_l2);
+
     void set_intercept_flag(bool intercept_flag);
 
-  protected:
-    explicit estimator_base(const dal::detail::object_wrapper& solver);
-
     const dal::detail::object_wrapper &get_solver() const;
-
     void set_solver(const dal::detail::object_wrapper& solver);
+
+    const dal::detail::object_wrapper &get_random_generator() const;
+    void set_random_generator(const dal::detail::object_wrapper& random_generator);
 
   private:
     dal::detail::pimpl<detail::estimator_impl> impl_;
@@ -69,15 +73,23 @@ class estimator_base : public base {
 
 template <typename Float  = estimator_base::float_t,
           typename Method = estimator_base::method_t,
-          typename Solver = estimator_base::solver_t>
+          typename Solver = estimator_base::solver_t,
+          typename Random = estimator_base::random_generator_t>
 class estimator : public estimator_base {
   public:
     using float_t  = Float;
     using method_t = Method;
     using solver_t = Solver;
+    using random_generator_t = Random;
 
-    explicit estimator(const solver_t &solver)
-        : estimator_base(dal::detail::wrap_object(solver)) {}
+    explicit estimator(const solver_t& solver = solver_t{},
+                       const random_generator_t& random_generator = random_generator_t{})
+        : estimator_base(dal::detail::wrap_object(solver),
+                         dal::detail::wrap_object(random_generator)) {}
+
+    explicit estimator(const random_generator_t& random_generator)
+        : estimator_base(dal::detail::wrap_object(solver_t{}),
+                         dal::detail::wrap_object(random_generator)) {}
 
     auto& set_penalty_l1(double penalty_l1) {
         estimator_base::set_penalty_l1(penalty_l1);
@@ -98,8 +110,17 @@ class estimator : public estimator_base {
         return dal::detail::unwrap_object<solver_t>(estimator_base::get_solver());
     }
 
-    estimator& set_solver(const solver_t& solver) {
+    auto& set_solver(const solver_t& solver) {
         estimator_base::set_solver(dal::detail::wrap_object(solver));
+        return *this;
+    }
+
+    const random_generator_t& get_random_generator() const {
+        return dal::detail::unwrap_object<random_generator_t>(estimator_base::get_random_generator());
+    }
+
+    auto& set_random_generator(const random_generator_t& random_generator) {
+        estimator_base::set_random_generator(dal::detail::wrap_object(random_generator));
         return *this;
     }
 };

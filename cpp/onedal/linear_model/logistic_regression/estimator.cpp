@@ -23,11 +23,9 @@ namespace logistic_regression {
 
 using detail::estimator_impl;
 
-estimator_base::estimator_base()
-    : impl_(new estimator_impl{dal::detail::wrap_object(estimator_base::solver_t{})}) {}
-
-estimator_base::estimator_base(const dal::detail::object_wrapper& solver)
-    : impl_(new estimator_impl{solver}) {}
+estimator_base::estimator_base(const dal::detail::object_wrapper& solver,
+                               const dal::detail::object_wrapper& random_generator)
+    : impl_(new estimator_impl{solver, random_generator}) {}
 
 double estimator_base::get_penalty_l1() const {
     return impl_->penalty_l1;
@@ -59,6 +57,14 @@ const dal::detail::object_wrapper& estimator_base::get_solver() const {
 
 void estimator_base::set_solver(const dal::detail::object_wrapper& solver) {
     impl_->solver = solver;
+}
+
+const dal::detail::object_wrapper& estimator_base::get_random_generator() const {
+    return impl_->random_generator;
+}
+
+void estimator_base::set_random_generator(const dal::detail::object_wrapper& random_generator) {
+    impl_->random_generator = random_generator;
 }
 
 } // namespace logistic_regression
