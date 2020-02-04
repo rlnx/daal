@@ -17,10 +17,7 @@
 #pragma once
 
 #include <cstring>
-
-#include "onedal/types_data.hpp"
 #include "onedal/detail/table_impl.hpp"
-#include "onedal/detail/type_rt.hpp"
 
 namespace dal {
 namespace detail {
@@ -69,10 +66,8 @@ private:
     void release_slice_impl(const table_range&, DataType*, bool need_copy_ptr);
 
 private:
-    dal::detail::type_rt type_rt_;
-
+    type_rt type_rt_;
     char* data_bytes_;
-    bool is_data_copied_;
 };
 
 } // namespace detail

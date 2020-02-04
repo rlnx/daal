@@ -16,9 +16,7 @@
 
 #pragma once
 
-#include "onedal/types_integral.hpp"
-
-#include <memory>
+#include <cstdint>
 
 namespace dal {
 
@@ -26,5 +24,26 @@ class base {
 public:
     virtual ~base() = default;
 };
+
+enum class access_mode {
+    read,
+    write
+};
+
+struct range {
+public:
+    range(std::int64_t start, std::int64_t end)
+        : start_idx(start), end_idx(end) {}
+
+    std::int64_t get_elements_count(std::int64_t end_of_parent) const noexcept {
+        // TODO: handle error if (end_of_parent + end_idx) < 0
+        auto final_row = (end_idx < 0) ? end_of_parent + end_idx + 1 : end_idx;
+        return (final_row - start_idx - 1) + 1;
+    }
+
+    std::int64_t start_idx;
+    std::int64_t end_idx;
+};
+
 
 } // namespace dal

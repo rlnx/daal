@@ -93,9 +93,9 @@ if __name__ == "__main__":
         'include/data_management/**/*',
         'include/oneapi/**/*',
         'include/services/**/*',
-        'algorithms/**/*',
-        'externals/*',
-        'services/**/*',
+        'src/algorithms/**/*',
+        'src/externals/*',
+        'src/services/**/*',
     ]
     config.include_extensions = [ '.h', '.i', '.cl' ]
     config.include_users_extensions = [ '.h', '.i', '.cpp' ]

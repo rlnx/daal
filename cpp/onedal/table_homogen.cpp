@@ -24,16 +24,12 @@ using namespace dal::detail;
 
 namespace dal {
 
-template<typename DataType>
-table_homogen::table_homogen(const DataType* data, int64_t rows, int64_t cols)
-    : table(make_from_pimpl<table>(shared<table_impl> {
+template<typename T>
+table_homogen::table_homogen(T* data, int64_t rows, int64_t cols)
+    : table(dal::detail::make_from_pointer<table>(shared<table_impl> {
         new table_homogen_impl(data, rows, cols) }))
 { }
 
-template <typename DataType>
-table_homogen make_table(const DataType* data, int64_t rows,int64_t cols) {
-    return table_homogen(data, rows, cols);
-}
 
 template table_homogen::table_homogen(const float* data, int64_t rows, int64_t cols);
 template table_homogen::table_homogen(const double* data, int64_t rows, int64_t cols);

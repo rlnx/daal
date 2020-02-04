@@ -404,12 +404,12 @@ release.DOC.OSSPEC := $(foreach fn,$(release.DOC),$(if $(filter %$(_OS),$(basena
 include makefile.ver
 include makefile.lst
 
-THR.srcdir       := $(DIR)/cpp/daal/algorithms/threading
-CORE.srcdir      := $(DIR)/cpp/daal/algorithms/kernel
-EXTERNALS.srcdir := $(DIR)/cpp/daal/externals
+THR.srcdir       := $(DIR)/cpp/daal/src/threading
+CORE.srcdir      := $(DIR)/cpp/daal/src/algorithms
+EXTERNALS.srcdir := $(DIR)/cpp/daal/src/externals
 
-CORE.SERV.srcdir          := $(DIR)/cpp/daal/services/kernel
-CORE.SERV.COMPILER.srcdir := $(DIR)/cpp/daal/services/kernel/compiler/$(CORE.SERV.COMPILER.$(COMPILER))
+CORE.SERV.srcdir          := $(DIR)/cpp/daal/src/services
+CORE.SERV.COMPILER.srcdir := $(DIR)/cpp/daal/src/services/compiler/$(CORE.SERV.COMPILER.$(COMPILER))
 
 CORE.srcdirs  := $(CORE.SERV.srcdir) $(CORE.srcdir)                  \
 								 $(if $(DAALTHRS),,$(THR.srcdir))                    \

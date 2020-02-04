@@ -71,7 +71,7 @@ protected:
                               kdtree_knn_classification::internal::Stack<SearchNode<algorithmFpType>, cpu> & stack, size_t k, algorithmFpType radius,
                               const KDTreeTable & kdTreeTable, size_t rootTreeNodeIndex, const NumericTable & data);
 
-    services::Status predict(algorithmFpType & predictedClass, const Heap<GlobalNeighbors<algorithmFpType, cpu>, cpu> & heap,
+    services::Status predict(size_t i, algorithmFpType & predictedClass, const Heap<GlobalNeighbors<algorithmFpType, cpu>, cpu> & heap,
                              const NumericTable & labels, size_t k);
 };
 

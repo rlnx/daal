@@ -19,45 +19,44 @@
 #include "onedal/array.hpp"
 #include "onedal/detail/table_impl.hpp"
 
-using std::int32_t;
-using std::int64_t;
-
 namespace dal {
 
-int64_t table::get_row_count() const noexcept {
+std::int64_t table::get_row_count() const noexcept {
     return impl_->get_num_rows();
 }
 
-int64_t table::get_column_count() const noexcept {
+std::int64_t table::get_column_count() const noexcept {
     return impl_->get_num_cols();
 }
 
 template <typename T, access_mode Mode>
 array<T> flatten(const table& t, const range& rows, const range& columns) {
-    auto t_impl = detail::get_impl_ptr(t);
+    auto table_impl = detail::get_impl_ptr(t);
 
-    T* data = nullptr;
-    data = t_impl->get_data_ptr({ rows, columns }, data);
+    T* data = table_impl->get_data_ptr({ rows, columns }, nullptr);
 
-    int64_t row_count = rows.get_num_of_elements(t_impl->get_num_rows());
-    int64_t col_count = columns.get_num_of_elements(t_impl->get_num_cols());
+    std::int64_t row_count = rows.get_num_of_elements(t_impl->get_num_rows());
+    std::int64_t col_count = columns.get_num_of_elements(t_impl->get_num_cols());
 
     return {
         data,
         row_count * col_count,
-        [t_impl, rows, columns](T* ptr) {
-            t_impl->release_data_ptr({rows, columns}, ptr, Mode == access_mode::write);
+        [table_impl, rows, columns](T* ptr) {
+            table_impl->release_data_ptr({rows, columns}, ptr, Mode == access_mode::write);
         }
     };
 }
 
-template array<float> flatten<float, access_mode::read>(const table&, const range& rows, const range& columns);
-template array<float> flatten<float, access_mode::write>(const table&, const range& rows, const range& columns);
+#define INSTANTIATE(T, M) \
+    template array<T> flatten<T, M>(const table&, const range&, const range&);
 
-template array<double> flatten<double, access_mode::read>(const table&, const range& rows, const range& columns);
-template array<double> flatten<double, access_mode::write>(const table&, const range& rows, const range& columns);
+INSTANTIATE(float, access_mode::read)
+INSTANTIATE(float, access_mode::write)
 
-template array<int32_t> flatten<int32_t, access_mode::read>(const table&, const range& rows, const range& columns);
-template array<int32_t> flatten<int32_t, access_mode::write>(const table&, const range& rows, const range& columns);
+INSTANTIATE(double, access_mode::read)
+INSTANTIATE(double, access_mode::write)
+
+INSTANTIATE(std::int32_t, access_mode::read)
+INSTANTIATE(std::int32_t, access_mode::write)
 
 } // namespace dal

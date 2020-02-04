@@ -16,10 +16,41 @@
 
 #pragma once
 
-#include "onedal/memory.hpp"
+#include <memory>
+#include "onedal/common.hpp"
 
 namespace dal {
 namespace detail {
+
+template <typename T>
+struct type_id {};
+
+enum class type_rt {
+    i32,
+    f32,
+    f64
+};
+
+template <typename DataType>
+inline type_rt make_type_rt();
+
+template <>
+inline type_rt make_type_rt<std::int32_t>() {
+    return type_rt::i32;
+}
+
+template <>
+inline type_rt make_type_rt<float>() {
+    return type_rt::f32;
+}
+
+template <>
+inline type_rt make_type_rt<double>() {
+    return type_rt::f64;
+}
+
+template <typename T>
+using shared = std::shared_ptr<T>;
 
 template <typename T>
 using pimpl = shared<T>;
@@ -32,7 +63,13 @@ struct pimpl_accessor {
 
     template <typename Object>
     auto make_from_pimpl(typename Object::pimpl const& impl) {
-        return Object { impl };
+        return Object{impl};
+    }
+
+    template <typename Object>
+    auto make_from_pointer(typename Object::pimpl::element_type* pointer) {
+        using pimpl_t = typename Object::pimpl;
+        return Object{pimpl_t(pointer)};
     }
 };
 
@@ -49,6 +86,11 @@ auto& get_impl_ptr(const Object& object) {
 template <typename Object, typename Pimpl>
 Object make_from_pimpl(const Pimpl& impl) {
     return pimpl_accessor().template make_from_pimpl<Object>(impl);
+}
+
+template <typename Object, typename Pimpl>
+Object make_from_pointer(const Pimpl& impl) {
+    return pimpl_accessor().template make_from_pointer<Object>(impl);
 }
 
 }  // namespace detail

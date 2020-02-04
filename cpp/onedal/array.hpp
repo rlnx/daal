@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include "onedal/common.hpp"
-#include "onedal/memory.hpp"
 #include "onedal/detail/common.hpp"
 
 namespace dal {

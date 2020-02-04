@@ -17,8 +17,6 @@
 #pragma once
 
 #include "onedal/array.hpp"
-#include "onedal/common.hpp"
-#include "onedal/types_data.hpp"
 #include "onedal/detail/common.hpp"
 
 namespace dal {
@@ -28,42 +26,26 @@ class table_impl;
 } // namespace detail
 
 class table : public base {
-public:
+  friend detail::pimpl_accessor;
+  public:
     table() = default;
 
-    table(const table& table)
-        : impl_(table.impl_)
-    { }
-
     std::int64_t get_row_count() const noexcept;
+
     std::int64_t get_column_count() const noexcept;
 
-private:
+  private:
     using pimpl = dal::detail::pimpl<detail::table_impl>;
 
-private:
-    table(const pimpl& impl)
-        : impl_(impl)
-    { }
+    explicit table(detail::table_impl* impl)
+        : impl_(impl) {}
 
-private:
     pimpl impl_;
-
-private:
-    friend detail::pimpl_accessor;
 };
 
 template <typename T, access_mode Mode>
-array<T> flatten(const table& t, const range& rows, const range& columns);
-
-template <typename T, access_mode Mode>
-array<T> flatten(const table& t) {
-    return flatten<T, Mode>(t, {0, -1}, {0, -1});
-}
-
-template <typename T, access_mode Mode>
-array<T> flatten(const table& t, const range& rows) {
-    return flatten<T, Mode>(t, rows, {0, -1});
-}
+array<T> flatten(const table& table,
+                 const range& rows = {0, -1},
+                 const range& columns = {0, -1});
 
 } // namespace dal
