@@ -26,11 +26,11 @@
 
 #include "algorithms/boosting/adaboost_model.h"
 #include "algorithms/boosting/adaboost_predict.h"
-#include "algorithms/kernel/kernel.h"
+#include "src/algorithms/kernel.h"
 #include "data_management/data/numeric_table.h"
-#include "services/kernel/data_management/service_numeric_table.h"
-#include "algorithms/kernel/boosting/inner/boosting_predict_kernel.h"
-#include "services/kernel/service_environment.h"
+#include "src/services/data_management/service_numeric_table.h"
+#include "src/algorithms/boosting/inner/boosting_predict_kernel.h"
+#include "src/services/service_environment.h"
 
 using namespace daal::data_management;
 using namespace daal::algorithms::boosting::prediction::internal;

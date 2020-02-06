@@ -18,10 +18,10 @@
 #ifndef __SUM_REDUCER_H__
 #define __SUM_REDUCER_H__
 
-#include "services/kernel/oneapi/math_service_types.h"
+#include "src/services/oneapi/math_service_types.h"
 #include "services/buffer.h"
-#include "services/kernel/oneapi/cl_kernels/sum_reducer.cl"
-#include "services/kernel/oneapi/service_defines_oneapi.h"
+#include "src/services/oneapi/cl_kernels/sum_reducer.cl"
+#include "src/services/oneapi/service_defines_oneapi.h"
 #include "oneapi/internal/types_utils.h"
 #include "oneapi/internal/execution_context.h"
 

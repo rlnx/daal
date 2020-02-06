@@ -25,13 +25,13 @@
 #ifndef __ASSOC_RULES_APRIORI_MINE_IMPL_I__
 #define __ASSOC_RULES_APRIORI_MINE_IMPL_I__
 
-#include "externals/service_memory.h"
-#include "externals/service_math.h"
-#include "algorithms/kernel/service_sort.h"
+#include "src/externals/service_memory.h"
+#include "src/externals/service_math.h"
+#include "src/algorithms/service_sort.h"
 
-#include "algorithms/threading/threading.h"
-#include "algorithms/kernel/assocrules/assoc_rules_apriori_types.i"
-#include "algorithms/kernel/assocrules/assoc_rules_apriori_tree.i"
+#include "src/threading/threading.h"
+#include "src/algorithms/assocrules/assoc_rules_apriori_types.i"
+#include "src/algorithms/assocrules/assoc_rules_apriori_tree.i"
 
 using namespace daal::algorithms::internal;
 

@@ -22,15 +22,15 @@
 //--
 */
 
-#include "externals/service_memory.h"
-#include "services/kernel/data_management/service_numeric_table.h"
-#include "services/kernel/service_defines.h"
-#include "algorithms/kernel/service_error_handling.h"
+#include "src/externals/service_memory.h"
+#include "src/services/data_management/service_numeric_table.h"
+#include "src/services/service_defines.h"
+#include "src/algorithms/service_error_handling.h"
 
-#include "algorithms/threading/threading.h"
-#include "externals/service_blas.h"
-#include "externals/service_spblas.h"
-#include "services/kernel/service_data_utils.h"
+#include "src/threading/threading.h"
+#include "src/externals/service_blas.h"
+#include "src/externals/service_spblas.h"
+#include "src/services/service_data_utils.h"
 
 namespace daal
 {

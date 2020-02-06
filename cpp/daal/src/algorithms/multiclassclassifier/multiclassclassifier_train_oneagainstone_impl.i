@@ -27,10 +27,10 @@
 
 #include "algorithms/multi_class_classifier/multi_class_classifier_model.h"
 
-#include "algorithms/threading/threading.h"
-#include "algorithms/kernel/service_sort.h"
-#include "algorithms/kernel/service_error_handling.h"
-#include "externals/service_blas.h"
+#include "src/threading/threading.h"
+#include "src/algorithms/service_sort.h"
+#include "src/algorithms/service_error_handling.h"
+#include "src/externals/service_blas.h"
 
 using namespace daal::internal;
 using namespace daal::services::internal;

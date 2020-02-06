@@ -22,9 +22,9 @@
 */
 
 #include "algorithms/gradient_boosted_trees/gbt_classification_predict_types.h"
-#include "services/kernel/serialization_utils.h"
-#include "services/kernel/daal_strings.h"
-#include "algorithms/kernel/dtrees/gbt/classification/gbt_classification_model_impl.h"
+#include "src/services/serialization_utils.h"
+#include "src/services/daal_strings.h"
+#include "src/algorithms/dtrees/gbt/classification/gbt_classification_model_impl.h"
 
 using namespace daal::data_management;
 using namespace daal::services;

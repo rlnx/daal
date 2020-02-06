@@ -15,9 +15,9 @@
 * limitations under the License.
 *******************************************************************************/
 
-#include "services/kernel/data_management/data_conversion_cpu.h"
+#include "src/services/data_management/data_conversion_cpu.h"
 #include "data_management/data/internal/conversion.h"
-#include "externals/service_memory.h"
+#include "src/externals/service_memory.h"
 
 namespace daal
 {

@@ -25,8 +25,8 @@
 
 #if !(defined DAAL_CPU_TOPO_DISABLED)
 
-#include "externals/service_memory.h"
-#include "services/kernel/service_topo.h"
+#include "src/externals/service_memory.h"
+#include "src/services/service_topo.h"
 
     #ifdef __FreeBSD__
 static int sched_setaffinity(pid_t pid, size_t cpusetsize, cpu_set_t * mask)

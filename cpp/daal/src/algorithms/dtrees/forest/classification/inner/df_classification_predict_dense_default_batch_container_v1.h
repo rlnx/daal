@@ -24,8 +24,8 @@
 */
 
 #include "algorithms/decision_forest/decision_forest_classification_predict.h"
-#include "algorithms/kernel/dtrees/forest/classification/df_classification_predict_dense_default_batch.h"
-#include "services/kernel/service_algo_utils.h"
+#include "src/algorithms/dtrees/forest/classification/df_classification_predict_dense_default_batch.h"
+#include "src/services/service_algo_utils.h"
 
 namespace daal
 {

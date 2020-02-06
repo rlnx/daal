@@ -21,8 +21,8 @@
 //--
 */
 
-#include "algorithms/kernel/pca/pca_result_impl.h"
-#include "services/kernel/daal_strings.h"
+#include "src/algorithms/pca/pca_result_impl.h"
+#include "src/services/daal_strings.h"
 
 using namespace daal::data_management;
 using namespace daal::services;

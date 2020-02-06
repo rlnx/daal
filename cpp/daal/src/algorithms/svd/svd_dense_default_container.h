@@ -26,9 +26,9 @@
 #include "algorithms/svd/svd_batch.h"
 #include "algorithms/svd/svd_online.h"
 #include "algorithms/svd/svd_distributed.h"
-#include "algorithms/kernel/svd/svd_dense_default_kernel.h"
-#include "algorithms/kernel/kernel.h"
-#include "services/kernel/data_management/service_numeric_table.h"
+#include "src/algorithms/svd/svd_dense_default_kernel.h"
+#include "src/algorithms/kernel.h"
+#include "src/services/data_management/service_numeric_table.h"
 
 namespace daal
 {

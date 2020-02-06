@@ -25,9 +25,9 @@
 #define __OUTLIERDETECTION_BACON_KERNEL_H__
 
 #include "algorithms/outlier_detection/outlier_detection_bacon.h"
-#include "algorithms/kernel/kernel.h"
-#include "services/kernel/data_management/service_numeric_table.h"
-#include "externals/service_math.h"
+#include "src/algorithms/kernel.h"
+#include "src/services/data_management/service_numeric_table.h"
+#include "src/externals/service_math.h"
 
 using namespace daal::internal;
 using namespace daal::data_management;

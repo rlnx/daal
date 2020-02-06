@@ -23,15 +23,15 @@
 
 #include "algorithms/algorithm.h"
 #include "data_management/data/numeric_table.h"
-#include "algorithms/threading/threading.h"
+#include "src/threading/threading.h"
 #include "services/daal_defines.h"
-#include "externals/service_memory.h"
-#include "algorithms/kernel/service_error_handling.h"
-#include "services/kernel/data_management/service_numeric_table.h"
-#include "algorithms/kernel/service_sort.h"
-#include "algorithms/kernel/kmeans/kmeans_plusplus_init_impl.i"
-#include "algorithms/kernel/distributions/uniform/uniform_kernel.h"
-#include "services/kernel/service_data_utils.h"
+#include "src/externals/service_memory.h"
+#include "src/algorithms/service_error_handling.h"
+#include "src/services/data_management/service_numeric_table.h"
+#include "src/algorithms/service_sort.h"
+#include "src/algorithms/kmeans/kmeans_plusplus_init_impl.i"
+#include "src/algorithms/distributions/uniform/uniform_kernel.h"
+#include "src/services/service_data_utils.h"
 
 using namespace daal::internal;
 using namespace daal::services::internal;

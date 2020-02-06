@@ -22,8 +22,8 @@
 */
 
 #include "algorithms/optimization_solver/adagrad/adagrad_types.h"
-#include "services/kernel/serialization_utils.h"
-#include "services/kernel/daal_strings.h"
+#include "src/services/serialization_utils.h"
+#include "src/services/daal_strings.h"
 
 namespace daal
 {

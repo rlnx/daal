@@ -25,12 +25,12 @@
 #define __KERNEL_FUNCTION_DENSE_BASE_H__
 
 #include "data_management/data/numeric_table.h"
-#include "algorithms/kernel_function/kernel_function_types_linear.h"
-#include "algorithms/kernel_function/kernel_function_types_rbf.h"
-#include "algorithms/kernel_function/kernel_function_linear.h"
-#include "algorithms/kernel_function/kernel_function_rbf.h"
-#include "services/kernel/data_management/service_micro_table.h"
-#include "algorithms/kernel/kernel.h"
+#include "src/algorithms_function/kernel_function_types_linear.h"
+#include "src/algorithms_function/kernel_function_types_rbf.h"
+#include "src/algorithms_function/kernel_function_linear.h"
+#include "src/algorithms_function/kernel_function_rbf.h"
+#include "src/services/data_management/service_micro_table.h"
+#include "src/algorithms/kernel.h"
 
 using namespace daal::internal;
 

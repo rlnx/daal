@@ -37,15 +37,15 @@
 #ifndef __LOGITBOOST_TRAIN_FRIEDMAN_IMPL_I__
 #define __LOGITBOOST_TRAIN_FRIEDMAN_IMPL_I__
 
-#include "algorithms/threading/threading.h"
-#include "externals/service_memory.h"
-#include "services/kernel/data_management/service_numeric_table.h"
-#include "services/kernel/service_data_utils.h"
-#include "services/kernel/service_utils.h"
-#include "algorithms/kernel/service_threading.h"
-#include "algorithms/kernel/service_error_handling.h"
-#include "algorithms/kernel/logitboost/logitboost_impl.i"
-#include "algorithms/kernel/logitboost/logitboost_train_friedman_aux.i"
+#include "src/threading/threading.h"
+#include "src/externals/service_memory.h"
+#include "src/services/data_management/service_numeric_table.h"
+#include "src/services/service_data_utils.h"
+#include "src/services/service_utils.h"
+#include "src/algorithms/service_threading.h"
+#include "src/algorithms/service_error_handling.h"
+#include "src/algorithms/logitboost/logitboost_impl.i"
+#include "src/algorithms/logitboost/logitboost_train_friedman_aux.i"
 
 using namespace daal::algorithms::logitboost::internal;
 using namespace daal::internal;

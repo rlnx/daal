@@ -15,9 +15,9 @@
 * limitations under the License.
 *******************************************************************************/
 
-#include "algorithms/kernel/k_nearest_neighbors/oneapi/bf_knn_classification_model_ucapi_impl.h"
-#include "services/kernel/serialization_utils.h"
-#include "services/kernel/daal_strings.h"
+#include "src/algorithms/k_nearest_neighbors/oneapi/bf_knn_classification_model_ucapi_impl.h"
+#include "src/services/serialization_utils.h"
+#include "src/services/daal_strings.h"
 
 using namespace daal::data_management;
 using namespace daal::services;

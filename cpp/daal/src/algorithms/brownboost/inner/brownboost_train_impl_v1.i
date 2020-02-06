@@ -33,17 +33,17 @@
 
 #include "algorithms/algorithm.h"
 #include "data_management/data/numeric_table.h"
-#include "algorithms/threading/threading.h"
+#include "src/threading/threading.h"
 #include "services/daal_defines.h"
-#include "externals/service_math.h"
-#include "externals/service_memory.h"
-#include "services/kernel/data_management/service_numeric_table.h"
+#include "src/externals/service_math.h"
+#include "src/externals/service_memory.h"
+#include "src/services/data_management/service_numeric_table.h"
 
 #include "algorithms/weak_learner/weak_learner_model.h"
 #include "algorithms/classifier/classifier_model.h"
 #include "algorithms/boosting/brownboost_model.h"
-#include "algorithms/kernel/brownboost/inner/brownboost_train_kernel_v1.h"
-#include "algorithms/kernel/brownboost/brownboost_train_kernel.h"
+#include "src/algorithms/brownboost/inner/brownboost_train_kernel_v1.h"
+#include "src/algorithms/brownboost/brownboost_train_kernel.h"
 
 namespace daal
 {

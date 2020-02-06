@@ -21,11 +21,11 @@
 //--
 */
 
-#include "algorithms/kernel/linear_model/linear_model_train_normeq_kernel.h"
-#include "externals/service_blas.h"
-#include "algorithms/kernel/service_error_handling.h"
-#include "algorithms/threading/threading.h"
-#include "externals/service_ittnotify.h"
+#include "src/algorithms/linear_model/linear_model_train_normeq_kernel.h"
+#include "src/externals/service_blas.h"
+#include "src/algorithms/service_error_handling.h"
+#include "src/threading/threading.h"
+#include "src/externals/service_ittnotify.h"
 
 namespace daal
 {

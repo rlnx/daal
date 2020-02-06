@@ -22,16 +22,16 @@
 #ifndef __ITERATIVE_SOLVER_KERNEL_H__
 #define __ITERATIVE_SOLVER_KERNEL_H__
 
-#include "algorithms/kernel/kernel.h"
-#include "externals/service_rng.h"
-#include "externals/service_math.h"
-#include "services/kernel/data_management/service_numeric_table.h"
-#include "algorithms/kernel/service_error_handling.h"
+#include "src/algorithms/kernel.h"
+#include "src/externals/service_rng.h"
+#include "src/externals/service_math.h"
+#include "src/services/data_management/service_numeric_table.h"
+#include "src/algorithms/service_error_handling.h"
 #include "data_management/data/memory_block.h"
-#include "algorithms/threading/threading.h"
-#include "algorithms/kernel/distributions/uniform/uniform_kernel.h"
-#include "algorithms/kernel/distributions/uniform/uniform_impl.i"
-#include "services/kernel/service_data_utils.h"
+#include "src/threading/threading.h"
+#include "src/algorithms/distributions/uniform/uniform_kernel.h"
+#include "src/algorithms/distributions/uniform/uniform_impl.i"
+#include "src/services/service_data_utils.h"
 
 using namespace daal::data_management;
 using namespace daal::internal;

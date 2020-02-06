@@ -20,10 +20,10 @@
 //  GPU-dependent initialization of service data structure
 //--
 */
-#include "algorithms/kernel/dtrees/dtrees_feature_type_helper.h"
+#include "src/algorithms/dtrees/dtrees_feature_type_helper.h"
 
-#include "services/kernel/service_data_utils.h"
-#include "externals/service_ittnotify.h"
+#include "src/services/service_data_utils.h"
+#include "src/externals/service_ittnotify.h"
 
 DAAL_ITTNOTIFY_DOMAIN(gbt.common.oneapi);
 

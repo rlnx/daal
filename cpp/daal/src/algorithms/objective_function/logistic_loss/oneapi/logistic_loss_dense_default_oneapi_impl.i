@@ -21,11 +21,11 @@
 //--
 */
 
-#include "algorithms/kernel/objective_function/logistic_loss/oneapi/cl_kernel/logistic_loss_dense_default.cl"
-#include "services/kernel/service_utils.h"
-#include "externals/service_math.h"
+#include "src/algorithms/objective_function/logistic_loss/oneapi/cl_kernel/logistic_loss_dense_default.cl"
+#include "src/services/service_utils.h"
+#include "src/externals/service_math.h"
 
-#include "externals/service_ittnotify.h"
+#include "src/externals/service_ittnotify.h"
 
 DAAL_ITTNOTIFY_DOMAIN(optimization_solver.logistic_loss.batch.oneapi);
 

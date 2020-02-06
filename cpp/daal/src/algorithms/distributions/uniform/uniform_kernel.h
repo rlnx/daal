@@ -24,13 +24,13 @@
 
 #include "algorithms/distributions/uniform/uniform.h"
 
-#include "algorithms/kernel/kernel.h"
+#include "src/algorithms/kernel.h"
 #include "data_management/data/numeric_table.h"
-#include "algorithms/kernel/engines/engine_batch_impl.h"
+#include "src/algorithms/engines/engine_batch_impl.h"
 
-#include "externals/service_rng.h"
-#include "services/kernel/service_unique_ptr.h"
-#include "services/kernel/data_management/service_numeric_table.h"
+#include "src/externals/service_rng.h"
+#include "src/services/service_unique_ptr.h"
+#include "src/services/data_management/service_numeric_table.h"
 
 using namespace daal::services;
 using namespace daal::internal;

@@ -21,8 +21,8 @@
 //--
 */
 
-#include "algorithms/kernel/ridge_regression/ridge_regression_ne_model_impl.h"
-#include "services/kernel/serialization_utils.h"
+#include "src/algorithms/ridge_regression/ridge_regression_ne_model_impl.h"
+#include "src/services/serialization_utils.h"
 
 namespace daal
 {

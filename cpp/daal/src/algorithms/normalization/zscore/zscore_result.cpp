@@ -21,10 +21,10 @@
 //--
 */
 
-#include "algorithms/kernel/normalization/zscore/zscore_result.h"
-#include "services/kernel/serialization_utils.h"
-#include "services/kernel/daal_strings.h"
-#include "services/kernel/service_defines.h"
+#include "src/algorithms/normalization/zscore/zscore_result.h"
+#include "src/services/serialization_utils.h"
+#include "src/services/daal_strings.h"
+#include "src/services/service_defines.h"
 
 using namespace daal::data_management;
 using namespace daal::services;

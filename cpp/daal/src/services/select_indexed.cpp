@@ -15,9 +15,9 @@
 * limitations under the License.
 *******************************************************************************/
 
-#include "services/kernel/oneapi/select_indexed.h"
+#include "src/services/oneapi/select_indexed.h"
 #include "oneapi/internal/utils.h"
-#include "externals/service_ittnotify.h"
+#include "src/externals/service_ittnotify.h"
 
 namespace daal
 {

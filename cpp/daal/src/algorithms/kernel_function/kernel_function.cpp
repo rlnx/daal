@@ -21,9 +21,9 @@
 //--
 */
 
-#include "algorithms/kernel_function/kernel_function_types.h"
-#include "services/kernel/serialization_utils.h"
-#include "services/kernel/daal_strings.h"
+#include "src/algorithms_function/kernel_function_types.h"
+#include "src/services/serialization_utils.h"
+#include "src/services/daal_strings.h"
 
 using namespace daal::data_management;
 using namespace daal::services;

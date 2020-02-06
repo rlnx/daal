@@ -21,11 +21,11 @@
 //--
 */
 
-#include "algorithms/kernel/linear_model/oneapi/linear_model_train_normeq_kernel_oneapi.h"
-#include "services/kernel/oneapi/blas_gpu.h"
+#include "src/algorithms/linear_model/oneapi/linear_model_train_normeq_kernel_oneapi.h"
+#include "src/services/oneapi/blas_gpu.h"
 #include "oneapi/internal/utils.h"
-#include "externals/service_ittnotify.h"
-#include "algorithms/kernel/linear_model/oneapi/cl_kernel/copy_reduce_results.cl"
+#include "src/externals/service_ittnotify.h"
+#include "src/algorithms/linear_model/oneapi/cl_kernel/copy_reduce_results.cl"
 
 namespace daal
 {

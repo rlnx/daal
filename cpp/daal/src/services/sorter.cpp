@@ -15,9 +15,9 @@
 * limitations under the License.
 *******************************************************************************/
 
-#include "services/kernel/oneapi/sorter.h"
+#include "src/services/oneapi/sorter.h"
 #include "oneapi/internal/utils.h"
-#include "externals/service_ittnotify.h"
+#include "src/externals/service_ittnotify.h"
 
 namespace daal
 {

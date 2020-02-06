@@ -23,11 +23,11 @@
 
 #include "algorithms/algorithm_base.h"
 #include "algorithms/algorithm_base_mode_impl.h"
-#include "algorithms/kernel/argument_storage.h"
-#include "services/kernel/service_algo_utils.h"
+#include "src/algorithms/argument_storage.h"
+#include "src/services/service_algo_utils.h"
 
-#include "algorithms/threading/service_thread_pinner.h"
-#include "services/kernel/service_topo.h"
+#include "src/threading/service_thread_pinner.h"
+#include "src/services/service_topo.h"
 
 namespace daal
 {

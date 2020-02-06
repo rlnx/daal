@@ -6,7 +6,7 @@ daal_kernel_module(
   srcs = glob(["**/*.cpp"]),
   deps = [
     "//cpp/daal:services",
-    "//cpp/daal/algorithms/kernel/covariance",
+    "//cpp/daal/src/algorithms/covariance",
   ],
   visibility = [ "//visibility:public" ],
 )

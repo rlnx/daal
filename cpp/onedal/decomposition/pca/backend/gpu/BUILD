@@ -8,6 +8,6 @@ dal_gpu_kernel(
   srcs = glob(["train_*.cpp"]),
   deps = [
     "//cpp/onedal/decomposition/pca:common",
-    "//cpp/daal/algorithms/kernel/pca",
+    "//cpp/daal/src/algorithms/kernel/pca",
   ],
 )

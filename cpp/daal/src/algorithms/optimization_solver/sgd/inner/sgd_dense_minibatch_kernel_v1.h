@@ -23,13 +23,13 @@
 #define __SGD_DENSE_MINIBATCH_KERNEL_V1_H__
 
 #include "algorithms/optimization_solver/sgd/sgd_batch.h"
-#include "algorithms/kernel/kernel.h"
+#include "src/algorithms/kernel.h"
 #include "data_management/data/numeric_table.h"
-#include "algorithms/kernel/optimization_solver/iterative_solver_kernel.h"
-#include "algorithms/kernel/optimization_solver/sgd/inner/sgd_dense_kernel_v1.h"
-#include "services/kernel/data_management/service_numeric_table.h"
-#include "externals/service_math.h"
-#include "services/kernel/service_utils.h"
+#include "src/algorithms/optimization_solver/iterative_solver_kernel.h"
+#include "src/algorithms/optimization_solver/sgd/inner/sgd_dense_kernel_v1.h"
+#include "src/services/data_management/service_numeric_table.h"
+#include "src/externals/service_math.h"
+#include "src/services/service_utils.h"
 
 using namespace daal::data_management;
 using namespace daal::internal;

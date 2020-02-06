@@ -22,8 +22,8 @@
 */
 
 #include "services/library_version_info.h"
-#include "services/kernel/_daal_version.h"
-#include "services/kernel/service_defines.h"
+#include "src/services/_daal_version.h"
+#include "src/services/service_defines.h"
 #include "services/env_detect.h"
 #include "mkl_daal.h"
 

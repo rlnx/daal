@@ -24,8 +24,8 @@
 #define __SERVICE_UTILS_H__
 
 #include "services/env_detect.h"
-#include "services/kernel/service_defines.h"
-#include "services/kernel/service_type_traits.h"
+#include "src/services/service_defines.h"
+#include "src/services/service_type_traits.h"
 
 namespace daal
 {

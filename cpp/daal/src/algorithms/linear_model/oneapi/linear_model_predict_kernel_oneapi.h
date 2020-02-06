@@ -26,8 +26,8 @@
 #define __LINEAR_MODEL_PREDICT_KERNEL_ONEAPI_H__
 
 #include "algorithms/linear_model/linear_model_predict.h"
-#include "externals/service_memory.h"
-#include "algorithms/kernel/kernel.h"
+#include "src/externals/service_memory.h"
+#include "src/algorithms/kernel.h"
 #include "data_management/data/numeric_table.h"
 
 using namespace daal::data_management;

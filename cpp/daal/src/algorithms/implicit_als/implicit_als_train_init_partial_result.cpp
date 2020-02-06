@@ -22,9 +22,9 @@
 */
 
 #include "algorithms/implicit_als/implicit_als_training_init_types.h"
-#include "algorithms/kernel/implicit_als/implicit_als_train_init_parameter.h"
-#include "services/kernel/serialization_utils.h"
-#include "services/kernel/daal_strings.h"
+#include "src/algorithms/implicit_als/implicit_als_train_init_parameter.h"
+#include "src/services/serialization_utils.h"
+#include "src/services/daal_strings.h"
 
 using namespace daal::data_management;
 using namespace daal::services;

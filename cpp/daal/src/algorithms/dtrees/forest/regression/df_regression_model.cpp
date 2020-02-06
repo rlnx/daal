@@ -22,9 +22,9 @@
 */
 
 #include "algorithms/decision_forest/decision_forest_regression_model.h"
-#include "services/kernel/serialization_utils.h"
-#include "algorithms/kernel/dtrees/forest/regression/df_regression_model_impl.h"
-#include "algorithms/kernel/dtrees/dtrees_model_impl_common.h"
+#include "src/services/serialization_utils.h"
+#include "src/algorithms/dtrees/forest/regression/df_regression_model_impl.h"
+#include "src/algorithms/dtrees/dtrees_model_impl_common.h"
 
 using namespace daal::data_management;
 using namespace daal::services;

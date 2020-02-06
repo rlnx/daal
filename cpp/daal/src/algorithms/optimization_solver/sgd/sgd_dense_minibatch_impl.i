@@ -26,11 +26,11 @@
 #ifndef __SGD_DENSE_MINIBATCH_IMPL_I__
 #define __SGD_DENSE_MINIBATCH_IMPL_I__
 
-#include "services/kernel/data_management/service_numeric_table.h"
-#include "externals/service_math.h"
-#include "services/kernel/service_utils.h"
-#include "services/kernel/service_data_utils.h"
-#include "externals/service_ittnotify.h"
+#include "src/services/data_management/service_numeric_table.h"
+#include "src/externals/service_math.h"
+#include "src/services/service_utils.h"
+#include "src/services/service_data_utils.h"
+#include "src/externals/service_ittnotify.h"
 
 using namespace daal::internal;
 using namespace daal::services;

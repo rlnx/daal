@@ -25,9 +25,9 @@
 #define __STUMP_CLASSIFICATION_TRAIN_AUX_I__
 
 #include "services/daal_defines.h"
-#include "externals/service_memory.h"
-#include "services/kernel/data_management/service_micro_table.h"
-#include "services/kernel/data_management/service_numeric_table.h"
+#include "src/externals/service_memory.h"
+#include "src/services/data_management/service_micro_table.h"
+#include "src/services/data_management/service_numeric_table.h"
 #include "algorithms/decision_tree/decision_tree_model.h"
 #include "algorithms/decision_tree/decision_tree_classification_training_batch.h"
 #include "algorithms/classifier/classifier_training_types.h"

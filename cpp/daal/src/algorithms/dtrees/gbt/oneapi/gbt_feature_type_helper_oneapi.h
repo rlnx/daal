@@ -24,20 +24,20 @@
 #ifndef __GBT_FEATURE_TYPE_HELPER_ONEAPI_H__
 #define __GBT_FEATURE_TYPE_HELPER_ONEAPI_H__
 
-#include "algorithms/kernel/dtrees/dtrees_feature_type_helper.h"
-#include "algorithms/kernel/dtrees/gbt/oneapi/gbt_feature_type_helper_oneapi.h"
-#include "algorithms/threading/threading.h"
-#include "algorithms/kernel/service_error_handling.h"
-#include "algorithms/kernel/service_sort.h"
-#include "algorithms/kernel/dtrees/service_array.h"
-#include "externals/service_memory.h"
-#include "services/kernel/service_data_utils.h"
-#include "services/kernel/data_management/service_numeric_table.h"
+#include "src/algorithms/dtrees/dtrees_feature_type_helper.h"
+#include "src/algorithms/dtrees/gbt/oneapi/gbt_feature_type_helper_oneapi.h"
+#include "src/threading/threading.h"
+#include "src/algorithms/service_error_handling.h"
+#include "src/algorithms/service_sort.h"
+#include "src/algorithms/dtrees/service_array.h"
+#include "src/externals/service_memory.h"
+#include "src/services/service_data_utils.h"
+#include "src/services/data_management/service_numeric_table.h"
 
-#include "algorithms/kernel/dtrees/gbt/oneapi/cl_kernels/gbt_common_kernels.cl"
+#include "src/algorithms/dtrees/gbt/oneapi/cl_kernels/gbt_common_kernels.cl"
 
 #include "services/execution_context.h"
-#include "services/kernel/oneapi/service_defines_oneapi.h"
+#include "src/services/oneapi/service_defines_oneapi.h"
 #include "oneapi/internal/types.h"
 
 namespace daal

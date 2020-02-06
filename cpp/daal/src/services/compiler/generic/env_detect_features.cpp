@@ -25,9 +25,9 @@
 
 #include "services/env_detect.h"
 #include "services/daal_defines.h"
-#include "services/kernel/service_defines.h"
+#include "src/services/service_defines.h"
 #include "mkl_daal.h"
-#include "algorithms/threading/threading.h"
+#include "src/threading/threading.h"
 
 #include <stdint.h>
 #if defined(_MSC_VER)

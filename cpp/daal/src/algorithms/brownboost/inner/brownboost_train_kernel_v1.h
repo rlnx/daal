@@ -26,8 +26,8 @@
 
 #include "algorithms/boosting/brownboost_model.h"
 #include "algorithms/boosting/brownboost_training_types.h"
-#include "algorithms/kernel/kernel.h"
-#include "services/kernel/data_management/service_numeric_table.h"
+#include "src/algorithms/kernel.h"
+#include "src/services/data_management/service_numeric_table.h"
 
 using namespace daal::data_management;
 

@@ -27,11 +27,11 @@
 
 #include "algorithms/implicit_als/implicit_als_training_batch.h"
 #include "algorithms/implicit_als/implicit_als_model.h"
-#include "algorithms/kernel/kernel.h"
-#include "algorithms/threading/threading.h"
+#include "src/algorithms/kernel.h"
+#include "src/threading/threading.h"
 
-#include "services/kernel/data_management/service_numeric_table.h"
-#include "externals/service_memory.h"
+#include "src/services/data_management/service_numeric_table.h"
+#include "src/externals/service_memory.h"
 
 using namespace daal::services::internal;
 

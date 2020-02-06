@@ -23,13 +23,13 @@ daal_module(
 daal_kernel_module(
   name = "services",
   srcs = glob([
-    "services/kernel/**/*.cpp",
-    "algorithms/kernel/*.cpp",
+    "src/services/**/*.cpp",
+    "src/algorithms/*.cpp",
   ]) + [
-    "externals/service_atomic_int.cpp",
-    "externals/service_memory.cpp",
-    "externals/service_profiler.cpp",
-    "externals/service_service.cpp",
+    "src/externals/service_atomic_int.cpp",
+    "src/externals/service_memory.cpp",
+    "src/externals/service_profiler.cpp",
+    "src/externals/service_service.cpp",
   ],
   deps = [
     ":common_headers",
@@ -39,7 +39,7 @@ daal_kernel_module(
 daal_module(
   name = "threading_tbb",
   srcs = glob([
-    "algorithms/threading/*.cpp"
+    "src/threading/*.cpp"
   ]),
   local_defines = ["__DO_TBB_LAYER__"],
   deps = [
@@ -52,7 +52,7 @@ daal_module(
 daal_module(
   name = "threading_seq",
   srcs = glob([
-    "algorithms/threading/*.cpp"
+    "src/threading/*.cpp"
   ]),
   local_defines = ["__DO_SEQ_LAYER__"],
   deps = [
@@ -66,8 +66,8 @@ daal_module(
   name = "algorithms",
   deps = [
     ":services",
-    "//cpp/daal/algorithms/kernel/covariance",
-    "//cpp/daal/algorithms/kernel/pca",
+    "//cpp/daal/src/algorithms/covariance",
+    "//cpp/daal/src/algorithms/pca",
   ],
 )
 

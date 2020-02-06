@@ -23,11 +23,11 @@
 
 #include "algorithms/algorithm.h"
 #include "data_management/data/numeric_table.h"
-#include "services/kernel/service_data_utils.h"
+#include "src/services/service_data_utils.h"
 
-#include "algorithms/threading/threading.h"
+#include "src/threading/threading.h"
 #include "algorithms/dbscan/dbscan_types.h"
-#include "algorithms/kernel/dbscan/dbscan_utils.h"
+#include "src/algorithms/dbscan/dbscan_utils.h"
 
 using namespace daal::internal;
 using namespace daal::services;

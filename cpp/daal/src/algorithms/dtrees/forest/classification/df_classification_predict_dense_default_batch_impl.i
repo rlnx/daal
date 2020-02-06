@@ -26,15 +26,15 @@
 
 #include "algorithms/algorithm.h"
 #include "data_management/data/numeric_table.h"
-#include "algorithms/kernel/dtrees/forest/classification/df_classification_predict_dense_default_batch.h"
-#include "algorithms/threading/threading.h"
+#include "src/algorithms/dtrees/forest/classification/df_classification_predict_dense_default_batch.h"
+#include "src/threading/threading.h"
 #include "services/daal_defines.h"
-#include "algorithms/kernel/dtrees/forest/classification/df_classification_model_impl.h"
-#include "services/kernel/data_management/service_numeric_table.h"
-#include "externals/service_memory.h"
-#include "algorithms/kernel/dtrees/dtrees_predict_dense_default_impl.i"
-#include "algorithms/kernel/service_error_handling.h"
-#include "services/kernel/service_arrays.h"
+#include "src/algorithms/dtrees/forest/classification/df_classification_model_impl.h"
+#include "src/services/data_management/service_numeric_table.h"
+#include "src/externals/service_memory.h"
+#include "src/algorithms/dtrees/dtrees_predict_dense_default_impl.i"
+#include "src/algorithms/service_error_handling.h"
+#include "src/services/service_arrays.h"
 #include "algorithms/decision_forest/decision_forest_classification_model.h"
 
 using namespace daal::internal;

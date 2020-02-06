@@ -26,11 +26,11 @@
 
 #include "algorithms/algorithm.h"
 #include "data_management/data/numeric_table.h"
-#include "algorithms/threading/threading.h"
+#include "src/threading/threading.h"
 #include "services/daal_defines.h"
-#include "externals/service_blas.h"
-#include "services/kernel/data_management/service_numeric_table.h"
-#include "algorithms/kernel/service_error_handling.h"
+#include "src/externals/service_blas.h"
+#include "src/services/data_management/service_numeric_table.h"
+#include "src/algorithms/service_error_handling.h"
 
 namespace daal
 {

@@ -24,8 +24,8 @@
 #ifndef __SERVICE_MATH_H__
 #define __SERVICE_MATH_H__
 
-#include "services/kernel/service_defines.h"
-#include "externals/service_math_mkl.h"
+#include "src/services/service_defines.h"
+#include "src/externals/service_math_mkl.h"
 
 namespace daal
 {

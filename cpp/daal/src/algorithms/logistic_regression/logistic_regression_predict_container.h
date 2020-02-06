@@ -25,10 +25,10 @@
 
 #include "algorithms/logistic_regression/logistic_regression_predict.h"
 #include "algorithms/classifier/classifier_model.h"
-#include "algorithms/kernel/logistic_regression/logistic_regression_predict_kernel.h"
-#include "services/kernel/service_algo_utils.h"
+#include "src/algorithms/logistic_regression/logistic_regression_predict_kernel.h"
+#include "src/services/service_algo_utils.h"
 
-#include "algorithms/kernel/logistic_regression/oneapi/logistic_regression_predict_kernel_oneapi_instance.h"
+#include "src/algorithms/logistic_regression/oneapi/logistic_regression_predict_kernel_oneapi_instance.h"
 
 namespace daal
 {

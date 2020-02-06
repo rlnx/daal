@@ -22,8 +22,8 @@
 */
 
 #include "algorithms/classifier/classifier_training_types.h"
-#include "services/kernel/serialization_utils.h"
-#include "services/kernel/daal_strings.h"
+#include "src/services/serialization_utils.h"
+#include "src/services/daal_strings.h"
 #include "data_management/data/numeric_table.h"
 #include "data_management/data/numeric_types.h"
 

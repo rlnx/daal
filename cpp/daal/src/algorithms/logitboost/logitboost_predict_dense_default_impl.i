@@ -27,12 +27,12 @@
 #include "algorithms/algorithm.h"
 #include "data_management/data/numeric_table.h"
 #include "algorithms/boosting/logitboost_model.h"
-#include "algorithms/threading/threading.h"
+#include "src/threading/threading.h"
 #include "services/daal_defines.h"
 
-#include "externals/service_memory.h"
-#include "services/kernel/data_management/service_numeric_table.h"
-#include "algorithms/kernel/logitboost/logitboost_impl.i"
+#include "src/externals/service_memory.h"
+#include "src/services/data_management/service_numeric_table.h"
+#include "src/algorithms/logitboost/logitboost_impl.i"
 
 using namespace daal::algorithms::logitboost::internal;
 

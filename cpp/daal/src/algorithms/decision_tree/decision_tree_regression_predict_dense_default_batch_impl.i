@@ -24,15 +24,15 @@
 #ifndef __DECISION_TREE_REGRESSION_PREDICT_DENSE_DEFAULT_BATCH_IMPL_I__
 #define __DECISION_TREE_REGRESSION_PREDICT_DENSE_DEFAULT_BATCH_IMPL_I__
 
-#include "algorithms/threading/threading.h"
+#include "src/threading/threading.h"
 #include "services/daal_defines.h"
 #include "algorithms/algorithm.h"
-#include "services/kernel/service_utils.h"
-#include "services/kernel/service_data_utils.h"
+#include "src/services/service_utils.h"
+#include "src/services/service_data_utils.h"
 #include "data_management/data/numeric_table.h"
-#include "algorithms/kernel/decision_tree/decision_tree_regression_predict_dense_default_batch.h"
-#include "algorithms/kernel/decision_tree/decision_tree_regression_model_impl.h"
-#include "algorithms/kernel/decision_tree/decision_tree_impl.i"
+#include "src/algorithms/decision_tree/decision_tree_regression_predict_dense_default_batch.h"
+#include "src/algorithms/decision_tree/decision_tree_regression_model_impl.h"
+#include "src/algorithms/decision_tree/decision_tree_impl.i"
 
 namespace daal
 {

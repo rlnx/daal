@@ -28,13 +28,13 @@
 #include "algorithms/model.h"
 #include "services/daal_defines.h"
 #include "algorithms/svm/svm_train_types.h"
-#include "algorithms/kernel/kernel.h"
-#include "services/kernel/data_management/service_micro_table.h"
+#include "src/algorithms/kernel.h"
+#include "src/services/data_management/service_micro_table.h"
 
 using namespace daal::data_management;
 using namespace daal::internal;
 
-#include "algorithms/kernel/svm/svm_train_kernel.h"
+#include "src/algorithms/svm/svm_train_kernel.h"
 
 namespace daal
 {

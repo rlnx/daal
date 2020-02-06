@@ -26,14 +26,14 @@
 
 #include "algorithms/dbscan/dbscan_types.h"
 
-#include "algorithms/threading/threading.h"
+#include "src/threading/threading.h"
 #include "services/daal_defines.h"
 #include "services/error_handling.h"
-#include "externals/service_memory.h"
-#include "services/kernel/data_management/service_numeric_table.h"
-#include "externals/service_math.h"
-#include "algorithms/kernel/service_kernel_math.h"
-#include "algorithms/kernel/service_error_handling.h"
+#include "src/externals/service_memory.h"
+#include "src/services/data_management/service_numeric_table.h"
+#include "src/externals/service_math.h"
+#include "src/algorithms/service_kernel_math.h"
+#include "src/algorithms/service_error_handling.h"
 
 using namespace daal::internal;
 using namespace daal::services::internal;

@@ -24,14 +24,14 @@
 #ifndef __STUMP_TRAIN_IMPL_I__
 #define __STUMP_TRAIN_IMPL_I__
 
-#include "algorithms/threading/threading.h"
+#include "src/threading/threading.h"
 #include "data_management/data/numeric_table.h"
-#include "services/kernel/service_utils.h"
-#include "services/kernel/service_data_utils.h"
-#include "externals/service_memory.h"
-#include "algorithms/kernel/stump/inner/stump_train_kernel.h"
-#include "services/kernel/data_management/service_numeric_table.h"
-#include "algorithms/kernel/service_error_handling.h"
+#include "src/services/service_utils.h"
+#include "src/services/service_data_utils.h"
+#include "src/externals/service_memory.h"
+#include "src/algorithms/stump/inner/stump_train_kernel.h"
+#include "src/services/data_management/service_numeric_table.h"
+#include "src/algorithms/service_error_handling.h"
 
 namespace daal
 {

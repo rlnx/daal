@@ -26,9 +26,9 @@
 #define __MULTICLASSCLASSIFIER_PREDICT_VOTEBASED_IMPL_I__
 
 #include "algorithms/multi_class_classifier/multi_class_classifier_model.h"
-#include "algorithms/threading/threading.h"
-#include "algorithms/kernel/service_error_handling.h"
-#include "services/kernel/data_management/service_numeric_table.h"
+#include "src/threading/threading.h"
+#include "src/algorithms/service_error_handling.h"
+#include "src/services/data_management/service_numeric_table.h"
 
 namespace daal
 {

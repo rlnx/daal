@@ -24,12 +24,12 @@
 #ifndef __SGD_DENSE_MOMENTUM_IMPL_V1_I__
 #define __SGD_DENSE_MOMENTUM_IMPL_V1_I__
 
-#include "services/kernel/data_management/service_numeric_table.h"
-#include "externals/service_math.h"
-#include "services/kernel/service_utils.h"
-#include "services/kernel/data_management/service_numeric_table.h"
-#include "algorithms/kernel/optimization_solver/iterative_solver_kernel.h"
-#include "algorithms/threading/threading.h"
+#include "src/services/data_management/service_numeric_table.h"
+#include "src/externals/service_math.h"
+#include "src/services/service_utils.h"
+#include "src/services/data_management/service_numeric_table.h"
+#include "src/algorithms/optimization_solver/iterative_solver_kernel.h"
+#include "src/threading/threading.h"
 
 using namespace daal::algorithms::optimization_solver::iterative_solver::internal;
 

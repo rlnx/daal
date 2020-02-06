@@ -20,8 +20,8 @@
 //--
 
 #include "algorithms/distributions/distribution_types.h"
-#include "services/kernel/daal_strings.h"
-#include "algorithms/kernel/engines/mt19937/mt19937_batch_impl.h"
+#include "src/services/daal_strings.h"
+#include "src/algorithms/engines/mt19937/mt19937_batch_impl.h"
 
 namespace daal
 {

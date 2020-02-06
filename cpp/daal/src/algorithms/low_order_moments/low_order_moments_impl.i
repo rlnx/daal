@@ -24,15 +24,15 @@
 #ifndef __LOW_ORDER_MOMENTS_IMPL_I__
 #define __LOW_ORDER_MOMENTS_IMPL_I__
 
-#include "algorithms/kernel/low_order_moments/low_order_moments_kernel.h"
-#include "services/kernel/data_management/service_numeric_table.h"
-#include "algorithms/kernel/service_error_handling.h"
+#include "src/algorithms/low_order_moments/low_order_moments_kernel.h"
+#include "src/services/data_management/service_numeric_table.h"
+#include "src/algorithms/service_error_handling.h"
 
-#include "externals/service_stat.h"
-#include "externals/service_math.h"
-#include "services/kernel/service_data_utils.h"
-#include "externals/service_memory.h"
-#include "algorithms/threading/threading.h"
+#include "src/externals/service_stat.h"
+#include "src/externals/service_math.h"
+#include "src/services/service_data_utils.h"
+#include "src/externals/service_memory.h"
+#include "src/threading/threading.h"
 
 using namespace daal::internal;
 using namespace daal::services;
@@ -75,7 +75,7 @@ namespace estimates_batch_all
 #define _STDEV_ENABLE_ /*+*/
 #define _VART_ENABLE_  /*+*/
 
-#include "algorithms/kernel/low_order_moments/low_order_moments_estimates_batch.i"
+#include "src/algorithms/low_order_moments/low_order_moments_estimates_batch.i"
 
 } // namespace estimates_batch_all
 
@@ -95,7 +95,7 @@ namespace estimates_batch_minmax
 #undef _STDEV_ENABLE_
 #undef _VART_ENABLE_
 
-#include "algorithms/kernel/low_order_moments/low_order_moments_estimates_batch.i"
+#include "src/algorithms/low_order_moments/low_order_moments_estimates_batch.i"
 
 } // namespace estimates_batch_minmax
 
@@ -115,7 +115,7 @@ namespace estimates_batch_meanvariance
 #undef _STDEV_ENABLE_
 #undef _VART_ENABLE_
 
-#include "algorithms/kernel/low_order_moments/low_order_moments_estimates_batch.i"
+#include "src/algorithms/low_order_moments/low_order_moments_estimates_batch.i"
 
 } // namespace estimates_batch_meanvariance
 
@@ -132,7 +132,7 @@ namespace estimates_online_all
 #define _STDEV_ENABLE_ /*+*/
 #define _VART_ENABLE_  /*+*/
 
-#include "algorithms/kernel/low_order_moments/low_order_moments_estimates_online.i"
+#include "src/algorithms/low_order_moments/low_order_moments_estimates_online.i"
 
 } // namespace estimates_online_all
 
@@ -149,7 +149,7 @@ namespace estimates_online_minmax
 #undef _STDEV_ENABLE_
 #undef _VART_ENABLE_
 
-#include "algorithms/kernel/low_order_moments/low_order_moments_estimates_online.i"
+#include "src/algorithms/low_order_moments/low_order_moments_estimates_online.i"
 
 } // namespace estimates_online_minmax
 
@@ -166,7 +166,7 @@ namespace estimates_online_meanvariance
 #undef _STDEV_ENABLE_
 #undef _VART_ENABLE_
 
-#include "algorithms/kernel/low_order_moments/low_order_moments_estimates_online.i"
+#include "src/algorithms/low_order_moments/low_order_moments_estimates_online.i"
 
 } // namespace estimates_online_meanvariance
 

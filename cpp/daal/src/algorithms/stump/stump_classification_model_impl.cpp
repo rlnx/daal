@@ -23,12 +23,12 @@
 
 #include "algorithms/decision_tree/decision_tree_classification_model.h"
 #include "algorithms/stump/stump_classification_model.h"
-#include "algorithms/kernel/classifier/classifier_model_impl.h"
-#include "algorithms/kernel/decision_tree/decision_tree_classification_model_impl.h"
-#include "services/kernel/service_defines.h"
-#include "services/kernel/serialization_utils.h"
-#include "services/kernel/daal_strings.h"
-#include "algorithms/kernel/stump/stump_classification_model_visitor.h"
+#include "src/algorithms/classifier/classifier_model_impl.h"
+#include "src/algorithms/decision_tree/decision_tree_classification_model_impl.h"
+#include "src/services/service_defines.h"
+#include "src/services/serialization_utils.h"
+#include "src/services/daal_strings.h"
+#include "src/algorithms/stump/stump_classification_model_visitor.h"
 
 namespace daal
 {

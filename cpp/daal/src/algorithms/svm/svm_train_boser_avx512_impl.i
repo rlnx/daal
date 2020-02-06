@@ -19,7 +19,7 @@
  * Contains optimizations for AVX512.
 */
 
-#include "services/kernel/service_data_utils.h"
+#include "src/services/service_data_utils.h"
 
 template <>
 void SVMTrainTask<float, daal::algorithms::svm::interface2::Parameter, avx512>::WSSjLocal(const size_t jStart, const size_t jEnd,

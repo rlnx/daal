@@ -20,7 +20,7 @@
 //--
 
 #include "algorithms/distributions/normal/normal_types.h"
-#include "services/kernel/daal_strings.h"
+#include "src/services/daal_strings.h"
 
 namespace daal
 {

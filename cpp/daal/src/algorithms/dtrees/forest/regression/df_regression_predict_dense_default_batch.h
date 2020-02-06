@@ -26,8 +26,8 @@
 #define __DF_REGRESSION_PREDICT_DENSE_DEFAULT_BATCH_H__
 
 #include "algorithms/decision_forest/decision_forest_regression_predict.h"
-#include "externals/service_memory.h"
-#include "algorithms/kernel/kernel.h"
+#include "src/externals/service_memory.h"
+#include "src/algorithms/kernel.h"
 #include "data_management/data/numeric_table.h"
 
 using namespace daal::data_management;

@@ -33,10 +33,10 @@
 #define __MULTICLASSCLASSIFIER_PREDICT_MCCWU_KERNEL_H__
 
 #include "algorithms/multi_class_classifier/multi_class_classifier_model.h"
-#include "externals/service_math.h"
-#include "externals/service_memory.h"
-#include "services/kernel/service_data_utils.h"
-#include "services/kernel/data_management/service_numeric_table.h"
+#include "src/externals/service_math.h"
+#include "src/externals/service_memory.h"
+#include "src/services/service_data_utils.h"
+#include "src/services/data_management/service_numeric_table.h"
 
 using namespace daal::internal;
 using namespace daal::services::internal;

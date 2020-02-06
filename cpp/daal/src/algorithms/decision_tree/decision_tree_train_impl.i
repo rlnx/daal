@@ -25,15 +25,15 @@
 #define __DECISION_TREE_TRAIN_IMPL_I__
 
 #include "data_management/data/numeric_table.h"
-#include "algorithms/threading/threading.h"
-#include "algorithms/kernel/decision_tree/decision_tree_impl.i"
-#include "services/kernel/service_utils.h"
-#include "algorithms/kernel/service_sort.h"
-#include "externals/service_math.h"
-#include "services/kernel/service_data_utils.h"
-#include "algorithms/kernel/service_threading.h"
+#include "src/threading/threading.h"
+#include "src/algorithms/decision_tree/decision_tree_impl.i"
+#include "src/services/service_utils.h"
+#include "src/algorithms/service_sort.h"
+#include "src/externals/service_math.h"
+#include "src/services/service_data_utils.h"
+#include "src/algorithms/service_threading.h"
 #include "data_management/features/defines.h"
-#include "algorithms/kernel/service_error_handling.h"
+#include "src/algorithms/service_error_handling.h"
 
 namespace daal
 {
