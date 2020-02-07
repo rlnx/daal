@@ -36,13 +36,13 @@ struct svd {};
 using by_default = cov;
 } // namespace method
 
-class params_base : public base {
+class descriptor_base : public base {
  public:
   using tag_t = detail::tag;
   using float_t = float;
   using method_t = method::by_default;
 
-  params_base();
+  descriptor_base();
 
   std::int64_t get_components_count() const;
   bool get_is_deterministic() const;
@@ -54,20 +54,20 @@ class params_base : public base {
   dal::detail::pimpl<detail::params_impl> impl_;
 };
 
-template <typename Float  = params_base::float_t,
-          typename Method = params_base::method_t>
-class params : public params_base {
+template <typename Float  = descriptor_base::float_t,
+          typename Method = descriptor_base::method_t>
+class descriptor : public descriptor_base {
  public:
   using float_t  = Float;
   using method_t = Method;
 
   auto& set_components_count(int64_t value) {
-    params_base::set_components_count(value);
+    descriptor_base::set_components_count(value);
     return *this;
   }
 
   auto& set_is_deterministic(bool value) {
-    params_base::set_is_deterministic(value);
+    descriptor_base::set_is_deterministic(value);
     return *this;
   }
 };

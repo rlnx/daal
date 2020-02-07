@@ -37,8 +37,7 @@ class table : public base {
   private:
     using pimpl = dal::detail::pimpl<detail::table_impl>;
 
-    explicit table(detail::table_impl* impl)
-        : impl_(impl) {}
+    explicit table(detail::table_impl* impl);
 
     pimpl impl_;
 };

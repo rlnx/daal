@@ -23,30 +23,30 @@ namespace dal {
 namespace detail {
 
 template <typename T>
-struct type_id {};
+struct type_tag {};
 
-enum class type_rt {
+enum class type_id {
     i32,
     f32,
     f64
 };
 
 template <typename DataType>
-inline type_rt make_type_rt();
+inline type_id make_type_id();
 
 template <>
-inline type_rt make_type_rt<std::int32_t>() {
-    return type_rt::i32;
+inline type_id make_type_id<std::int32_t>() {
+    return type_id::i32;
 }
 
 template <>
-inline type_rt make_type_rt<float>() {
-    return type_rt::f32;
+inline type_id make_type_id<float>() {
+    return type_id::f32;
 }
 
 template <>
-inline type_rt make_type_rt<double>() {
-    return type_rt::f64;
+inline type_id make_type_id<double>() {
+    return type_id::f64;
 }
 
 template <typename T>
@@ -78,19 +78,14 @@ Impl& get_impl(Object&& object) {
     return static_cast<Impl&>(pimpl_accessor().get_pimpl(object).get());
 }
 
-template <typename Object>
-auto& get_impl_ptr(const Object& object) {
-    return pimpl_accessor().get_pimpl(object);
-}
-
 template <typename Object, typename Pimpl>
 Object make_from_pimpl(const Pimpl& impl) {
     return pimpl_accessor().template make_from_pimpl<Object>(impl);
 }
 
 template <typename Object, typename Pimpl>
-Object make_from_pointer(const Pimpl& impl) {
-    return pimpl_accessor().template make_from_pointer<Object>(impl);
+Object make_from_pointer(typename Object::pimpl::element_type* pointer) {
+    return pimpl_accessor().template make_from_pointer<Object>(pointer);
 }
 
 }  // namespace detail

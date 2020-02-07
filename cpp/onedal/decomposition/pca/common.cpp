@@ -15,7 +15,7 @@
 *******************************************************************************/
 
 #include "onedal/decomposition/pca/detail/common_impl.hpp"
-#include "onedal/detail/table_impl.hpp"
+#include "onedal/table_impl.hpp"
 
 namespace dal {
 namespace decomposition {
@@ -24,22 +24,22 @@ namespace pca {
 using detail::params_impl;
 using detail::model_impl;
 
-params_base::params_base()
+descriptor_base::descriptor_base()
   : impl_(new params_impl()) { }
 
-std::int64_t params_base::get_components_count() const {
+std::int64_t descriptor_base::get_components_count() const {
   return impl_->components_count;
 }
 
-bool params_base::get_is_deterministic() const {
+bool descriptor_base::get_is_deterministic() const {
   return impl_->is_deterministic;
 }
 
-void params_base::set_components_count(std::int64_t value) {
+void descriptor_base::set_components_count(std::int64_t value) {
   impl_->components_count = value;
 }
 
-void params_base::set_is_deterministic(bool value) {
+void descriptor_base::set_is_deterministic(bool value) {
   impl_->is_deterministic = value;
 }
 

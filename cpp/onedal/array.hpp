@@ -23,7 +23,7 @@ namespace dal {
 template <typename T>
 class array {
 public:
-    array(const shared<T>& data, std::int64_t size)
+    array(const detail::shared<T>& data, std::int64_t size)
         : data_(data),
           size_(size)
     { }
@@ -47,7 +47,7 @@ public:
     }
 
 private:
-    shared<T> data_;
+    detail::shared<T> data_;
     std::int64_t size_;
 };
 

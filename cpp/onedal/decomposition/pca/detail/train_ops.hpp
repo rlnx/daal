@@ -26,7 +26,7 @@ namespace detail {
 template <typename Context, typename... Options>
 struct train_ops_dispatcher {
   train_result operator()(const Context&,
-                          const params_base&,
+                          const descriptor_base&,
                           const train_input&) const;
 };
 
@@ -36,7 +36,7 @@ struct train_ops {
   using method_t = typename Params::method_t;
   using input_t = train_input;
   using result_t = train_result;
-  using params_base_t = params_base;
+  using params_base_t = descriptor_base;
 
   void validate(const Params& params, const train_input& input) const {
 

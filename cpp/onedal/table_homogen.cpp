@@ -15,28 +15,16 @@
  *******************************************************************************/
 
 #include "onedal/table_homogen.hpp"
-#include "onedal/detail/table_homogen_impl.hpp"
-
-using std::int32_t;
-using std::int64_t;
-
-using namespace dal::detail;
+#include "onedal/table_homogen_impl.hpp"
 
 namespace dal {
 
-template<typename T>
-table_homogen::table_homogen(T* data, int64_t rows, int64_t cols)
-    : table(dal::detail::make_from_pointer<table>(shared<table_impl> {
-        new table_homogen_impl(data, rows, cols) }))
-{ }
+template <typename T>
+table_homogen::table_homogen(T* data, std::int64_t row_count, std::int64_t column_count)
+    : table(new dal::detail::table_homogen_impl{data, row_count, column_count}) {}
 
-
-template table_homogen::table_homogen(const float* data, int64_t rows, int64_t cols);
-template table_homogen::table_homogen(const double* data, int64_t rows, int64_t cols);
-template table_homogen::table_homogen(const int32_t* data, int64_t rows, int64_t cols);
-
-template table_homogen make_table<float>(const float* data, int64_t rows, int64_t cols);
-template table_homogen make_table<double>(const double* data, int64_t rows, int64_t cols);
-template table_homogen make_table<int32_t>(const int32_t* data, int64_t rows, int64_t cols);
+template table_homogen::table_homogen(float*,   std::int64_t, std::int64_t);
+template table_homogen::table_homogen(double*,  std::int64_t, std::int64_t);
+template table_homogen::table_homogen(int32_t*, std::int64_t, std::int64_t);
 
 } // namespace dal

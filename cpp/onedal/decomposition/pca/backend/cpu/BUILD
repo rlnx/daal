@@ -9,6 +9,6 @@ dal_cpu_kernel(
   deps = [
     "//cpp/onedal/backend/interop",
     "//cpp/onedal/decomposition/pca:common",
-    "//cpp/daal/src/algorithms/kernel/pca",
+    "//cpp/daal/src/algorithms/pca",
   ],
 )

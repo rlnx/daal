@@ -21,11 +21,22 @@
 namespace dal {
 namespace detail {
 
+class table_impl;
+
 template <typename T>
 class slice {
   public:
-    slice(const range& rows, const range& columns, access_mode mode, T* data)
-        : rows_(rows), columns_(columns), mode_(mode), data_(data) {}
+    explicit slice(table_impl* table,
+                   T* data = nullptr,
+                   range rows = range(),
+                   range columns = range(),
+                   access_mode mode = access_mode::read)
+        : table_(table), data_(data), rows_(rows),
+          columns_(columns), mode_(mode) {}
+
+    table_impl* get_table() const{
+        return table_;
+    }
 
     T* get_data() const {
         return data_;
@@ -35,19 +46,17 @@ class slice {
         return mode_;
     }
 
-    const range &get_rows() const {
-        return rows_;
-    }
-
-    const range &get_columns() const {
-        return columns_;
+    std::int64_t get_element_count() const {
+        return rows_.get_element_count(table_->get_row_count()) *
+               columns_.get_element_count(table_->get_column_count());
     }
 
   private:
+    table_impl *table_;
+    T* data_;
     range rows_;
     range columns_;
     access_mode mode_;
-    T* data_;
 };
 
 class table_impl : public base {
@@ -55,28 +64,30 @@ class table_impl : public base {
     explicit table_impl(std::int64_t row_count, std::int64_t column_count)
         : row_count_(row_count), column_count_(column_count) {}
 
-    std::int64_t get_num_rows() const {
+    std::int64_t get_row_count() const {
         return row_count_;
     }
 
-    std::int64_t get_num_cols() const {
+    std::int64_t get_column_count() const {
         return column_count_;
     }
 
     template <typename T>
-    slice<T> get_slice(const range& rows, const range& columns, access_mode mode) const {
-        return get_slice_impl(type_id<T>{}, rows, columns);
+    slice<T> get_slice(const range& rows, const range& columns,
+                       access_mode mode = access_mode::read) const {
+        return get_slice_impl(type_tag<T>{}, rows, columns, mode);
     }
 
     template <typename T>
     void release_slice(const slice<T>& slice) {
-        release_slice_impl(slice, data);
+        release_slice_impl(slice);
     }
 
-  private:
+  protected:
     #define DECLARE_GET_SLICE_IMPL(T) \
-        virtual slice<T> get_slice_impl(type_id<T>, const range& rows, \
-                                                    const range& columns) const = 0; \
+        virtual slice<T> get_slice_impl(type_tag<T>, const range& rows,           \
+                                                     const range& columns,        \
+                                                     access_mode mode) const = 0; \
         virtual void release_slice_impl(const slice<T>& info) = 0;
 
     DECLARE_GET_SLICE_IMPL(float)
@@ -85,11 +96,10 @@ class table_impl : public base {
 
     #undef DECLARE_GET_SLICE_IMPL
 
+  private:
     std::int64_t row_count_;
     std::int64_t column_count_;
 };
-
-using table_impl_ptr = dal::shared<table_impl>;
 
 } // namespace detail
 } // namespace dal

@@ -27,7 +27,7 @@ namespace detail {
 template <typename Float, typename Method>
 struct train_ops_dispatcher<data_parallel_execution_context, Float, Method> {
   train_result operator()(const data_parallel_execution_context& ctx,
-                          const params_base& params,
+                          const descriptor_base& params,
                           const train_input& input) const {
     return dal::backend::dispatch(ctx, [&](auto cpu_or_gpu) {
       return backend::train_kernel<decltype(cpu_or_gpu), Float, Method>()(ctx, params, input);

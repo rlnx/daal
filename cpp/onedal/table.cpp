@@ -17,34 +17,38 @@
 #include "onedal/table.hpp"
 
 #include "onedal/array.hpp"
-#include "onedal/detail/table_impl.hpp"
+#include "onedal/table_impl.hpp"
 
 namespace dal {
 
+table::table(detail::table_impl* impl)
+    : impl_(impl) {}
+
 std::int64_t table::get_row_count() const noexcept {
-    return impl_->get_num_rows();
+    return impl_->get_row_count();
 }
 
 std::int64_t table::get_column_count() const noexcept {
-    return impl_->get_num_cols();
+    return impl_->get_column_count();
 }
+
+template <typename T>
+struct slice_array_deleter {
+    explicit slice_array_deleter(const detail::slice<T>& slice)
+        : slice(slice) {}
+
+    void operator() (T*) const {
+        slice.get_table()->release_slice(slice);
+    }
+
+    detail::slice<T> slice;
+};
 
 template <typename T, access_mode Mode>
 array<T> flatten(const table& t, const range& rows, const range& columns) {
-    auto table_impl = detail::get_impl_ptr(t);
-
-    T* data = table_impl->get_data_ptr({ rows, columns }, nullptr);
-
-    std::int64_t row_count = rows.get_num_of_elements(t_impl->get_num_rows());
-    std::int64_t col_count = columns.get_num_of_elements(t_impl->get_num_cols());
-
-    return {
-        data,
-        row_count * col_count,
-        [table_impl, rows, columns](T* ptr) {
-            table_impl->release_data_ptr({rows, columns}, ptr, Mode == access_mode::write);
-        }
-    };
+    auto table_impl = detail::get_impl<detail::table_impl>(t);
+    auto slice = table_impl.get_slice<T>(rows, columns, Mode);
+    return array<T>{slice.get_data(), slice.get_element_count(), slice_array_deleter<T>(slice)};
 }
 
 #define INSTANTIATE(T, M) \

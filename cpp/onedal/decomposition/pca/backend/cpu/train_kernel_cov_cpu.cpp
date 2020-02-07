@@ -14,7 +14,7 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include "daal/algorithms/kernel/pca/pca_dense_correlation_batch_kernel.h"
+#include "daal/src/algorithms/pca/pca_dense_correlation_batch_kernel.h"
 
 #include "onedal/backend/interop/common.hpp"
 #include "onedal/backend/interop/table_conversion.hpp"
@@ -41,7 +41,7 @@ namespace interop = dal::backend::interop;
 template <typename Cpu, typename Float>
 struct train_kernel<Cpu, Float, method::cov> {
     train_result operator()(const default_execution_context& ctx,
-                            const params_base& params,
+                            const descriptor_base& params,
                             const train_input& input) const {
         const auto data = input.get_data();
 

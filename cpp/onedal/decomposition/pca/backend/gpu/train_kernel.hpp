@@ -27,7 +27,7 @@ namespace backend {
 template <typename Gpu, typename Float, typename Method>
 struct train_kernel {
   train_result operator()(const data_parallel_execution_context& ctx,
-                          const params_base& params,
+                          const descriptor_base& params,
                           const train_input& input) const;
 };
 
