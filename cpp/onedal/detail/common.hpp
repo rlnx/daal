@@ -75,7 +75,7 @@ struct pimpl_accessor {
 
 template <typename Impl, typename Object>
 Impl& get_impl(Object&& object) {
-    return static_cast<Impl&>(pimpl_accessor().get_pimpl(object).get());
+    return static_cast<Impl&>(*pimpl_accessor().get_pimpl(object));
 }
 
 template <typename Object, typename Pimpl>

@@ -14,15 +14,13 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include "daal/src/algorithms/pca/pca_dense_correlation_batch_kernel.h"
+#include "onedal/decomposition/pca/backend/cpu/train_kernel.hpp"
 
 #include "onedal/backend/interop/common.hpp"
 #include "onedal/backend/interop/table_conversion.hpp"
-#include "onedal/detail/table_homogen_impl.hpp"
+#include "onedal/table_homogen_impl.hpp"
 
-#include "onedal/decomposition/pca/backend/cpu/train_kernel.hpp"
-#include "onedal/decomposition/pca/detail/train_types_impl.hpp"
-#include "onedal/decomposition/pca/detail/common_impl.hpp"
+#include "daal/src/algorithms/pca/pca_dense_correlation_batch_kernel.h"
 
 using namespace dal::detail;
 using namespace dal::decomposition::pca::detail;
@@ -69,13 +67,13 @@ struct train_kernel<Cpu, Float, method::cov> {
                                        &covariance_alg, results_to_compute,
                                        *eigenvectors, *eigenvalues, *means, *variances);
 
-        shared<model_impl> model { new model_impl() };
-        model->eigenvectors = interop::from_daal_table<Float>(*eigenvectors);
+        const auto trained_model = model()
+            .set_eigenvectors(interop::from_daal_table<Float>(*eigenvectors));
 
-        shared<train_result_impl> result { new train_result_impl() };
-        result->trained_model = model;
+        const auto result = train_result()
+            .set_model(trained_model);
 
-        return dal::detail::make_from_pimpl<train_result>(result);
+        return result;
     }
 };
 

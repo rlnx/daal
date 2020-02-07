@@ -14,37 +14,51 @@
 * limitations under the License.
 *******************************************************************************/
 
-#include "onedal/decomposition/pca/detail/common_impl.hpp"
-#include "onedal/table_impl.hpp"
+#include "onedal/decomposition/pca/common.hpp"
 
 namespace dal {
 namespace decomposition {
 namespace pca {
 
+class detail::params_impl : public base {
+  public:
+    std::int64_t components_count = -1;
+    bool is_deterministic = false;
+};
+
+class detail::model_impl : public base {
+  public:
+    table eigenvectors;
+};
+
 using detail::params_impl;
 using detail::model_impl;
 
 descriptor_base::descriptor_base()
-  : impl_(new params_impl()) { }
+    : impl_(new params_impl()) { }
 
 std::int64_t descriptor_base::get_components_count() const {
-  return impl_->components_count;
+    return impl_->components_count;
 }
 
 bool descriptor_base::get_is_deterministic() const {
-  return impl_->is_deterministic;
+    return impl_->is_deterministic;
 }
 
-void descriptor_base::set_components_count(std::int64_t value) {
-  impl_->components_count = value;
+void descriptor_base::set_components_count_impl(std::int64_t value) {
+    impl_->components_count = value;
 }
 
-void descriptor_base::set_is_deterministic(bool value) {
-  impl_->is_deterministic = value;
+void descriptor_base::set_is_deterministic_impl(bool value) {
+    impl_->is_deterministic = value;
 }
 
 table model::get_eigenvectors() const {
-  return dal::detail::make_from_pimpl<table>(impl_->eigenvectors);
+    return impl_->eigenvectors;
+}
+
+void model::set_eigenvectors_impl(const table& value) {
+    impl_->eigenvectors = value;
 }
 
 } // namespace pca

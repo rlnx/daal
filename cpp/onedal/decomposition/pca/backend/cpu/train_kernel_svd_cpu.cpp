@@ -26,7 +26,7 @@ struct train_kernel<Cpu, Float, method::svd> {
   train_result operator()(const default_execution_context& ctx,
                           const descriptor_base& params,
                           const train_input& input) const {
-    return dal::detail::make_from_pimpl<train_result>(nullptr);
+    return train_result();
   }
 };
 

@@ -32,9 +32,9 @@ class table_homogen : public table {
 };
 
 template <typename T>
-table_homogen make_table(T* data, std::int64_t row_count,
-                                  std::int64_t column_count) {
-    return table_homogen(data, rows, cols);
+inline table_homogen make_table(T* data, std::int64_t row_count,
+                                         std::int64_t column_count) {
+    return table_homogen(data, row_count, column_count);
 }
 
 } // namespace dal

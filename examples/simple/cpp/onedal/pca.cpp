@@ -32,13 +32,13 @@ int main(int argc, char const *argv[]) {
         -4.f, 3.f,  0.f
     };
 
-    const auto data = dal::make_table(data, row_count, column_count);
+    const auto data_table = dal::make_table(data, row_count, column_count);
 
     const auto pca_desc = pca::descriptor()
         .set_components_count(5)
         .set_is_deterministic(true);
 
-    const auto model = dal::train(pca_desc, data).get_model();
+    const auto model = dal::train(pca_desc, data_table).get_model();
 
     std::cout << "Eigenvectors:" << std::endl
               << model.get_eigenvectors() << std::endl;

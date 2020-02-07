@@ -43,7 +43,7 @@ slice<T> table_homogen_impl::get_slice_template(const range& rows,
 
     // TODO: Handle access_mode::write
     // TODO: Handle case where a copy is necessary
-    return slice<T>(this);
+    return slice<T>(const_cast<table_homogen_impl*>(this));
 }
 
 template <typename T>

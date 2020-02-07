@@ -32,12 +32,12 @@ enum class access_mode {
 
 struct range {
 public:
-    range(std::int64_t start, std::int64_t end)
+    range(std::int64_t start = 0, std::int64_t end = -1)
         : start_idx(start), end_idx(end) {}
 
-    std::int64_t get_element_count(std::int64_t end_of_parent) const noexcept {
-        // TODO: handle error if (end_of_parent + end_idx) < 0
-        auto final_row = (end_idx < 0) ? end_of_parent + end_idx + 1 : end_idx;
+    std::int64_t get_element_count(std::int64_t max_end_index) const noexcept {
+        // TODO: handle error if (max_end_index + end_idx) < 0
+        std::int64_t final_row = (end_idx < 0) ? max_end_index + end_idx + 1 : end_idx;
         return (final_row - start_idx - 1) + 1;
     }
 

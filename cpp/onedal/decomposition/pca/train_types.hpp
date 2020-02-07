@@ -28,39 +28,56 @@ class train_result_impl;
 } // namespace detail
 
 class train_input : public base {
- public:
-  train_input(const table& data);
+  public:
+    train_input(const table& data);
 
-  table get_data() const;
+    table get_data() const;
 
-  auto& set_data(const table& data) {
-    set_data_impl(data);
-    return *this;
-  }
+    auto& set_data(const table& data) {
+        set_data_impl(data);
+        return *this;
+    }
 
- private:
-  void set_data_impl(const table& data);
-  dal::detail::pimpl<detail::train_input_impl> impl_;
+  private:
+    void set_data_impl(const table& data);
+
+    dal::detail::pimpl<detail::train_input_impl> impl_;
 };
 
 class train_result {
- public:
-  auto get_model() const -> model;
-  table get_eigenvalues() const;
-  table get_eigenvectors() const;
-  table get_explained_variance() const;
+  public:
+    model get_model() const;
+    table get_eigenvalues() const;
+    table get_eigenvectors() const;
+    table get_explained_variance() const;
 
- private:
-  using pimpl = dal::detail::pimpl<detail::train_result_impl>;
+    auto& set_model(const model& value) {
+        set_model_impl(value);
+        return *this;
+    }
 
- private:
-  train_result(const pimpl& impl);
+    auto& set_eigenvalues(const table& value) {
+        set_eigenvalues_impl(value);
+        return *this;
+    }
 
- private:
-  dal::detail::pimpl<detail::train_result_impl> impl_;
+    auto& set_eigenvectors(const table& value) {
+        set_eigenvectors_impl(value);
+        return *this;
+    }
 
- private:
-  friend dal::detail::pimpl_accessor;
+    auto& set_explained_variance(const table& value) {
+        set_explained_variance_impl(value);
+        return *this;
+    }
+
+  private:
+    void set_model_impl(const model&);
+    void set_eigenvalues_impl(const table&);
+    void set_eigenvectors_impl(const table&);
+    void set_explained_variance_impl(const table&);
+
+    dal::detail::pimpl<detail::train_result_impl> impl_;
 };
 
 } // namespace pca

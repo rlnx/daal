@@ -31,15 +31,13 @@ class table : public base {
     table() = default;
 
     std::int64_t get_row_count() const noexcept;
-
     std::int64_t get_column_count() const noexcept;
 
-  private:
-    using pimpl = dal::detail::pimpl<detail::table_impl>;
-
+  protected:
     explicit table(detail::table_impl* impl);
 
-    pimpl impl_;
+  private:
+    dal::detail::pimpl<detail::table_impl> impl_;
 };
 
 template <typename T, access_mode Mode>

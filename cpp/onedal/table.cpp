@@ -46,7 +46,7 @@ struct slice_array_deleter {
 
 template <typename T, access_mode Mode>
 array<T> flatten(const table& t, const range& rows, const range& columns) {
-    auto table_impl = detail::get_impl<detail::table_impl>(t);
+    auto& table_impl = detail::get_impl<detail::table_impl>(t);
     auto slice = table_impl.get_slice<T>(rows, columns, Mode);
     return array<T>{slice.get_data(), slice.get_element_count(), slice_array_deleter<T>(slice)};
 }

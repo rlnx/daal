@@ -3,7 +3,7 @@
 #include "daal/include/data_management/data/homogen_numeric_table.h"
 
 #include "onedal/table.hpp"
-#include "onedal/detail/table_homogen_impl.hpp"
+#include "onedal/table_homogen_impl.hpp"
 
 namespace dal {
 namespace backend {

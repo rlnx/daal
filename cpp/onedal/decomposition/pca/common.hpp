@@ -16,11 +16,10 @@
 
 #pragma once
 
-#include "onedal/detail/common.hpp"
 #include "onedal/table.hpp"
+#include "onedal/detail/common.hpp"
 
 namespace dal {
-
 namespace decomposition {
 namespace pca {
 
@@ -37,57 +36,55 @@ using by_default = cov;
 } // namespace method
 
 class descriptor_base : public base {
- public:
-  using tag_t = detail::tag;
-  using float_t = float;
-  using method_t = method::by_default;
+  public:
+    using tag_t = detail::tag;
+    using float_t = float;
+    using method_t = method::by_default;
 
-  descriptor_base();
+    descriptor_base();
 
-  std::int64_t get_components_count() const;
-  bool get_is_deterministic() const;
+    auto get_components_count() const -> std::int64_t;
+    auto get_is_deterministic() const -> bool;
 
-  void set_components_count(std::int64_t value);
-  void set_is_deterministic(bool value);
+  protected:
+    void set_components_count_impl(std::int64_t value);
+    void set_is_deterministic_impl(bool value);
 
- private:
-  dal::detail::pimpl<detail::params_impl> impl_;
+    dal::detail::pimpl<detail::params_impl> impl_;
 };
 
 template <typename Float  = descriptor_base::float_t,
           typename Method = descriptor_base::method_t>
 class descriptor : public descriptor_base {
- public:
-  using float_t  = Float;
-  using method_t = Method;
+  public:
+    using float_t  = Float;
+    using method_t = Method;
 
-  auto& set_components_count(int64_t value) {
-    descriptor_base::set_components_count(value);
-    return *this;
-  }
+    auto& set_components_count(int64_t value) {
+        set_components_count_impl(value);
+        return *this;
+    }
 
-  auto& set_is_deterministic(bool value) {
-    descriptor_base::set_is_deterministic(value);
-    return *this;
-  }
+    auto& set_is_deterministic(bool value) {
+        set_is_deterministic_impl(value);
+        return *this;
+    }
 };
 
 class model : public base {
-public:
-  table get_eigenvectors() const;
-
-private:
-  using pimpl = dal::detail::pimpl<detail::model_impl>;
-
-private:
-  model(const pimpl& impl)
-      : impl_(impl) { }
-
-private:
-  dal::detail::pimpl<detail::model_impl> impl_;
-
-private:
   friend dal::detail::pimpl_accessor;
+  public:
+    auto get_eigenvectors() const -> table;
+
+    auto set_eigenvectors(const table& value) {
+        set_eigenvectors_impl(value);
+        return *this;
+    }
+
+  private:
+    void set_eigenvectors_impl(const table&);
+
+    dal::detail::pimpl<detail::model_impl> impl_;
 };
 
 } // namespace pca
