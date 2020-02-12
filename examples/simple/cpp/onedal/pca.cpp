@@ -32,15 +32,19 @@ int main(int argc, char const *argv[]) {
         -4.f, 3.f,  0.f
     };
 
-    const auto data_table = dal::make_table(data, row_count, column_count);
+    const auto data_table = dal::table_homogen(data, row_count, column_count);
 
     const auto pca_desc = pca::descriptor()
-        .set_components_count(5)
+        .set_component_count(3)
         .set_is_deterministic(true);
 
-    const auto model = dal::train(pca_desc, data_table).get_model();
+    const auto result = dal::train(pca_desc, data_table);
 
     std::cout << "Eigenvectors:" << std::endl
-              << model.get_eigenvectors() << std::endl;
+              << result.get_eigenvectors() << std::endl;
+
+    std::cout << "Eigenvalues:" << std::endl
+              << result.get_eigenvalues() << std::endl;
+
     return 0;
 }

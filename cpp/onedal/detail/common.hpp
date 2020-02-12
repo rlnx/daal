@@ -31,22 +31,27 @@ enum class type_id {
     f64
 };
 
-template <typename DataType>
-inline type_id make_type_id();
+template <typename T>
+inline type_id make_type_id_impl();
 
 template <>
-inline type_id make_type_id<std::int32_t>() {
+inline type_id make_type_id_impl<std::int32_t>() {
     return type_id::i32;
 }
 
 template <>
-inline type_id make_type_id<float>() {
+inline type_id make_type_id_impl<float>() {
     return type_id::f32;
 }
 
 template <>
-inline type_id make_type_id<double>() {
+inline type_id make_type_id_impl<double>() {
     return type_id::f64;
+}
+
+template <typename T>
+inline type_id make_type_id() {
+    return make_type_id_impl<std::decay_t<T>>();
 }
 
 template <typename T>

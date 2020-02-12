@@ -16,11 +16,22 @@
 
 #pragma once
 
+#include "onedal/execution_context_dp.hpp"
+#include "onedal/backend/dispatcher.hpp"
+
 namespace dal {
 namespace backend {
 
-class context_gpu {
+class context_gpu {};
+
+template <typename CpuKernel, typename GpuKernel>
+struct kernel_dispatcher<CpuKernel, GpuKernel> {
+    template <typename ... Args>
+    auto operator() (const data_parallel_execution_context& ctx, Args&& ...args) const {
+        // TODO: Dispatch to GPU
+        return CpuKernel()(context_cpu{}, std::forward<Args>(args)...);
+    }
 };
 
-} // namespace backend
-} // namespace dal
+}  // namespace backend
+}  // namespace dal

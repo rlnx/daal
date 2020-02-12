@@ -20,9 +20,9 @@ namespace dal {
 namespace decomposition {
 namespace pca {
 
-class detail::params_impl : public base {
+class detail::descriptor_impl : public base {
   public:
-    std::int64_t components_count = -1;
+    std::int64_t component_count = -1;
     bool is_deterministic = false;
 };
 
@@ -31,27 +31,29 @@ class detail::model_impl : public base {
     table eigenvectors;
 };
 
-using detail::params_impl;
+using detail::descriptor_impl;
 using detail::model_impl;
 
 descriptor_base::descriptor_base()
-    : impl_(new params_impl()) { }
+    : impl_(new descriptor_impl{}) {}
 
-std::int64_t descriptor_base::get_components_count() const {
-    return impl_->components_count;
+std::int64_t descriptor_base::get_component_count() const {
+    return impl_->component_count;
 }
 
 bool descriptor_base::get_is_deterministic() const {
     return impl_->is_deterministic;
 }
 
-void descriptor_base::set_components_count_impl(std::int64_t value) {
-    impl_->components_count = value;
+void descriptor_base::set_component_count_impl(std::int64_t value) {
+    impl_->component_count = value;
 }
 
 void descriptor_base::set_is_deterministic_impl(bool value) {
     impl_->is_deterministic = value;
 }
+
+model::model() : impl_(new model_impl{}) {}
 
 table model::get_eigenvectors() const {
     return impl_->eigenvectors;

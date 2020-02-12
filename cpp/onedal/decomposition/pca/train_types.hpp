@@ -46,6 +46,8 @@ class train_input : public base {
 
 class train_result {
   public:
+    train_result();
+
     model get_model() const;
     table get_eigenvalues() const;
     table get_eigenvectors() const;
@@ -58,11 +60,6 @@ class train_result {
 
     auto& set_eigenvalues(const table& value) {
         set_eigenvalues_impl(value);
-        return *this;
-    }
-
-    auto& set_eigenvectors(const table& value) {
-        set_eigenvectors_impl(value);
         return *this;
     }
 

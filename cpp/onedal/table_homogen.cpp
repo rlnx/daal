@@ -19,14 +19,10 @@
 
 namespace dal {
 
-template <typename T>
-table_homogen::table_homogen(const array<T>& data,
+table_homogen::table_homogen(const array<byte_t>& data,
+                             detail::type_id type_id,
                              std::int64_t row_count,
                              std::int64_t column_count)
-    : table(new dal::detail::table_homogen_impl{data, row_count, column_count}) {}
-
-template table_homogen::table_homogen(const array<float>&, std::int64_t, std::int64_t);
-template table_homogen::table_homogen(const array<double>&, std::int64_t, std::int64_t);
-template table_homogen::table_homogen(const array<std::int32_t>&, std::int64_t, std::int64_t);
+    : table(new dal::detail::table_homogen_impl{data, type_id, row_count, column_count}) {}
 
 } // namespace dal

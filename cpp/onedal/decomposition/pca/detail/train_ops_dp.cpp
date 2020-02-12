@@ -14,7 +14,7 @@
 * limitations under the License.
 *******************************************************************************/
 
-#include "onedal/execution_context_dp.hpp"
+#include "onedal/backend/dispatcher_dp.hpp"
 #include "onedal/decomposition/pca/detail/train_ops.hpp"
 #include "onedal/decomposition/pca/backend/cpu/train_kernel.hpp"
 #include "onedal/decomposition/pca/backend/gpu/train_kernel.hpp"

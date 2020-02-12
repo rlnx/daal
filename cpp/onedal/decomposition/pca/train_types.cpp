@@ -33,7 +33,6 @@ class detail::train_result_impl : public base {
   public:
     model trained_model;
     table eigenvalues;
-    table eigenvectors;
     table explained_variance;
 };
 
@@ -51,6 +50,8 @@ void train_input::set_data_impl(const table& value) {
     impl_->data = value;
 }
 
+train_result::train_result() : impl_(new train_result_impl{}) {}
+
 model train_result::get_model() const {
     return impl_->trained_model;
 }
@@ -60,7 +61,7 @@ table train_result::get_eigenvalues() const {
 }
 
 table train_result::get_eigenvectors() const {
-    return impl_->eigenvectors;
+    return impl_->trained_model.get_eigenvectors();
 }
 
 table train_result::get_explained_variance() const {
@@ -73,10 +74,6 @@ void train_result::set_model_impl(const model& value) {
 
 void train_result::set_eigenvalues_impl(const table& value) {
     impl_->eigenvalues = value;
-}
-
-void train_result::set_eigenvectors_impl(const table& value) {
-    impl_->eigenvectors = value;
 }
 
 void train_result::set_explained_variance_impl(const table& value) {

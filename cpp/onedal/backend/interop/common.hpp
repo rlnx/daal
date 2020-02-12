@@ -9,25 +9,25 @@ namespace backend {
 namespace interop {
 
 template <typename CpuType>
-constexpr daal::CpuType get_daal_cpu_type();
+constexpr daal::CpuType get_daal_cpu_type(CpuType cpu);
 
 template <>
-constexpr daal::CpuType get_daal_cpu_type<cpu_dispatch_default>() {
+constexpr daal::CpuType get_daal_cpu_type<cpu_dispatch_default>(cpu_dispatch_default) {
     return daal::CpuType::sse2;
 }
 
 template <>
-constexpr daal::CpuType get_daal_cpu_type<cpu_dispatch_avx>() {
+constexpr daal::CpuType get_daal_cpu_type<cpu_dispatch_avx>(cpu_dispatch_avx) {
     return daal::CpuType::avx;
 }
 
 template <>
-constexpr daal::CpuType get_daal_cpu_type<cpu_dispatch_avx2>() {
+constexpr daal::CpuType get_daal_cpu_type<cpu_dispatch_avx2>(cpu_dispatch_avx2) {
     return daal::CpuType::avx2;
 }
 
 template <>
-constexpr daal::CpuType get_daal_cpu_type<cpu_dispatch_avx512>() {
+constexpr daal::CpuType get_daal_cpu_type<cpu_dispatch_avx512>(cpu_dispatch_avx512) {
     return daal::CpuType::avx512;
 }
 

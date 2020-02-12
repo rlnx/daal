@@ -24,13 +24,13 @@ namespace detail {
 
 class table_homogen_impl : public table_impl {
   public:
-    template <typename T>
-    explicit table_homogen_impl(const array<T>& data,
+    explicit table_homogen_impl(const array<byte_t>& data,
+                                type_id type_id_value,
                                 std::int64_t row_count,
                                 std::int64_t column_count)
         : table_impl(row_count, column_count),
-          type_id_(make_type_id<T>()),
-          data_(reinterpret_array_cast<byte_t>(data)) {}
+          type_id_(type_id_value),
+          data_(data) {}
 
   protected:
     #define DECLARE_GET_SLICE_IMPL(T) \

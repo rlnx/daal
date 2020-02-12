@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "onedal/backend/context_gpu.hpp"
+#include "onedal/backend/dispatcher_dp.hpp"
 #include "onedal/decomposition/pca/train_types.hpp"
 
 namespace dal {

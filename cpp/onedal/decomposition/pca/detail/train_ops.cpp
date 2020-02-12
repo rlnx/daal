@@ -14,7 +14,7 @@
 * limitations under the License.
 *******************************************************************************/
 
-#include "onedal/execution_context.hpp"
+#include "onedal/backend/dispatcher.hpp"
 #include "onedal/decomposition/pca/detail/train_ops.hpp"
 #include "onedal/decomposition/pca/backend/cpu/train_kernel.hpp"
 
@@ -43,6 +43,6 @@ INSTANTIATE(double, method::cov)
 INSTANTIATE(double, method::svd)
 
 } // namespace detail
-} // namespace dal
-} // namespace decomposition
 } // namespace pca
+} // namespace decomposition
+} // namespace dal

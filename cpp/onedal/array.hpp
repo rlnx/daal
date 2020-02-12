@@ -28,6 +28,9 @@ class array {
   template <typename Y, typename U>
   friend array<Y> reinterpret_array_cast(const array<U>&);
 
+  template <typename Y, typename U>
+  friend array<Y> const_array_cast(const array<U>&);
+
   public:
     explicit array(const detail::shared<T>& data, std::int64_t size)
         : data_(data),
@@ -72,6 +75,16 @@ private:
 template <typename T, typename U>
 inline array<T> reinterpret_array_cast(const array<U>& arr) {
     return array<T>{std::reinterpret_pointer_cast<T>(arr.data_), arr.size_};
+}
+
+template <typename T, typename U>
+inline array<T> const_array_cast(const array<U>& arr) {
+    return array<T>{std::const_pointer_cast<T>(arr.data_), arr.size_};
+}
+
+template <typename T, typename U>
+inline array<T> array_cast(const array<U>& arr) {
+    return reinterpret_array_cast<T>(const_array_cast<std::remove_cv_t<U>>(arr));
 }
 
 } // namespace dal

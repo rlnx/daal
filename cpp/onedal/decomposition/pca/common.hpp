@@ -25,7 +25,7 @@ namespace pca {
 
 namespace detail {
 struct tag {};
-class params_impl;
+class descriptor_impl;
 class model_impl;
 } // namespace detail
 
@@ -43,14 +43,14 @@ class descriptor_base : public base {
 
     descriptor_base();
 
-    auto get_components_count() const -> std::int64_t;
+    auto get_component_count() const -> std::int64_t;
     auto get_is_deterministic() const -> bool;
 
   protected:
-    void set_components_count_impl(std::int64_t value);
+    void set_component_count_impl(std::int64_t value);
     void set_is_deterministic_impl(bool value);
 
-    dal::detail::pimpl<detail::params_impl> impl_;
+    dal::detail::pimpl<detail::descriptor_impl> impl_;
 };
 
 template <typename Float  = descriptor_base::float_t,
@@ -60,8 +60,8 @@ class descriptor : public descriptor_base {
     using float_t  = Float;
     using method_t = Method;
 
-    auto& set_components_count(int64_t value) {
-        set_components_count_impl(value);
+    auto& set_component_count(int64_t value) {
+        set_component_count_impl(value);
         return *this;
     }
 
@@ -74,9 +74,11 @@ class descriptor : public descriptor_base {
 class model : public base {
   friend dal::detail::pimpl_accessor;
   public:
-    auto get_eigenvectors() const -> table;
+    model();
 
-    auto set_eigenvectors(const table& value) {
+    table get_eigenvectors() const;
+
+    auto& set_eigenvectors(const table& value) {
         set_eigenvectors_impl(value);
         return *this;
     }
