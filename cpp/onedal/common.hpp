@@ -20,6 +20,8 @@
 
 namespace dal {
 
+using byte_t = std::uint8_t;
+
 class base {
 public:
     virtual ~base() = default;

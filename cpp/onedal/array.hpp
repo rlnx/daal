@@ -23,16 +23,14 @@ namespace dal {
 template <typename T>
 class array {
 public:
-    array(const detail::shared<T>& data, std::int64_t size)
+    explicit array(const detail::shared<T>& data, std::int64_t size)
         : data_(data),
-          size_(size)
-    { }
+          size_(size) {}
 
     template <typename Deleter>
-    array(T* data, std::int64_t size, Deleter d)
-        : data_(data, d),
-          size_(size)
-    { }
+    explicit array(T* data, std::int64_t size, Deleter&& deleter)
+        : data_(data, deleter),
+          size_(size) {}
 
     T* get_pointer() const noexcept {
         return data_.get();
@@ -46,9 +44,18 @@ public:
         return get_pointer()[index];
     }
 
+    T& operator [](std::int64_t index) noexcept {
+        return get_pointer()[index];
+    }
+
 private:
     detail::shared<T> data_;
     std::int64_t size_;
 };
+
+template <typename T, typename U>
+inline array<T> reinterpret_array_cast(const array<T>& arr) {
+    return array<T>(arr.data_)
+}
 
 } // namespace dal

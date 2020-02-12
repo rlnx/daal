@@ -27,14 +27,17 @@ class table_homogen_impl;
 class table_homogen : public table {
   public:
     template <typename T>
-    explicit table_homogen(T* data, std::int64_t row_count,
-                                    std::int64_t column_count);
-};
+    explicit table_homogen(const array<T>& data,
+                           std::int64_t row_count,
+                           std::int64_t column_count);
 
-template <typename T>
-inline table_homogen make_table(T* data, std::int64_t row_count,
-                                         std::int64_t column_count) {
-    return table_homogen(data, row_count, column_count);
-}
+    template <typename T, typename Deleter = detail::empty_deleter<T>>
+    explicit table_homogen(T* data,
+                           std::int64_t row_count,
+                           std::int64_t column_count,
+                           Deleter&& deleter = Deleter())
+        : table_homogen(array<T>{data, row_count * column_count, deleter},
+                        row_count, column_count) {}
+};
 
 } // namespace dal

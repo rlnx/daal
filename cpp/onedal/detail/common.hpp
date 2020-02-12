@@ -55,6 +55,12 @@ using shared = std::shared_ptr<T>;
 template <typename T>
 using pimpl = shared<T>;
 
+
+template <typename T>
+struct empty_deleter {
+    void operator() (T*) const noexcept {}
+};
+
 struct pimpl_accessor {
     template <typename Object>
     auto& get_pimpl(Object&& object) const {
