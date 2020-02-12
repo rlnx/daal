@@ -27,6 +27,6 @@ table_homogen::table_homogen(const array<T>& data,
 
 template table_homogen::table_homogen(const array<float>&, std::int64_t, std::int64_t);
 template table_homogen::table_homogen(const array<double>&, std::int64_t, std::int64_t);
-template table_homogen::table_homogen(const array<float>&, std::int64_t, std::int64_t);
+template table_homogen::table_homogen(const array<std::int32_t>&, std::int64_t, std::int64_t);
 
 } // namespace dal

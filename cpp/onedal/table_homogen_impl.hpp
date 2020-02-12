@@ -16,25 +16,21 @@
 
 #pragma once
 
+#include "onedal/array.hpp"
 #include "onedal/table_impl.hpp"
 
 namespace dal {
 namespace detail {
 
-template <typename T>
-struct empty_deleter {
-    void operator() (T*) const {}
-};
-
 class table_homogen_impl : public table_impl {
   public:
     template <typename T>
-    explicit table_homogen_impl(T* data,
+    explicit table_homogen_impl(const array<T>& data,
                                 std::int64_t row_count,
                                 std::int64_t column_count)
         : table_impl(row_count, column_count),
           type_id_(make_type_id<T>()),
-          data_((char *)data, empty_deleter<char>()) {}
+          data_(reinterpret_array_cast<byte_t>(data)) {}
 
   protected:
     #define DECLARE_GET_SLICE_IMPL(T) \
@@ -63,7 +59,7 @@ class table_homogen_impl : public table_impl {
                               const range& columns) const;
 
     type_id type_id_;
-    shared<char> data_;
+    array<byte_t> data_;
 };
 
 } // namespace detail

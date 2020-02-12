@@ -37,8 +37,9 @@ slice<T> table_homogen_impl::get_slice_template(const range& rows,
                                                 access_mode mode) const {
     if (can_avoid_slice_copy<T>(rows, columns)) {
         const int64_t elements_offset = rows.start_idx * get_column_count();
-        T* data_with_offset = (T*)(data_.get() + elements_offset * sizeof(T));
-        return slice<T>(const_cast<table_homogen_impl*>(this), data_with_offset, rows, columns, mode);
+        T* data_with_offset = (T*)(data_.get_pointer() + elements_offset * sizeof(T));
+        return slice<T>(const_cast<table_homogen_impl*>(this),
+                        data_with_offset, rows, columns, mode);
     }
 
     // TODO: Handle access_mode::write

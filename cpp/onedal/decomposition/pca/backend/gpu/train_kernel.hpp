@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "onedal/backend/common.hpp"
+#include "onedal/backend/context_gpu.hpp"
 #include "onedal/decomposition/pca/train_types.hpp"
 
 namespace dal {
@@ -24,9 +24,9 @@ namespace decomposition {
 namespace pca {
 namespace backend {
 
-template <typename Gpu, typename Float, typename Method>
-struct train_kernel {
-  train_result operator()(const data_parallel_execution_context& ctx,
+template <typename Float, typename Method>
+struct train_kernel_gpu {
+  train_result operator()(const dal::backend::context_gpu& ctx,
                           const descriptor_base& params,
                           const train_input& input) const;
 };

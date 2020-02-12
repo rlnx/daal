@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "onedal/backend/common.hpp"
+#include "onedal/backend/context_cpu.hpp"
 #include "onedal/decomposition/pca/train_types.hpp"
 
 namespace dal {
@@ -24,14 +24,14 @@ namespace decomposition {
 namespace pca {
 namespace backend {
 
-template <typename Cpu, typename Float, typename Method>
-struct train_kernel {
-  train_result operator()(const default_execution_context& ctx,
+template <typename Float, typename Method>
+struct train_kernel_cpu {
+  train_result operator()(const dal::backend::context_cpu& ctx,
                           const descriptor_base& params,
                           const train_input& input) const;
 };
 
-} // namespace detail
+} // namespace backend
 } // namespace pca
 } // namespace decomposition
 } // namespace dal

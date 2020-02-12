@@ -2,48 +2,75 @@
 
 #include "daal/include/data_management/data/homogen_numeric_table.h"
 
-#include "onedal/table.hpp"
-#include "onedal/table_homogen_impl.hpp"
+#include "onedal/table_homogen.hpp"
 
 namespace dal {
 namespace backend {
 namespace interop {
 
+template <typename T>
+struct daal_array_owner {
+    explicit daal_array_holder(const array<T>& arr)
+        : array_(arr) {}
+
+    void operator() (const void*) const {
+        array_.reset();
+    }
+
+    array<T> array_;
+};
+
 template <typename Float>
-inline auto make_daal_homogen_table(std::int64_t row_count, std::int64_t column_count) {
+inline auto allocate_daal_homogen_table(std::int64_t row_count,
+                                        std::int64_t column_count) {
     return daal::data_management::HomogenNumericTable<Float>::create(
         column_count, row_count, daal::data_management::NumericTable::doAllocate);
 }
 
-template <typename Float>
-inline auto make_daal_homogen_table(Float *pointer,
-                                    std::int64_t row_count,
-                                    std::int64_t column_count) {
-    return daal::data_management::HomogenNumericTable<Float>::create(
-        pointer, column_count, row_count);
+inline constexpr auto get_daal_access_mode(access_mode access) {
+    switch (access) {
+        // TODO: Think about read/write mapping
+        case access_mode::read: return daal::data_management::readOnly;
+        case access_mode::write: return daal::data_management::readWrite;
+    }
 }
 
-template <typename Float, access_mode Mode>
-inline auto make_daal_homogen_table(const table& t) {
-    const auto array = flatten<Float, Mode>(t);
-    return make_daal_homogen_table<Float>(array.get_pointer(),
-                                          t.get_column_count(),
-                                          t.get_row_count());
+template <typename T, access_mode Access>
+struct table_converter {
+    auto to_daal_homogen_table(const table& t) {
+        const auto data = flatten<T, Access>(t);
+
+        const auto daal_data = daal::services::SharedPtr<T>(
+            array.get_pointer(), daal_array_owner<T>{array});
+
+        return daal::data_management::HomogenNumericTable<T>::create(
+            daal_data, column_count, row_count);
+    }
+
+    auto to_onedal_homogen_table(const daal::data_management::NumericTablePtr& t) {
+        daal::data_management::BlockDescriptor<T> desc;
+
+        t->getBlockOfRows(0, t.getNumberOfRows(), get_daal_access_mode(Access), desc);
+
+        const auto deleter = [=](T*) {
+            t->releaseBlockOfRows(desc);
+        };
+
+        return table_homogen{desc.getBlockPtr(),
+                             t.getNumberOfRows(),
+                             t.getNumberOfRows(),
+                             deleter};
+    }
+};
+
+template <typename Float, access_mode Access>
+inline auto convert_to_daal_homogen_table(const table& t) {
+    return table_converter<Float, Access>().to_daal_homogen_table(t);
 }
 
-template <typename Float>
-inline auto make_dal_homogen_table(daal::data_management::NumericTable& t) {
-    daal::data_management::BlockDescriptor<Float> desc;
-    t.getBlockOfRows(0, t.getNumberOfRows(), daal::data_management::readOnly, desc);
-
-    dal::detail::table_impl_ptr result {
-        new dal::detail::table_homogen_impl(desc.getBlockPtr(),
-                                            t.getNumberOfRows(),
-                                            t.getNumberOfColumns())
-    };
-
-    t.releaseBlockOfRows(desc);
-    return result;
+template <typename Float, access_mode Access>
+inline auto convert_to_onedal_homogen_table(const daal::data_management::NumericTablePtr& t) {
+    return table_converter<Float, Access>().to_onedal_homogen_table(t);
 }
 
 } // namespace interop

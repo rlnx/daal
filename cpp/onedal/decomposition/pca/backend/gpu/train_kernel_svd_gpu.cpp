@@ -21,17 +21,17 @@ namespace decomposition {
 namespace pca {
 namespace backend {
 
-template <typename Gpu, typename Float>
-struct train_kernel<Gpu, Float, method::svd> {
-  train_result operator()(const data_parallel_execution_context& ctx,
+template <typename Float>
+struct train_kernel_gpu<Float, method::svd> {
+  train_result operator()(const dal::backend::context_gpu& ctx,
                           const descriptor_base& params,
                           const train_input& input) const {
     return train_result();
   }
 };
 
-template struct train_kernel<DAL_GPU_ID_, float, method::svd>;
-template struct train_kernel<DAL_GPU_ID_, double, method::svd>;
+template struct train_kernel_gpu<float, method::svd>;
+template struct train_kernel_gpu<double, method::svd>;
 
 } // namespace backend
 } // namespace pca

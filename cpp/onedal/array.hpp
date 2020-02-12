@@ -22,7 +22,13 @@ namespace dal {
 
 template <typename T>
 class array {
-public:
+  template <typename U>
+  friend class array;
+
+  template <typename Y, typename U>
+  friend array<Y> reinterpret_array_cast(const array<U>&);
+
+  public:
     explicit array(const detail::shared<T>& data, std::int64_t size)
         : data_(data),
           size_(size) {}
@@ -32,12 +38,22 @@ public:
         : data_(data, deleter),
           size_(size) {}
 
+    template <typename U>
+    array(const array<U>& other)
+        : data_(other.data_),
+          size_(other.size_) {}
+
     T* get_pointer() const noexcept {
         return data_.get();
     }
 
     std::int64_t get_size() const noexcept {
         return size_;
+    }
+
+    void reset() {
+        data_.reset();
+        size_ = 0;
     }
 
     const T& operator [](std::int64_t index) const noexcept {
@@ -54,8 +70,8 @@ private:
 };
 
 template <typename T, typename U>
-inline array<T> reinterpret_array_cast(const array<T>& arr) {
-    return array<T>(arr.data_)
+inline array<T> reinterpret_array_cast(const array<U>& arr) {
+    return array<T>{std::reinterpret_pointer_cast<T>(arr.data_), arr.size_};
 }
 
 } // namespace dal
