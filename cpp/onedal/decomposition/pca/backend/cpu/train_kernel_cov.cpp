@@ -36,7 +36,8 @@ namespace daal_dm  = daal::data_management;
 namespace interop  = dal::backend::interop;
 
 template <typename Float>
-static void call_daal_kernel(const descriptor_base& desc,
+static void call_daal_kernel(const context_cpu& ctx,
+                             const descriptor_base& desc,
                              const table& data,
                              const table& eigenvectors,
                              const table& eigenvalues,
@@ -61,7 +62,7 @@ static void call_daal_kernel(const descriptor_base& desc,
         constexpr auto cpu_type = interop::get_daal_cpu_type(cpu);
         interop::call_kernel<PCACorrelationKernel<daal::batch, Float, cpu_type>>(
             is_correlation,
-            params.get_is_deterministic(),
+            desc.get_is_deterministic(),
             *daal_data,
             &covariance_alg,
             results_to_compute,
@@ -74,19 +75,21 @@ static void call_daal_kernel(const descriptor_base& desc,
 }
 
 template <typename Float>
-static train_result train(const descriptor_base& desc, const train_input& input) {
+static train_result train(const context_cpu& ctx,
+                          const descriptor_base& desc,
+                          const train_input& input) {
     const auto data = input.get_data();
 
     const int64_t row_count = data.get_row_count();
     const int64_t column_count = data.get_column_count();
     const int64_t component_count = desc.get_component_count();
 
-    const auto eigenvectors = allocate_table<T>(1, component_count);
-    const auto eigenvalues  = allocate_table<T>(1, component_count);
-    const auto means        = allocate_table<T>(1, component_count);
-    const auto variances    = allocate_table<T>(1, component_count);
+    const auto eigenvectors = allocate_table<Float>(column_count, component_count);
+    const auto eigenvalues  = allocate_table<Float>(1, component_count);
+    const auto means        = allocate_table<Float>(1, component_count);
+    const auto variances    = allocate_table<Float>(1, component_count);
 
-    call_daal_kernel<Float>(desc, data, eigenvectors, eigenvalues, means, variances);
+    call_daal_kernel<Float>(ctx, desc, data, eigenvectors, eigenvalues, means, variances);
 
     return train_result()
         .set_model(model().set_eigenvectors(eigenvectors))
@@ -98,7 +101,7 @@ struct train_kernel_cpu<Float, method::cov> {
     train_result operator()(const context_cpu& ctx,
                             const descriptor_base& desc,
                             const train_input& input) const {
-        return train<Float>(desc, input);
+        return train<Float>(ctx, desc, input);
     }
 };
 
