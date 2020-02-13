@@ -49,4 +49,9 @@ class table_homogen : public table {
                            std::int64_t column_count);
 };
 
+template <typename T>
+table_homogen allocate_table(std::int64_t row_count, std::int64_t column_count) {
+    return table_homogen(array<T>(row_count * column_count), row_count, column_count);
+}
+
 } // namespace dal

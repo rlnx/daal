@@ -22,66 +22,83 @@
 
 #include "daal/src/algorithms/pca/pca_dense_correlation_batch_kernel.h"
 
-using namespace dal::detail;
-using namespace dal::decomposition::pca::detail;
-
 namespace dal {
 namespace decomposition {
 namespace pca {
 namespace backend {
 
+using std::int64_t;
+using dal::backend::context_cpu;
+
 namespace daal_pca = daal::algorithms::pca;
 namespace daal_cov = daal::algorithms::covariance;
 namespace daal_dm  = daal::data_management;
-namespace interop = dal::backend::interop;
+namespace interop  = dal::backend::interop;
+
+template <typename Float>
+static void call_daal_kernel(const descriptor_base& desc,
+                             const table& data,
+                             const table& eigenvectors,
+                             const table& eigenvalues,
+                             const table& means,
+                             const table& variances) {
+    const auto daal_data         = interop::convert_to_daal_homogen_table<Float>(data);
+    const auto daal_eigenvectors = interop::convert_to_daal_homogen_table<Float>(eigenvectors);
+    const auto daal_eigenvalues  = interop::convert_to_daal_homogen_table<Float>(eigenvalues);
+    const auto daal_means        = interop::convert_to_daal_homogen_table<Float>(means);
+    const auto daal_variances    = interop::convert_to_daal_homogen_table<Float>(variances);
+
+    daal_cov::Batch<Float, daal_cov::defaultDense> covariance_alg;
+    covariance_alg.input.set(daal_cov::data, daal_data);
+
+    constexpr bool is_correlation = false;
+    constexpr uint64_t results_to_compute = int64_t(daal_pca::mean ||
+                                                    daal_pca::variance ||
+                                                    daal_pca::eigenvalue);
+
+    dal::backend::dispatch_by_cpu(ctx, [&](auto cpu) {
+        using daal_pca::internal::PCACorrelationKernel;
+        constexpr auto cpu_type = interop::get_daal_cpu_type(cpu);
+        interop::call_kernel<PCACorrelationKernel<daal::batch, Float, cpu_type>>(
+            is_correlation,
+            params.get_is_deterministic(),
+            *daal_data,
+            &covariance_alg,
+            results_to_compute,
+            *daal_eigenvectors,
+            *daal_eigenvalues,
+            *daal_means,
+            *daal_variances);
+    });
+
+}
+
+template <typename Float>
+static train_result train(const descriptor_base& desc, const train_input& input) {
+    const auto data = input.get_data();
+
+    const int64_t row_count = data.get_row_count();
+    const int64_t column_count = data.get_column_count();
+    const int64_t component_count = desc.get_component_count();
+
+    const auto eigenvectors = allocate_table<T>(1, component_count);
+    const auto eigenvalues  = allocate_table<T>(1, component_count);
+    const auto means        = allocate_table<T>(1, component_count);
+    const auto variances    = allocate_table<T>(1, component_count);
+
+    call_daal_kernel<Float>(desc, data, eigenvectors, eigenvalues, means, variances);
+
+    return train_result()
+        .set_model(model().set_eigenvectors(eigenvectors))
+        .set_eigenvalues(eigenvalues);
+}
 
 template <typename Float>
 struct train_kernel_cpu<Float, method::cov> {
-    train_result operator()(const dal::backend::context_cpu& ctx,
-                            const descriptor_base& params,
+    train_result operator()(const context_cpu& ctx,
+                            const descriptor_base& desc,
                             const train_input& input) const {
-        const table data = input.get_data();
-
-        const std::int64_t row_count = data.get_row_count();
-        const std::int64_t column_count = data.get_column_count();
-        const std::int64_t component_count = params.get_component_count();
-        const std::uint64_t results_to_compute = std::uint64_t(daal_pca::none);
-        // TODO: results_to_compute = daal_pca::mean || daal_pca::variance || daal_pca::eigenvalue;
-
-        const auto daal_data = interop::convert_to_daal_homogen_table<Float>(data);
-
-        const auto eigenvectors = interop::allocate_daal_homogen_table<Float>(column_count, component_count);
-        const auto eigenvalues  = interop::allocate_daal_homogen_table<Float>(1, component_count);
-        const auto means        = interop::allocate_daal_homogen_table<Float>(1, component_count);
-        const auto variances    = interop::allocate_daal_homogen_table<Float>(1, component_count);
-
-        daal_cov::Batch<Float> covariance_alg;
-        covariance_alg.input.set(daal_cov::data, daal_data);
-
-        constexpr bool is_correlation = false;
-        dal::backend::dispatch_by_cpu(ctx, [&](auto cpu) {
-            constexpr auto cpu_type = interop::get_daal_cpu_type(cpu);
-            using kernel_t = daal_pca::internal::PCACorrelationKernel<daal::batch, Float, cpu_type>;
-            interop::call_kernel<kernel_t>(
-                is_correlation,
-                params.get_is_deterministic(),
-                *daal_data,
-                &covariance_alg,
-                results_to_compute,
-                *eigenvectors,
-                *eigenvalues,
-                *means,
-                *variances);
-        });
-
-        const auto trained_model = model()
-            .set_eigenvectors(interop::convert_to_onedal_homogen_table<Float>(eigenvectors));
-
-        const auto result = train_result()
-            .set_model(trained_model)
-            .set_eigenvalues(interop::convert_to_onedal_homogen_table<Float>(eigenvalues));
-
-        return result;
+        return train<Float>(desc, input);
     }
 };
 
