@@ -32,8 +32,10 @@ using dal::backend::context_cpu;
 
 namespace daal_pca = daal::algorithms::pca;
 namespace daal_cov = daal::algorithms::covariance;
-namespace daal_dm  = daal::data_management;
 namespace interop  = dal::backend::interop;
+
+template <typename Float, daal::CpuType Cpu>
+using daal_pca_cor_kernel_t = daal_pca::internal::PCACorrelationKernel<daal::batch, Float, Cpu>;
 
 template <typename Float>
 static void call_daal_kernel(const context_cpu& ctx,
@@ -57,21 +59,17 @@ static void call_daal_kernel(const context_cpu& ctx,
                                                     daal_pca::variance ||
                                                     daal_pca::eigenvalue);
 
-    dal::backend::dispatch_by_cpu(ctx, [&](auto cpu) {
-        using daal_pca::internal::PCACorrelationKernel;
-        constexpr auto cpu_type = interop::get_daal_cpu_type(cpu);
-        interop::call_kernel<PCACorrelationKernel<daal::batch, Float, cpu_type>>(
-            is_correlation,
-            desc.get_is_deterministic(),
-            *daal_data,
-            &covariance_alg,
-            results_to_compute,
-            *daal_eigenvectors,
-            *daal_eigenvalues,
-            *daal_means,
-            *daal_variances);
-    });
-
+    interop::call_daal_kernel<Float, daal_pca_cor_kernel_t>(
+        ctx,
+        is_correlation,
+        desc.get_is_deterministic(),
+        *daal_data,
+        &covariance_alg,
+        results_to_compute,
+        *daal_eigenvectors,
+        *daal_eigenvalues,
+        *daal_means,
+        *daal_variances);
 }
 
 template <typename Float>

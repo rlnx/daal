@@ -8,8 +8,8 @@ namespace dal {
 namespace backend {
 namespace interop {
 
-template <typename CpuType>
-constexpr daal::CpuType get_daal_cpu_type(CpuType cpu);
+template <typename DispatchId>
+constexpr daal::CpuType get_daal_cpu_type(DispatchId);
 
 template <>
 constexpr daal::CpuType get_daal_cpu_type<cpu_dispatch_default>(cpu_dispatch_default) {
@@ -31,11 +31,14 @@ constexpr daal::CpuType get_daal_cpu_type<cpu_dispatch_avx512>(cpu_dispatch_avx5
     return daal::CpuType::avx512;
 }
 
-template <typename KernelType, typename... Args>
-auto call_kernel(Args&&... args) {
-    return KernelType().compute(std::forward<Args>(args)...);
+template <typename Float, template <typename, daal::CpuType> typename CpuKernel, typename... Args>
+inline auto call_daal_kernel(const context_cpu& ctx, Args&&... args) {
+    return dal::backend::dispatch_by_cpu(ctx, [&](auto cpu) {
+        constexpr daal::CpuType daal_cpu_type = get_daal_cpu_type(cpu);
+        return CpuKernel<Float, daal_cpu_type>().compute(std::forward<Args>(args)...);
+    });
 }
 
 } // namespace interop
-} // namespace detail
+} // namespace backend
 } // namespace dal

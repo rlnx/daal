@@ -29,7 +29,7 @@ struct execution_context_tag {};
 class default_execution_context_impl;
 } // namespace detail
 
-enum class cpu_extensions : uint64_t {
+enum class cpu_extension : uint64_t {
     none   = 0U,
     sse2   = 1U << 0,
     ssse3  = 1U << 1,
@@ -44,15 +44,15 @@ public:
     using tag_t = detail::execution_context_tag;
     default_execution_context();
 
-    cpu_extensions get_enabled_cpu_extensions() const noexcept;
+    cpu_extension get_enabled_cpu_extensions() const noexcept;
 
-    auto &set_enabled_cpu_extensions(const cpu_extensions& extensions) noexcept {
+    auto &set_enabled_cpu_extensions(const cpu_extension& extensions) noexcept {
         set_enabled_cpu_extensions_impl(extensions);
         return *this;
     }
 
 private:
-    void set_enabled_cpu_extensions_impl(const cpu_extensions& extensions) noexcept;
+    void set_enabled_cpu_extensions_impl(const cpu_extension& extensions) noexcept;
     dal::detail::pimpl<detail::default_execution_context_impl> impl_;
 };
 

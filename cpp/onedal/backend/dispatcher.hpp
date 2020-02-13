@@ -29,12 +29,12 @@ class context_cpu {
     explicit context_cpu(const default_execution_context& ctx)
         : cpu_extensions_(ctx.get_enabled_cpu_extensions()) {}
 
-    cpu_extensions get_enabled_cpu_extensions() const {
+    cpu_extension get_enabled_cpu_extensions() const {
         return cpu_extensions_;
     }
 
   private:
-    cpu_extensions cpu_extensions_;
+    cpu_extension cpu_extensions_;
 };
 
 template <typename CpuKernel>
@@ -50,13 +50,23 @@ struct cpu_dispatch_avx {};
 struct cpu_dispatch_avx2 {};
 struct cpu_dispatch_avx512 {};
 
+inline bool test_cpu_extension(cpu_extension mask, cpu_extension test) {
+    return ((std::uint64_t)mask & (std::uint64_t)test) > 0;
+}
+
 template <typename Op>
 constexpr auto dispatch_by_cpu(const context_cpu& ctx, Op&& op) {
-    switch (ctx.get_enabled_cpu_extensions()) {
-        case cpu_extensions::avx512: return op(cpu_dispatch_avx512{});
-        case cpu_extensions::avx2: return op(cpu_dispatch_avx2{});
-        case cpu_extensions::avx: return op(cpu_dispatch_avx{});
+    const cpu_extension cpu_ex = ctx.get_enabled_cpu_extensions();
+    if (test_cpu_extension(cpu_ex, cpu_extension::avx512)) {
+        return op(cpu_dispatch_avx512{});
     }
+    else if (test_cpu_extension(cpu_ex, cpu_extension::avx2)) {
+        return op(cpu_dispatch_avx2{});
+    }
+    else if (test_cpu_extension(cpu_ex, cpu_extension::avx)) {
+        return op(cpu_dispatch_avx{});
+    }
+    // TODO: Add more extensions
     return op(cpu_dispatch_default{});
 }
 
