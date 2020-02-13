@@ -30,22 +30,22 @@ struct train_ops_dispatcher {
                           const train_input&) const;
 };
 
-template <typename Params>
+template <typename Descriptor>
 struct train_ops {
-  using float_t = typename Params::float_t;
-  using method_t = typename Params::method_t;
+  using float_t = typename Descriptor::float_t;
+  using method_t = typename Descriptor::method_t;
   using input_t = train_input;
   using result_t = train_result;
-  using params_base_t = descriptor_base;
+  using descriptor_base_t = descriptor_base;
 
-  void validate(const Params& params, const train_input& input) const {
+  void validate(const Descriptor& params, const train_input& input) const {
 
   }
 
   template <typename Context>
-  auto operator()(const Context& ctx, const Params& params, const train_input& input) const {
-    validate(params, input);
-    return train_ops_dispatcher<Context, float_t, method_t>()(ctx, params, input);
+  auto operator()(const Context& ctx, const Descriptor& desc, const train_input& input) const {
+    validate(desc, input);
+    return train_ops_dispatcher<Context, float_t, method_t>()(ctx, desc, input);
   }
 };
 

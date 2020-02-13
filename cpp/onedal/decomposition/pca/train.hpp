@@ -23,9 +23,9 @@
 namespace dal {
 namespace detail {
 
-template <typename Params>
-struct train_ops<Params, decomposition::pca::detail::tag>
-  : decomposition::pca::detail::train_ops<Params> {};
+template <typename Descriptor>
+struct train_ops<Descriptor, decomposition::pca::detail::tag>
+  : decomposition::pca::detail::train_ops<Descriptor> {};
 
 } // namespace detail
 } // namespace dal

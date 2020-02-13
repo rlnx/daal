@@ -26,11 +26,11 @@ namespace detail {
 template <typename Float, typename Method>
 struct train_ops_dispatcher<default_execution_context, Float, Method> {
     train_result operator()(const default_execution_context& ctx,
-                            const descriptor_base& params,
+                            const descriptor_base& desc,
                             const train_input& input) const {
         using kernel_dispatcher_t = dal::backend::kernel_dispatcher<
             backend::train_kernel_cpu<Float, Method>>;
-        return kernel_dispatcher_t()(ctx, params, input);
+        return kernel_dispatcher_t()(ctx, desc, input);
     }
 };
 
