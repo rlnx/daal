@@ -1,6 +1,5 @@
 package(default_visibility = ["//visibility:public"])
-load("//build/bazel:rules.bzl", "dal_module",
-                                "dal_cpu_kernel")
+load("//build/bazel:dal.bzl", "dal_module")
 
 dal_module(
     name = "interop",

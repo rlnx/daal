@@ -23,6 +23,8 @@ load(
     "tool_path",
     "variable_with_value",
     "with_feature_set",
+    "action_config",
+    "tool",
 )
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
 
@@ -85,7 +87,35 @@ def _impl(ctx):
         tool_path(name = name, path = path)
         for name, path in ctx.attr.tool_paths.items()
     ]
+
     action_configs = []
+
+    for action_name in (all_cpp_compile_actions + all_link_actions):
+        dpcpp_action = action_config(
+            action_name = action_name,
+            enabled = True,
+            tools = [
+                tool(
+                    path = ctx.attr.tool_paths["dpcc"],
+                    with_features = [
+                        with_feature_set(features = ["dpc++"]),
+                    ],
+                ),
+                tool(
+                    path = ctx.attr.tool_paths["gcc"],
+                    with_features = [
+                        with_feature_set(not_features = ["dpc++"])
+                    ]
+                ),
+            ],
+        )
+        action_configs.append(dpcpp_action)
+
+    dpcpp_feature = feature(
+        name = "dpc++",
+        # TODO: Do not enable by default
+        # enabled = True,
+    )
 
     supports_pic_feature = feature(
         name = "supports_pic",
@@ -104,9 +134,19 @@ def _impl(ctx):
                 actions = all_compile_actions,
                 flag_groups = ([
                     flag_group(
-                        flags = ctx.attr.compile_flags,
+                        flags = ctx.attr.compile_flags_cc,
                     ),
-                ] if ctx.attr.compile_flags else []),
+                ] if ctx.attr.compile_flags_cc else []),
+                with_features = [with_feature_set(not_features = ["dpc++"])],
+            ),
+            flag_set(
+                actions = all_compile_actions,
+                flag_groups = ([
+                    flag_group(
+                        flags = ctx.attr.compile_flags_dpcc,
+                    ),
+                ] if ctx.attr.compile_flags_dpcc else []),
+                with_features = [with_feature_set(features = ["dpc++"])],
             ),
             flag_set(
                 actions = all_compile_actions,
@@ -145,9 +185,19 @@ def _impl(ctx):
                 actions = all_link_actions + lto_index_actions,
                 flag_groups = ([
                     flag_group(
-                        flags = ctx.attr.link_flags,
+                        flags = ctx.attr.link_flags_cc,
                     ),
-                ] if ctx.attr.link_flags else []),
+                ] if ctx.attr.link_flags_cc else []),
+                with_features = [with_feature_set(not_features = ["dpc++"])],
+            ),
+            flag_set(
+                actions = all_link_actions + lto_index_actions,
+                flag_groups = ([
+                    flag_group(
+                        flags = ctx.attr.link_flags_dpcc,
+                    ),
+                ] if ctx.attr.link_flags_dpcc else []),
+                with_features = [with_feature_set(features = ["dpc++"])],
             ),
             flag_set(
                 actions = all_link_actions + lto_index_actions,
@@ -237,9 +287,27 @@ def _impl(ctx):
                 actions = all_compile_actions,
                 flag_groups = ([
                     flag_group(
-                        flags = ctx.attr.unfiltered_compile_flags,
+                        flags = ctx.attr.no_canonical_system_headers_flags_cc,
                     ),
-                ] if ctx.attr.unfiltered_compile_flags else []),
+                ] if ctx.attr.no_canonical_system_headers_flags_cc else []),
+                with_features = [with_feature_set(not_features = ["dpc++"])]
+            ),
+            flag_set(
+                actions = all_compile_actions,
+                flag_groups = ([
+                    flag_group(
+                        flags = ctx.attr.no_canonical_system_headers_flags_dpcc,
+                    ),
+                ] if ctx.attr.no_canonical_system_headers_flags_dpcc else []),
+                with_features = [with_feature_set(features = ["dpc++"])]
+            ),
+            flag_set(
+                actions = all_compile_actions,
+                flag_groups = ([
+                    flag_group(
+                        flags = ctx.attr.deterministic_compile_flags,
+                    ),
+                ] if ctx.attr.deterministic_compile_flags else []),
             ),
         ],
     )
@@ -1084,9 +1152,9 @@ def _impl(ctx):
 
     is_linux = ctx.attr.target_libc != "macosx"
 
-    # TODO(#8303): Mac crosstool should also declare every feature.
     if is_linux:
         features = [
+            dpcpp_feature,
             dependency_file_feature,
             random_seed_feature,
             pic_feature,
@@ -1134,6 +1202,7 @@ def _impl(ctx):
         ]
     else:
         features = [
+            dpcpp_feature,
             supports_pic_feature,
         ] + (
             [
@@ -1179,16 +1248,21 @@ cc_toolchain_config = rule(
         "target_libc": attr.string(mandatory = True),
         "abi_version": attr.string(mandatory = True),
         "abi_libc_version": attr.string(mandatory = True),
+        "gcc_toolchain_path": attr.string(),
         "cxx_builtin_include_directories": attr.string_list(),
         "tool_paths": attr.string_dict(),
-        "compile_flags": attr.string_list(),
+        "compile_flags_cc": attr.string_list(),
+        "compile_flags_dpcc": attr.string_list(),
         "dbg_compile_flags": attr.string_list(),
         "opt_compile_flags": attr.string_list(),
         "cxx_flags": attr.string_list(),
-        "link_flags": attr.string_list(),
+        "link_flags_cc": attr.string_list(),
+        "link_flags_dpcc": attr.string_list(),
         "link_libs": attr.string_list(),
         "opt_link_flags": attr.string_list(),
-        "unfiltered_compile_flags": attr.string_list(),
+        "no_canonical_system_headers_flags_cc": attr.string_list(),
+        "no_canonical_system_headers_flags_dpcc": attr.string_list(),
+        "deterministic_compile_flags": attr.string_list(),
         "coverage_compile_flags": attr.string_list(),
         "coverage_link_flags": attr.string_list(),
         "supports_start_end_lib": attr.bool(),

@@ -1,4 +1,4 @@
-load("//build/bazel:rules.bzl", "daal_kernel_module")
+load("//build/bazel:daal.bzl", "daal_kernel_module")
 
 daal_kernel_module(
   name = "pca",

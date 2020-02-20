@@ -46,10 +46,7 @@ class slice {
         return mode_;
     }
 
-    std::int64_t get_element_count() const {
-        return rows_.get_element_count(table_->get_row_count()) *
-               columns_.get_element_count(table_->get_column_count());
-    }
+    std::int64_t get_element_count() const;
 
   private:
     table_impl *table_;
@@ -100,6 +97,14 @@ class table_impl : public base {
     std::int64_t row_count_;
     std::int64_t column_count_;
 };
+
+
+template <typename T>
+std::int64_t slice<T>::get_element_count() const {
+    return rows_.get_element_count(table_->get_row_count()) *
+            columns_.get_element_count(table_->get_column_count());
+}
+
 
 } // namespace detail
 } // namespace dal

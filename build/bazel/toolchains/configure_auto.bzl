@@ -9,11 +9,17 @@ def _detect_requirements(repo_ctx):
         host_arch_id = "intel64",
         target_arch_id = "intel64",
 
-        # TODO: Detect compiler, use ($env{CC})
+        # TODO: Detect compiler, use $env{CC}
         compiler_id = "gcc",
 
         # TODO: Detect compiler version
         compiler_version = "9.1.0",
+
+        # TODO: Detect DPC++ compiler, use $env{DPCC}
+        compiler_dpcpp_id = "clang++",
+
+        # TODO: Detect compiler version
+        compiler_dpcpp_version = "2021.1",
 
         # TODO: Decide whether it required to detect libc/ABI version
         compiler_abi_version = "local",
@@ -38,3 +44,11 @@ onedal_cc_toolchain = repository_rule(
         "CC",
     ],
 )
+
+def declare_onedal_cc_toolchain(name):
+    onedal_cc_toolchain(
+        name = name,
+    )
+    native.register_toolchains(
+        "@{}//:all".format(name)
+    )

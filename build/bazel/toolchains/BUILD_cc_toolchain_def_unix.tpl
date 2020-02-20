@@ -23,24 +23,26 @@ cc_toolchain_config(
     abi_version = "%{abi_version}",
     abi_libc_version = "%{abi_libc_version}",
     cxx_builtin_include_directories = [%{cxx_builtin_include_directories}],
-    tool_paths = {
-        %{tool_paths}
-    },
-    compile_flags = [%{compile_flags}],
+    tool_paths = {%{tool_paths}},
+    compile_flags_cc = [%{compile_flags_cc}],
+    compile_flags_dpcc = [%{compile_flags_dpcc}],
     opt_compile_flags = [%{opt_compile_flags}],
     dbg_compile_flags = [%{dbg_compile_flags}],
     cxx_flags = [%{cxx_flags}],
-    link_flags = [%{link_flags}],
+    link_flags_cc = [%{link_flags_cc}],
+    link_flags_dpcc = [%{link_flags_dpcc}],
     link_libs = [%{link_libs}],
     opt_link_flags = [%{opt_link_flags}],
-    unfiltered_compile_flags = [%{unfiltered_compile_flags}],
+    no_canonical_system_headers_flags_cc = [%{no_canonical_system_headers_flags_cc}],
+    no_canonical_system_headers_flags_dpcc = [%{no_canonical_system_headers_flags_dpcc}],
+    deterministic_compile_flags = [%{deterministic_compile_flags}],
     coverage_compile_flags = [%{coverage_compile_flags}],
     coverage_link_flags = [%{coverage_link_flags}],
     supports_start_end_lib = %{supports_start_end_lib},
 )
 
 cc_toolchain(
-    name = "onedal_cc_toolchain",
+    name = "cc_toolchain",
     toolchain_identifier = "%{cc_toolchain_identifier}",
     toolchain_config = ":%{cc_toolchain_identifier}",
     all_files = ":compiler_deps",
@@ -55,7 +57,7 @@ cc_toolchain(
 )
 
 toolchain(
-    name = "cc_toolchain_linux",
+    name = "cc_toolchain_lnx",
     exec_compatible_with = [
         "@platforms//cpu:x86_64",
         "@platforms//os:linux",
@@ -64,6 +66,20 @@ toolchain(
         "@platforms//cpu:x86_64",
         "@platforms//os:linux",
     ],
-    toolchain = ":onedal_cc_toolchain",
+    toolchain = ":cc_toolchain",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)
+
+toolchain(
+    name = "cc_toolchain_mac",
+    exec_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:macos",
+    ],
+    target_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:macos",
+    ],
+    toolchain = ":cc_toolchain",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )

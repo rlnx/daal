@@ -38,8 +38,8 @@ cc_library(
 cc_library(
   name = "mklfpk",
   srcs = [
-    "mklfpk/lnx/lib/intel64/libdaal_mkl_thread.a",
     "mklfpk/lnx/lib/intel64/libdaal_vmlipp_core.a",
+    "mklfpk/lnx/lib/intel64/libdaal_mkl_thread.a",
   ],
   deps = [
     ":mklfpk_headers",

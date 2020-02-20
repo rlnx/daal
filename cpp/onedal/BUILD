@@ -1,5 +1,5 @@
-load("//build/bazel:rules.bzl", "dal_module",
-                                "dal_dpcpp_module")
+load("//build/bazel:dal.bzl", "dal_module",
+                              "dal_dpcpp_module")
 
 dal_module(
   name = "headers",

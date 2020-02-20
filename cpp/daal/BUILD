@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
-load("//build/bazel:rules.bzl", "daal_module",
-                                "daal_kernel_module",
-                                "daal_shared_lib")
+load("//build/bazel:daal.bzl", "daal_module",
+                               "daal_kernel_module",
+                               "daal_shared_lib")
 
 daal_module(
   name = "public_headers",
