@@ -69,17 +69,3 @@ toolchain(
     toolchain = ":cc_toolchain",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
-
-toolchain(
-    name = "cc_toolchain_mac",
-    exec_compatible_with = [
-        "@platforms//cpu:x86_64",
-        "@platforms//os:macos",
-    ],
-    target_compatible_with = [
-        "@platforms//cpu:x86_64",
-        "@platforms//os:macos",
-    ],
-    toolchain = ":cc_toolchain",
-    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
-)

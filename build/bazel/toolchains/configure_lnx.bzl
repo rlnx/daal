@@ -1,5 +1,15 @@
-load("@onedal//build/bazel:utils.bzl", "unique")
-
+load(
+    "@onedal//build/bazel:utils.bzl",
+    "unique"
+)
+load(
+    "@onedal//build/bazel/toolchains:common.bzl",
+    "TEST_CPP_FILE",
+    "get_cxx_inc_directories",
+    "add_compiler_option_if_supported",
+    "add_linker_option_if_supported",
+    "get_no_canonical_prefixes_opt",
+)
 load(
     "@bazel_tools//tools/cpp:lib_cc_configure.bzl",
     "auto_configure_fail",
@@ -9,66 +19,6 @@ load(
 )
 
 _TEST_CPP_FILE = "empty.cpp"
-_INC_DIR_MARKER_BEGIN = "#include <...>"
-_INC_DIR_MARKER_END = "End of search list"
-
-# OSX add " (framework directory)" at the end of line, strip it.
-_MAC_FRAMEWORK_SUFFIX = " (framework directory)"
-_MAC_FRAMEWORK_SUFFIX_LEN = len(_MAC_FRAMEWORK_SUFFIX)
-
-def _prepare_include_path(repo_ctx, path):
-    """Resolve and sanitize include path before outputting it into the crosstool.
-    Args:
-      repo_ctx: repository_ctx object.
-      path: an include path to be sanitized.
-    Returns:
-      Sanitized include path that can be written to the crosstoot. Resulting path
-      is absolute if it is outside the repository and relative otherwise.
-    """
-    path = path.strip()
-    if path.endswith(_MAC_FRAMEWORK_SUFFIX):
-        path = path[:-_MAC_FRAMEWORK_SUFFIX_LEN].strip()
-
-    # We're on UNIX, so the path delimiter is '/'.
-    repo_root = str(repo_ctx.path(".")) + "/"
-    path = str(repo_ctx.path(path))
-    if path.startswith(repo_root):
-        return path[len(repo_root):]
-    return path
-
-def _get_cxx_inc_directories(repo_ctx, cc, lang_flag, additional_flags = []):
-    """Compute the list of default C++ include directories."""
-    result = repo_ctx.execute([cc, "-E", lang_flag, "-", "-v"] + additional_flags)
-    index1 = result.stderr.rfind(_INC_DIR_MARKER_BEGIN)
-    index2 = result.stderr.rfind(_INC_DIR_MARKER_END)
-    inc_dirs = result.stderr[index1:index2].strip()
-    return [ _prepare_include_path(repo_ctx, p) for p in inc_dirs.split("\n") ]
-
-
-def _is_compiler_option_supported(repo_ctx, cc, option):
-    """Checks that `option` is supported by the C compiler."""
-    result = repo_ctx.execute([
-        cc,
-        option,
-        "-o",
-        "/dev/null",
-        "-c",
-        str(repo_ctx.path(_TEST_CPP_FILE)),
-    ])
-    return result.stderr.find(option) == -1
-
-
-def _is_linker_option_supported(repo_ctx, cc, option, pattern):
-    """Checks that `option` is supported by the C linker."""
-    result = repo_ctx.execute([
-        cc,
-        option,
-        "-o",
-        "/dev/null",
-        str(repo_ctx.path(_TEST_CPP_FILE)),
-    ])
-    return result.stderr.find(pattern) == -1
-
 
 def _find_gold_linker_path(repo_ctx, cc):
     """Checks if `gold` is supported by the C compiler.
@@ -120,50 +70,6 @@ def _find_gold_linker_path(repo_ctx, cc):
     return None
 
 
-def _add_compiler_option_if_supported(repo_ctx, cc, option):
-    """Returns `[option]` if supported, `[]` otherwise."""
-    return [option] if _is_compiler_option_supported(repo_ctx, cc, option) else []
-
-
-def _add_linker_option_if_supported(repo_ctx, cc, option, pattern):
-    """Returns `[option]` if supported, `[]` otherwise."""
-    return [option] if _is_linker_option_supported(repo_ctx, cc, option, pattern) else []
-
-
-def _get_no_canonical_prefixes_opt(repo_ctx, cc):
-    # If the compiler sometimes rewrites paths in the .d files without symlinks
-    # (ie when they're shorter), it confuses Bazel's logic for verifying all
-    # #included header files are listed as inputs to the action.
-
-    # The '-fno-canonical-system-headers' should be enough, but clang does not
-    # support it, so we also try '-no-canonical-prefixes' if first option does
-    # not work.
-    opt = _add_compiler_option_if_supported(
-        repo_ctx,
-        cc,
-        "-fno-canonical-system-headers",
-    )
-    if len(opt) == 0:
-        return _add_compiler_option_if_supported(
-            repo_ctx,
-            cc,
-            "-no-canonical-prefixes",
-        )
-    return opt
-
-
-def _get_coverage_flags(repo_ctx, reqs):
-    if reqs.compiler_id == "clang":
-        compile_flags = '"-fprofile-instr-generate",  "-fcoverage-mapping"'
-        link_flags = '"-fprofile-instr-generate"'
-    else:
-        # gcc requires --coverage being passed for compilation and linking
-        # https://gcc.gnu.org/onlinedocs/gcc/Instrumentation-Options.html#Instrumentation-Options
-        compile_flags = '"--coverage"'
-        link_flags = '"--coverage"'
-    return compile_flags, link_flags
-
-
 def _find_tool(repo_ctx, tool_name, mandatory=False):
     if tool_name.startswith("/"):
         return tool_name
@@ -181,39 +87,17 @@ def _find_tool(repo_ctx, tool_name, mandatory=False):
     return str(tool_path)
 
 
-def _try_wrap_compiler(repo_ctx, reqs, wrapper_name, compiler_path):
-    if reqs.os_id == "mac":
-        wrapper_path = "{}.sh".format(wrapper_name)
-        wrapper_src = Label("@bazel_tools//tools/cpp:osx_cc_wrapper.sh.tpl")
-        # TODO: Extra environment variables may be required for
-        #       some compilers, no need for gcc/clang.
-        env = ""
-        repo_ctx.template(
-            wrapper_path,
-            wrapper_src,
-            {
-                "%{cc}": compiler_path,
-                "%{env}": env,
-            }
-        )
-        return wrapper_path
-
-
 def _find_tools(repo_ctx, reqs):
-    ar_tool_name = {
-        "mac": "libtool",
-        "lnx": "ar",
-    }[reqs.os_id]
     # TODO: Use full compiler path from reqs
     compiler_name = reqs.compiler_id
+    dpcpp_compiler_name = reqs.compiler_dpcpp_id
     cpp_compiler_name = {
         "gcc": "g++",
         "clang": "clang++",
     }[reqs.compiler_id]
-    dpcpp_compiler_name = reqs.compiler_dpcpp_id
     # { <key>: ( <tool_name>, <mandatory_flag> ) }
     tools_meta = {
-        "ar":      ( ar_tool_name,        True  ),
+        "ar":      ( "ar",                True  ),
         "ld":      ( "ld",                True  ),
         "gcc":     ( compiler_name,       True  ),
         "cpp":     ( cpp_compiler_name,   True  ),
@@ -233,17 +117,14 @@ def _find_tools(repo_ctx, reqs):
         cc = tool_paths["gcc"],
         dpcc = tool_paths["dpcc"],
         paths = tool_paths,
-        cc_wrapped = _try_wrap_compiler(repo_ctx, reqs, "cc_wrapper", tool_paths["gcc"]),
-        cpp_wrapped = _try_wrap_compiler(repo_ctx, reqs, "cpp_wrapper", tool_paths["cpp"]),
-        dpcc_wrapped = _try_wrap_compiler(repo_ctx, reqs, "dpcc_wrapper", tool_paths["dpcc"]),
     )
 
 
 def _preapre_builtin_include_directory_paths(repo_ctx, reqs, tools, cxx_opts):
     builtin_include_directories = unique(
-        _get_cxx_inc_directories(repo_ctx, tools.cc, "-xc") +
-        _get_cxx_inc_directories(repo_ctx, tools.cc, "-xc++", cxx_opts) +
-        _get_cxx_inc_directories(
+        get_cxx_inc_directories(repo_ctx, tools.cc, "-xc") +
+        get_cxx_inc_directories(repo_ctx, tools.cc, "-xc++", cxx_opts) +
+        get_cxx_inc_directories(
             repo_ctx,
             tools.dpcc,
             "-xc++",
@@ -251,38 +132,21 @@ def _preapre_builtin_include_directory_paths(repo_ctx, reqs, tools, cxx_opts):
                 "--gcc-toolchain={}".format(_get_gcc_toolchain_path(repo_ctx, tools)),
             ],
         ) +
-        _get_cxx_inc_directories(
+        get_cxx_inc_directories(
             repo_ctx,
             tools.cc,
             "-xc",
-            _get_no_canonical_prefixes_opt(repo_ctx, tools.cc),
+            get_no_canonical_prefixes_opt(repo_ctx, tools.cc),
         ) +
-        _get_cxx_inc_directories(
+        get_cxx_inc_directories(
             repo_ctx,
             tools.cc,
             "-xc++",
-            cxx_opts + _get_no_canonical_prefixes_opt(repo_ctx, tools.cc),
+            cxx_opts + get_no_canonical_prefixes_opt(repo_ctx, tools.cc),
         )
     )
     write_builtin_include_directory_paths(repo_ctx, tools.cc, builtin_include_directories)
     return builtin_include_directories
-
-
-def _add_tools_deps(tools):
-    deps = [
-        tools.cc_wrapped,
-        tools.cpp_wrapped,
-        tools.dpcc_wrapped,
-    ]
-    return [x for x in deps if x]
-
-
-def _get_tool_paths(tools):
-    tool_paths = {k: v for k, v in tools.paths.items()}
-    if tools.cc_wrapped:   tool_paths["gcc"] = tools.cc_wrapped
-    if tools.cpp_wrapped:  tool_paths["cpp"] = tools.cpp_wrapped
-    if tools.dpcc_wrapped: tool_paths["dpcc"] = tools.dpcc_wrapped
-    return tool_paths
 
 
 def _get_toolchain_identifier(reqs):
@@ -305,11 +169,9 @@ def _get_gcc_toolchain_path(repo_ctx, tools):
     return str(repo_ctx.path(tools.cc).dirname.dirname.realpath)
 
 
-def configure_cc_toolchain_unix(repo_ctx, reqs):
-    if reqs.os_id not in ["lnx", "mac"]:
-        auto_configure_fail("Cannot configure Unix toolchain on '{}', " +
-                            "only Linux and Mac supported".format(reqs.os_id))
-    is_mac = reqs.os_id == "mac"
+def configure_cc_toolchain_lnx(repo_ctx, reqs):
+    if reqs.os_id != "lnx":
+        auto_configure_fail("Cannot configure Linunx toolchain for '{}'".format(reqs.os_id))
     repo_ctx.file(_TEST_CPP_FILE, "int main() { return 0; }")
 
     # Default compilations/link options
@@ -326,7 +188,6 @@ def configure_cc_toolchain_unix(repo_ctx, reqs):
     # Addition compile/link flags
     bin_search_flag_cc = _get_bin_search_flag(repo_ctx, tools.cc)
     bin_search_flag_dpcc = _get_bin_search_flag(repo_ctx, tools.dpcc)
-    coverage_compile_flags, coverage_link_flags = _get_coverage_flags(repo_ctx, reqs)
 
     repo_ctx.template(
         "BUILD",
@@ -342,35 +203,33 @@ def configure_cc_toolchain_unix(repo_ctx, reqs):
             "%{host_system_name}":        reqs.os_id + "-" + reqs.host_arch_id,
             "%{target_system_name}":      reqs.os_id + "-" + reqs.target_arch_id,
 
-            "%{supports_param_files}": "0" if is_mac else "1",
+            "%{supports_param_files}": "1",
             "%{cc_compiler_deps}": get_starlark_list(
-                [":builtin_include_directory_paths"] +
-                _add_tools_deps(tools)
+                [":builtin_include_directory_paths"]
             ),
             "%{tool_paths}": ",\n        ".join(
-                ['"%s": "%s"' % (k, v) for k, v in _get_tool_paths(tools).items()],
+                ['"%s": "%s"' % (k, v) for k, v in tools.paths.items()],
             ),
-            "%{gcc_toolchain_path}": "/export/users/cache/gcc/gnu_9.1.0",
             "%{cxx_builtin_include_directories}": get_starlark_list(builtin_include_directories),
             "%{compile_flags_cc}": get_starlark_list(
                 [
-                    # TODO: Add clang to clang if on Linux?
+                    # TODO: Add gcc toolchain to clang?
                     # "--gcc-toolchain=",
 
                     "-U_FORTIFY_SOURCE",
                     "-fstack-protector",
                     "-Wall",
                 ] + (
-                    _add_compiler_option_if_supported(repo_ctx, tools.cc, "-Wthread-safety") +
-                    _add_compiler_option_if_supported(repo_ctx, tools.cc, "-Wself-assign")
+                    add_compiler_option_if_supported(repo_ctx, tools.cc, "-Wthread-safety") +
+                    add_compiler_option_if_supported(repo_ctx, tools.cc, "-Wself-assign")
                 ) + (
                     # Disable problematic warnings.
-                    _add_compiler_option_if_supported(repo_ctx, tools.cc, "-Wunused-but-set-parameter") +
+                    add_compiler_option_if_supported(repo_ctx, tools.cc, "-Wunused-but-set-parameter") +
                     # has false positives
-                    _add_compiler_option_if_supported(repo_ctx, tools.cc, "-Wno-free-nonheap-object") +
+                    add_compiler_option_if_supported(repo_ctx, tools.cc, "-Wno-free-nonheap-object") +
                     # Enable coloring even if there's no attached terminal. Bazel removes the
                     # escape sequences if --nocolor is specified.
-                    _add_compiler_option_if_supported(repo_ctx, tools.cc, "-fcolor-diagnostics")
+                    add_compiler_option_if_supported(repo_ctx, tools.cc, "-fcolor-diagnostics")
                 ) + [
                     # Keep stack frames for debugging, even in opt mode.
                     "-fno-omit-frame-pointer",
@@ -378,89 +237,71 @@ def configure_cc_toolchain_unix(repo_ctx, reqs):
             ),
             "%{compile_flags_dpcc}": get_starlark_list(
                 [
-                    # TODO: Fix path to GCC toolchain
                     "--gcc-toolchain={}".format(_get_gcc_toolchain_path(repo_ctx, tools)),
-
                     "-U_FORTIFY_SOURCE",
                     "-fstack-protector",
                     "-Wall",
                 ] + (
-                    _add_compiler_option_if_supported(repo_ctx, tools.dpcc, "-Wthread-safety") +
-                    _add_compiler_option_if_supported(repo_ctx, tools.dpcc, "-Wself-assign")
+                    add_compiler_option_if_supported(repo_ctx, tools.dpcc, "-Wthread-safety") +
+                    add_compiler_option_if_supported(repo_ctx, tools.dpcc, "-Wself-assign")
                 ) + (
                     # Disable problematic warnings.
-                    _add_compiler_option_if_supported(repo_ctx, tools.dpcc, "-Wunused-but-set-parameter") +
+                    add_compiler_option_if_supported(repo_ctx, tools.dpcc, "-Wunused-but-set-parameter") +
                     # has false positives
-                    _add_compiler_option_if_supported(repo_ctx, tools.dpcc, "-Wno-free-nonheap-object") +
+                    add_compiler_option_if_supported(repo_ctx, tools.dpcc, "-Wno-free-nonheap-object") +
                     # Enable coloring even if there's no attached terminal. Bazel removes the
                     # escape sequences if --nocolor is specified.
-                    _add_compiler_option_if_supported(repo_ctx, tools.dpcc, "-fcolor-diagnostics")
+                    add_compiler_option_if_supported(repo_ctx, tools.dpcc, "-fcolor-diagnostics")
                 ) + [
                     # Keep stack frames for debugging, even in opt mode.
                     "-fno-omit-frame-pointer",
                 ],
             ),
             "%{cxx_flags}": get_starlark_list(cxx_opts),
-            "%{link_flags_cc}": get_starlark_list((
-                ["-fuse-ld=" + gold_linker_path] if gold_linker_path else []
-            ) + _add_linker_option_if_supported(
-                repo_ctx,
-                tools.cc,
-                "-Wl,-no-as-needed",
-                "-no-as-needed",
-            ) + _add_linker_option_if_supported(
-                repo_ctx,
-                tools.cc,
-                "-Wl,-z,relro,-z,now",
-                "-z",
-            ) + (
-                [
-                    "-undefined",
-                    "dynamic_lookup",
-                    "-headerpad_max_install_names",
-                ] if is_mac else bin_search_flag_cc + [
-                    # Gold linker only? Can we enable this by default?
-                    # "-Wl,--warn-execstack",
-                    # "-Wl,--detect-odr-violations"
-                ] + _add_compiler_option_if_supported(
+            "%{link_flags_cc}": get_starlark_list(
+                (
+                    ["-fuse-ld=" + gold_linker_path] if gold_linker_path else []
+                ) + add_linker_option_if_supported(
+                    repo_ctx,
+                    tools.cc,
+                    "-Wl,-no-as-needed",
+                    "-no-as-needed",
+                ) + add_linker_option_if_supported(
+                    repo_ctx,
+                    tools.cc,
+                    "-Wl,-z,relro,-z,now",
+                    "-z",
+                ) + add_compiler_option_if_supported(
                     # Have gcc return the exit code from ld.
                     repo_ctx,
                     tools.cc,
                     "-pass-exit-codes",
                 )
-            ) + link_opts),
+                + bin_search_flag_cc + link_opts
+            ),
             "%{link_flags_dpcc}": get_starlark_list(
                 [
-                    # TODO: Fix path to GCC toolchain
                     "--gcc-toolchain={}".format(_get_gcc_toolchain_path(repo_ctx, tools)),
                 ] + (
                     ["-fuse-ld=" + gold_linker_path] if gold_linker_path else []
-            ) + _add_linker_option_if_supported(
-                repo_ctx,
-                tools.dpcc,
-                "-Wl,-no-as-needed",
-                "-no-as-needed",
-            ) + _add_linker_option_if_supported(
-                repo_ctx,
-                tools.dpcc,
-                "-Wl,-z,relro,-z,now",
-                "-z",
-            ) + (
-                [
-                    "-undefined",
-                    "dynamic_lookup",
-                    "-headerpad_max_install_names",
-                ] if is_mac else bin_search_flag_dpcc + [
-                    # Gold linker only? Can we enable this by default?
-                    # "-Wl,--warn-execstack",
-                    # "-Wl,--detect-odr-violations"
-                ] + _add_compiler_option_if_supported(
+                ) + add_linker_option_if_supported(
+                    repo_ctx,
+                    tools.dpcc,
+                    "-Wl,-no-as-needed",
+                    "-no-as-needed",
+                ) + add_linker_option_if_supported(
+                    repo_ctx,
+                    tools.dpcc,
+                    "-Wl,-z,relro,-z,now",
+                    "-z",
+                ) + add_compiler_option_if_supported(
                     # Have gcc return the exit code from ld.
                     repo_ctx,
                     tools.dpcc,
                     "-pass-exit-codes",
                 )
-            ) + link_opts),
+                + bin_search_flag_dpcc + link_opts
+            ),
             "%{link_libs}": get_starlark_list(link_libs),
             "%{opt_compile_flags}": get_starlark_list(
                 [
@@ -489,7 +330,7 @@ def configure_cc_toolchain_unix(repo_ctx, reqs):
                 ],
             ),
             "%{opt_link_flags}": get_starlark_list(
-                [] if is_mac else _add_linker_option_if_supported(
+                add_linker_option_if_supported(
                     repo_ctx,
                     tools.cc,
                     "-Wl,--gc-sections",
@@ -497,10 +338,10 @@ def configure_cc_toolchain_unix(repo_ctx, reqs):
                 ),
             ),
             "%{no_canonical_system_headers_flags_cc}": get_starlark_list(
-                _get_no_canonical_prefixes_opt(repo_ctx, tools.cc)
+                get_no_canonical_prefixes_opt(repo_ctx, tools.cc)
             ),
             "%{no_canonical_system_headers_flags_dpcc}": get_starlark_list(
-                _get_no_canonical_prefixes_opt(repo_ctx, tools.dpcc)
+                get_no_canonical_prefixes_opt(repo_ctx, tools.dpcc)
             ),
             "%{deterministic_compile_flags}": get_starlark_list(
                 [
@@ -521,8 +362,6 @@ def configure_cc_toolchain_unix(repo_ctx, reqs):
                     # "-O0",
                 ]
             ),
-            "%{coverage_compile_flags}": coverage_compile_flags,
-            "%{coverage_link_flags}": coverage_link_flags,
             "%{supports_start_end_lib}": "True" if gold_linker_path else "False",
         },
     )

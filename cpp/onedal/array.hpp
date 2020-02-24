@@ -78,7 +78,9 @@ private:
 
 template <typename T, typename U>
 inline array<T> reinterpret_array_cast(const array<U>& arr) {
-    return array<T>{std::reinterpret_pointer_cast<T>(arr.data_), arr.size_};
+    // Intentionally do not use std::reinterpret_pointer_cast, libc++ missing it
+    auto p = reinterpret_cast<T*>(arr.get_pointer());
+    return array<T>{std::shared_ptr<T>(arr.data_, p), arr.size_};
 }
 
 template <typename T, typename U>

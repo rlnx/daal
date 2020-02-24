@@ -1,16 +1,17 @@
-load("@onedal//build/bazel/toolchains:configure_unix.bzl", "configure_cc_toolchain_unix")
+load("@onedal//build/bazel/toolchains:configure_lnx.bzl", "configure_cc_toolchain_lnx")
+load("@onedal//build/bazel/toolchains:configure_mac.bzl", "configure_cc_toolchain_mac")
 
 def _detect_requirements(repo_ctx):
     return struct(
         # TODO: Detect OS, os_ids = [lnx, mac, win]
-        os_id = "lnx",
+        os_id = "mac",
 
         # TODO: Detect bitness
         host_arch_id = "intel64",
         target_arch_id = "intel64",
 
         # TODO: Detect compiler, use $env{CC}
-        compiler_id = "gcc",
+        compiler_id = "clang",
 
         # TODO: Detect compiler version
         compiler_version = "9.1.0",
@@ -29,8 +30,8 @@ def _detect_requirements(repo_ctx):
 
 def _configure_cc_toolchain(repo_ctx, reqs):
     configure_cc_toolchain_os = {
-        "lnx": configure_cc_toolchain_unix,
-        "mac": configure_cc_toolchain_unix,
+        "lnx": configure_cc_toolchain_lnx,
+        "mac": configure_cc_toolchain_mac,
     }[reqs.os_id]
     return configure_cc_toolchain_os(repo_ctx, reqs)
 
