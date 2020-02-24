@@ -44,7 +44,7 @@ def _find_tools(repo_ctx, reqs):
     }[reqs.compiler_id]
     # { <key>: ( <tool_name>, <mandatory_flag> ) }
     tools_meta = {
-        "ar":      ( "ar",                True  ),
+        "ar":      ( "libtool",           True  ),
         "ld":      ( "ld",                True  ),
         "gcc":     ( compiler_name,       True  ),
         "cpp":     ( cpp_compiler_name,   True  ),
@@ -223,5 +223,6 @@ def configure_cc_toolchain_mac(repo_ctx, reqs):
                     # "-O0",
                 ]
             ),
+            "%{macosx_version_min}": "10.11",
         },
     )

@@ -5,6 +5,7 @@ def _detect_requirements(repo_ctx):
     return struct(
         # TODO: Detect OS, os_ids = [lnx, mac, win]
         os_id = "lnx",
+        # os_id = "mac",
 
         # TODO: Detect bitness
         host_arch_id = "intel64",
@@ -12,6 +13,7 @@ def _detect_requirements(repo_ctx):
 
         # TODO: Detect compiler, use $env{CC}
         compiler_id = "gcc",
+        # compiler_id = "clang",
 
         # TODO: Detect compiler version
         compiler_version = "9.1.0",

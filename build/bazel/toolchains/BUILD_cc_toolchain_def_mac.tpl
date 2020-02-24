@@ -28,6 +28,7 @@ cc_toolchain_config(
     opt_link_flags = [%{opt_link_flags}],
     no_canonical_system_headers_flags_cc = [%{no_canonical_system_headers_flags_cc}],
     deterministic_compile_flags = [%{deterministic_compile_flags}],
+    macosx_version_min = "%{macosx_version_min}",
 )
 
 cc_toolchain(
