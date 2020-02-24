@@ -17,7 +17,7 @@ def _aggregate_deps(ctx):
                 libs_to_link.append(lib_to_link)
         link_flags += local_link_ctx.user_link_flags
     return struct(
-        compulation_outputs = cc_common.create_compilation_outputs(
+        compilation_outputs = cc_common.create_compilation_outputs(
             objects = depset(objects_to_link),
             pic_objects = depset(pic_objects_to_link),
         ),

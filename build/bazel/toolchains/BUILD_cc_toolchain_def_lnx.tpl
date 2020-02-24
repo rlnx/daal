@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@onedal//build/bazel/toolchains:cc_toolchain_config_unix.bzl", "cc_toolchain_config")
+load("@onedal//build/bazel/toolchains:cc_toolchain_config_lnx.bzl", "cc_toolchain_config")
 
 filegroup(
     name = "empty",
@@ -36,8 +36,6 @@ cc_toolchain_config(
     no_canonical_system_headers_flags_cc = [%{no_canonical_system_headers_flags_cc}],
     no_canonical_system_headers_flags_dpcc = [%{no_canonical_system_headers_flags_dpcc}],
     deterministic_compile_flags = [%{deterministic_compile_flags}],
-    coverage_compile_flags = [%{coverage_compile_flags}],
-    coverage_link_flags = [%{coverage_link_flags}],
     supports_start_end_lib = %{supports_start_end_lib},
 )
 

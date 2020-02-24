@@ -4,20 +4,20 @@ load("@onedal//build/bazel/toolchains:configure_mac.bzl", "configure_cc_toolchai
 def _detect_requirements(repo_ctx):
     return struct(
         # TODO: Detect OS, os_ids = [lnx, mac, win]
-        os_id = "mac",
+        os_id = "lnx",
 
         # TODO: Detect bitness
         host_arch_id = "intel64",
         target_arch_id = "intel64",
 
         # TODO: Detect compiler, use $env{CC}
-        compiler_id = "clang",
+        compiler_id = "gcc",
 
         # TODO: Detect compiler version
         compiler_version = "9.1.0",
 
         # TODO: Detect DPC++ compiler, use $env{DPCC}
-        compiler_dpcpp_id = "clang++",
+        compiler_dpcpp_id = "dpcpp",
 
         # TODO: Detect compiler version
         compiler_dpcpp_version = "2021.1",

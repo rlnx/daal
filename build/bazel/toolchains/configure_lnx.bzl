@@ -191,7 +191,7 @@ def configure_cc_toolchain_lnx(repo_ctx, reqs):
 
     repo_ctx.template(
         "BUILD",
-        Label("@onedal//build/bazel/toolchains:BUILD_cc_toolchain_def_unix.tpl"),
+        Label("@onedal//build/bazel/toolchains:BUILD_cc_toolchain_def_lnx.tpl"),
         {
             # Various IDs
             "%{cc_toolchain_identifier}": _get_toolchain_identifier(reqs),

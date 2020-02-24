@@ -113,6 +113,7 @@ def _impl(ctx):
 
     dpcpp_feature = feature(
         name = "dpc++",
+        enabled = True,
     )
 
     supports_pic_feature = feature(
@@ -326,6 +327,22 @@ def _impl(ctx):
                 ],
                 flag_groups = [
                     flag_group(flags = ["-fPIC"], expand_if_available = "pic"),
+                ],
+            ),
+        ],
+    )
+
+    dpcpp_linking_pic_feature = feature(
+        name = "dpcpp_linking_pic",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = [
+                    ACTION_NAMES.cpp_link_dynamic_library,
+                    ACTION_NAMES.cpp_link_nodeps_dynamic_library,
+                ],
+                flag_groups = [
+                    flag_group(flags = ["-fPIC"]),
                 ],
             ),
         ],
@@ -695,28 +712,35 @@ def _impl(ctx):
 
     features = [
         dpcpp_feature,
+        dbg_feature,
+        opt_feature,
+        supports_pic_feature,
+        supports_dynamic_linker_feature,
+        sysroot_feature,
+
+        # Compilation
+        pic_feature,
+        default_compile_flags_feature,
+        user_compile_flags_feature,
+        preprocessor_defines_feature,
         dependency_file_feature,
         random_seed_feature,
-        pic_feature,
-        preprocessor_defines_feature,
-        includes_feature,
+        unfiltered_compile_flags_feature,
         include_paths_feature,
+        includes_feature,
+
+        # Static linking
+        archiver_flags_feature,
+
+        # Dynamic linking
         shared_flag_feature,
+        dpcpp_linking_pic_feature,
         output_execpath_flags_feature,
         runtime_library_search_directories_feature,
         library_search_directories_feature,
-        archiver_flags_feature,
-        supports_pic_feature,
-        default_compile_flags_feature,
         default_link_flags_feature,
         libraries_to_link_feature,
         user_link_flags_feature,
-        supports_dynamic_linker_feature,
-        dbg_feature,
-        opt_feature,
-        user_compile_flags_feature,
-        sysroot_feature,
-        unfiltered_compile_flags_feature,
     ]
 
     if ctx.attr.supports_start_end_lib:
