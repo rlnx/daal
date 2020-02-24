@@ -83,46 +83,301 @@ lto_index_actions = [
 ]
 
 def _impl(ctx):
-    tool_paths = [
-        tool_path(name = name, path = path)
-        for name, path in ctx.attr.tool_paths.items()
+    gcc_tool = tool(
+        path = ctx.attr.tool_paths["gcc"],
+        with_features = [
+            with_feature_set(not_features = ["dpc++"])
+        ]
+    )
+
+    dpcpp_tool = tool(
+        path = ctx.attr.tool_paths["dpcc"],
+        with_features = [
+            with_feature_set(features = ["dpc++"]),
+        ],
+    )
+
+    assemble_action = action_config(
+        action_name = ACTION_NAMES.assemble,
+        implies = [
+            "default_compile_flags",
+            "user_compile_flags",
+            "unfiltered_compile_flags",
+            "compiler_input_flags",
+            "compiler_output_flags",
+            "sysroot",
+        ],
+        tools = [ gcc_tool, dpcpp_tool ],
+    )
+
+    preprocess_assemble_action = action_config(
+        action_name = ACTION_NAMES.preprocess_assemble,
+        implies = [
+            "default_compile_flags",
+            "user_compile_flags",
+            "unfiltered_compile_flags",
+            "compiler_input_flags",
+            "compiler_output_flags",
+            "sysroot",
+        ],
+        tools = [ gcc_tool, dpcpp_tool ],
+    )
+
+    c_compile_action = action_config(
+        action_name = ACTION_NAMES.c_compile,
+        implies = [
+            "default_compile_flags",
+            "user_compile_flags",
+            "unfiltered_compile_flags",
+            "compiler_input_flags",
+            "compiler_output_flags",
+            "sysroot",
+        ],
+        tools = [ gcc_tool, dpcpp_tool ],
+    )
+
+    cpp_compile_action = action_config(
+        action_name = ACTION_NAMES.cpp_compile,
+        implies = [
+            "default_compile_flags",
+            "user_compile_flags",
+            "unfiltered_compile_flags",
+            "compiler_input_flags",
+            "compiler_output_flags",
+            "sysroot",
+        ],
+        tools = [ gcc_tool, dpcpp_tool ],
+    )
+
+    cpp_header_parsing_action = action_config(
+        action_name = ACTION_NAMES.cpp_header_parsing,
+        implies = [
+            "default_compile_flags",
+            "user_compile_flags",
+            "unfiltered_compile_flags",
+            "compiler_input_flags",
+            "compiler_output_flags",
+            "sysroot",
+        ],
+        tools = [ gcc_tool, dpcpp_tool ],
+    )
+
+    cpp_link_executable_action = action_config(
+        action_name = ACTION_NAMES.cpp_link_executable,
+        implies = [
+            "default_link_flags",
+            "user_link_flags",
+            "output_execpath_flags",
+            "libraries_to_link",
+            "runtime_library_search_directories",
+            "library_search_directories",
+            "linker_param_file",
+            "force_pic_flags",
+            "strip_debug_symbols",
+            "sysroot",
+        ],
+        tools = [ gcc_tool, dpcpp_tool ],
+    )
+
+    cpp_link_nodeps_dynamic_library_action = action_config(
+        action_name = ACTION_NAMES.cpp_link_nodeps_dynamic_library,
+        implies = [
+            "default_link_flags",
+            "user_link_flags",
+            "output_execpath_flags",
+            "libraries_to_link",
+            "runtime_library_search_directories",
+            "library_search_directories",
+            "linker_param_file",
+            "force_pic_flags",
+            "strip_debug_symbols",
+            "sysroot",
+        ],
+        tools = [ gcc_tool, dpcpp_tool ],
+    )
+
+    cpp_link_dynamic_library_action = action_config(
+        action_name = ACTION_NAMES.cpp_link_dynamic_library,
+        implies = [
+            "shared_flag",
+            "default_link_flags",
+            "user_link_flags",
+            "output_execpath_flags",
+            "libraries_to_link",
+            "runtime_library_search_directories",
+            "library_search_directories",
+            "linker_param_file",
+            "force_pic_flags",
+            "strip_debug_symbols",
+            "sysroot",
+        ],
+        tools = [ gcc_tool, dpcpp_tool ],
+    )
+
+    cpp_link_static_library_action = action_config(
+        action_name = ACTION_NAMES.cpp_link_static_library,
+        implies = [
+            "archiver_flags",
+            "linker_param_file",
+        ],
+        tools = [
+            tool(path = ctx.attr.tool_paths["ar"])
+        ],
+    )
+
+    strip_action = action_config(
+        action_name = ACTION_NAMES.strip,
+        flag_sets = [
+            flag_set(
+                flag_groups = [
+                    flag_group(flags = ["-S", "-o", "%{output_file}"]),
+                    # TODO: Add only if use GNU compiler stack
+                    flag_group(
+                        flags = [
+                            "-R", ".gnu.switches.text.quote_paths'",
+                            "-R", ".gnu.switches.text.bracket_paths",
+                            "-R", ".gnu.switches.text.system_paths",
+                            "-R", ".gnu.switches.text.cpp_defines",
+                            "-R", ".gnu.switches.text.cpp_includes",
+                            "-R", ".gnu.switches.text.cl_args",
+                            "-R", ".gnu.switches.text.lipo_info",
+                            "-R", ".gnu.switches.text.annotation",
+                        ],
+                    ),
+                    flag_group(
+                        flags = ["%{stripopts}"],
+                        iterate_over = "stripopts",
+                    ),
+                    flag_group(flags = ["%{input_file}"]),
+                ],
+            ),
+        ],
+        tools = [
+            tool(path = ctx.attr.tool_paths["strip"])
+        ],
+    )
+
+    action_configs = [
+        assemble_action,
+        preprocess_assemble_action,
+        c_compile_action,
+        cpp_compile_action,
+        cpp_header_parsing_action,
+        cpp_link_executable_action,
+        cpp_link_nodeps_dynamic_library_action,
+        cpp_link_dynamic_library_action,
+        cpp_link_static_library_action,
+        strip_action,
     ]
-
-    action_configs = []
-
-    for action_name in (all_cpp_compile_actions + all_link_actions):
-        dpcpp_action = action_config(
-            action_name = action_name,
-            enabled = True,
-            tools = [
-                tool(
-                    path = ctx.attr.tool_paths["dpcc"],
-                    with_features = [
-                        with_feature_set(features = ["dpc++"]),
-                    ],
-                ),
-                tool(
-                    path = ctx.attr.tool_paths["gcc"],
-                    with_features = [
-                        with_feature_set(not_features = ["dpc++"])
-                    ]
-                ),
-            ],
-        )
-        action_configs.append(dpcpp_action)
 
     dpcpp_feature = feature(
         name = "dpc++",
-        enabled = True,
+    )
+
+    dbg_feature = feature(
+        name = "dbg"
+    )
+
+    opt_feature = feature(
+        name = "opt"
     )
 
     supports_pic_feature = feature(
         name = "supports_pic",
         enabled = True,
     )
+
     supports_start_end_lib_feature = feature(
         name = "supports_start_end_lib",
         enabled = True,
+    )
+
+    supports_dynamic_linker_feature = feature(
+        name = "supports_dynamic_linker",
+        enabled = True
+    )
+
+    compiler_input_flags_feature = feature(
+        name = "compiler_input_flags",
+        flag_sets = [
+            flag_set(
+                actions = all_compile_actions,
+                flag_groups = [
+                    flag_group(
+                        flags = [ "-c", "%{source_file}" ],
+                        expand_if_available = "source_file",
+                    ),
+                ],
+            ),
+        ],
+    )
+
+    compiler_output_flags_feature = feature(
+        name = "compiler_output_flags",
+        flag_sets = [
+            flag_set(
+                actions = all_compile_actions,
+                flag_groups = [
+                    flag_group(
+                        flags = [ "-S" ],
+                        expand_if_available = "output_assembly_file",
+                    ),
+                    flag_group(
+                        flags = [ "-E" ],
+                        expand_if_available = "output_preprocess_file",
+                    ),
+                    flag_group(
+                        flags = [ "-o", "%{output_file}" ],
+                        expand_if_available = "output_file",
+                    ),
+                ],
+            ),
+        ],
+    )
+
+    strip_debug_symbols_feature = feature(
+        name = "strip_debug_symbols",
+        flag_sets = [
+            flag_set(
+                actions = all_link_actions,
+                flag_groups = [
+                    flag_group(
+                        flags = [ "-Wl,-S" ],
+                        expand_if_available = "strip_debug_symbols",
+                    ),
+                ],
+            ),
+        ],
+    )
+
+    force_pic_flags_feature = feature(
+        name = "force_pic_flags",
+        flag_sets = [
+            flag_set(
+                actions = [ ACTION_NAMES.cpp_link_executable ],
+                flag_groups = [
+                    flag_group(
+                        flags = [ "-pie" ],
+                        expand_if_available = "force_pic",
+                    ),
+                ],
+            ),
+        ],
+    )
+
+    linker_param_file_feature = feature(
+        name = "linker_param_file",
+        flag_sets = [
+            flag_set(
+                actions = all_link_actions,
+                flag_groups = [
+                    flag_group(
+                        flags = [ "@%{linker_param_file}" ],
+                        expand_if_available = "linker_param_file",
+                    ),
+                ],
+            ),
+        ],
     )
 
     default_compile_flags_feature = feature(
@@ -210,10 +465,6 @@ def _impl(ctx):
         ],
     )
 
-    dbg_feature = feature(name = "dbg")
-
-    opt_feature = feature(name = "opt")
-
     sysroot_feature = feature(
         name = "sysroot",
         enabled = True,
@@ -240,11 +491,6 @@ def _impl(ctx):
         ],
     )
 
-    supports_dynamic_linker_feature = feature(
-        name = "supports_dynamic_linker",
-        enabled = True
-    )
-
     user_compile_flags_feature = feature(
         name = "user_compile_flags",
         enabled = True,
@@ -258,6 +504,22 @@ def _impl(ctx):
                         expand_if_available = "user_compile_flags",
                     ),
                 ],
+            ),
+        ],
+    )
+
+    user_link_flags_feature = feature(
+        name = "user_link_flags",
+        flag_sets = [
+            flag_set(
+                actions = all_link_actions + lto_index_actions,
+                flag_groups = [
+                    flag_group(
+                        flags = ["%{user_link_flags}"],
+                        iterate_over = "user_link_flags",
+                        expand_if_available = "user_link_flags",
+                    ),
+                ] + ([flag_group(flags = ctx.attr.link_libs)] if ctx.attr.link_libs else []),
             ),
         ],
     )
@@ -344,6 +606,7 @@ def _impl(ctx):
                 flag_groups = [
                     flag_group(flags = ["-fPIC"]),
                 ],
+                with_features = [with_feature_set(features = ["dpc++"])],
             ),
         ],
     )
@@ -611,22 +874,6 @@ def _impl(ctx):
         ],
     )
 
-    user_link_flags_feature = feature(
-        name = "user_link_flags",
-        flag_sets = [
-            flag_set(
-                actions = all_link_actions + lto_index_actions,
-                flag_groups = [
-                    flag_group(
-                        flags = ["%{user_link_flags}"],
-                        iterate_over = "user_link_flags",
-                        expand_if_available = "user_link_flags",
-                    ),
-                ] + ([flag_group(flags = ctx.attr.link_libs)] if ctx.attr.link_libs else []),
-            ),
-        ],
-    )
-
     archiver_flags_feature = feature(
         name = "archiver_flags",
         flag_sets = [
@@ -710,37 +957,49 @@ def _impl(ctx):
         ],
     )
 
+    no_legacy_features_feature = feature(
+        name = "no_legacy_features",
+        enabled = True,
+    )
+
     features = [
+        no_legacy_features_feature,
         dpcpp_feature,
         dbg_feature,
         opt_feature,
         supports_pic_feature,
         supports_dynamic_linker_feature,
-        sysroot_feature,
 
         # Compilation
-        pic_feature,
         default_compile_flags_feature,
+        force_pic_flags_feature,
+        pic_feature,
         user_compile_flags_feature,
         preprocessor_defines_feature,
+        includes_feature,
+        include_paths_feature,
+        unfiltered_compile_flags_feature,
         dependency_file_feature,
         random_seed_feature,
-        unfiltered_compile_flags_feature,
-        include_paths_feature,
-        includes_feature,
+        compiler_input_flags_feature,
+        compiler_output_flags_feature,
+
+        # Dynamic linking
+        strip_debug_symbols_feature,
+        shared_flag_feature,
+        output_execpath_flags_feature,
+        default_link_flags_feature,
+        dpcpp_linking_pic_feature,
+        library_search_directories_feature,
+        runtime_library_search_directories_feature,
+        libraries_to_link_feature,
+        user_link_flags_feature,
 
         # Static linking
         archiver_flags_feature,
+        linker_param_file_feature,
 
-        # Dynamic linking
-        shared_flag_feature,
-        dpcpp_linking_pic_feature,
-        output_execpath_flags_feature,
-        runtime_library_search_directories_feature,
-        library_search_directories_feature,
-        default_link_flags_feature,
-        libraries_to_link_feature,
-        user_link_flags_feature,
+        sysroot_feature,
     ]
 
     if ctx.attr.supports_start_end_lib:
@@ -759,7 +1018,6 @@ def _impl(ctx):
         compiler = ctx.attr.compiler,
         abi_version = ctx.attr.abi_version,
         abi_libc_version = ctx.attr.abi_libc_version,
-        tool_paths = tool_paths,
     )
 
 cc_toolchain_config = rule(
