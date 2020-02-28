@@ -36,12 +36,11 @@ auto train_dispatch_by_input(const Context& ctx,
         return ops_t()(ctx, desc, std::forward<Head>(head),
                                   std::forward<Tail>(tail)...);
     }
-    else {
-        const auto input = input_t { std::forward<Head>(head),
-                                     std::forward<Tail>(tail)... };
-        return ops_t()(ctx, desc, input);
-    }
-};
+
+    const auto input = input_t { std::forward<Head>(head),
+                                 std::forward<Tail>(tail)... };
+    return ops_t()(ctx, desc, input);
+}
 
 template <typename Head, typename... Tail>
 auto train_dispatch_by_ctx(Head&& head, Tail&&... tail) {
@@ -49,12 +48,11 @@ auto train_dispatch_by_ctx(Head&& head, Tail&&... tail) {
     if constexpr (std::is_same_v<tag_t, detail::execution_context_tag>) {
         return train_dispatch_by_input(head, std::forward<Tail>(tail)...);
     }
-    else {
-        return train_dispatch_by_input(default_execution_context(),
-                                    std::forward<Head>(head),
-                                    std::forward<Tail>(tail)...);
-    }
-};
+
+    return train_dispatch_by_input(default_execution_context(),
+                                   std::forward<Head>(head),
+                                   std::forward<Tail>(tail)...);
+}
 
 } // namespace detail
 } // namespace dal

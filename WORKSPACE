@@ -5,6 +5,11 @@ declare_onedal_cc_toolchain(
     name = "onedal_cc_toolchain",
 )
 
+load("@onedal//build/bazel/config:def.bzl", "declare_onedal_config")
+declare_onedal_config(
+    name = "config",
+)
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 http_archive(
   name = "bazel_skylib",

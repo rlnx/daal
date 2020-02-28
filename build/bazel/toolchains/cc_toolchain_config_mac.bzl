@@ -1065,7 +1065,6 @@ cc_toolchain_config = rule(
         "opt_link_flags": attr.string_list(),
         "no_canonical_system_headers_flags_cc": attr.string_list(),
         "deterministic_compile_flags": attr.string_list(),
-        "supports_start_end_lib": attr.bool(),
         "macosx_version_min": attr.string(mandatory = True),
     },
     provides = [CcToolchainConfigInfo],

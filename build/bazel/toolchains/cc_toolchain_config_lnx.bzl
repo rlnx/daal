@@ -84,14 +84,14 @@ lto_index_actions = [
 
 def _impl(ctx):
     gcc_tool = tool(
-        path = ctx.attr.tool_paths["gcc"],
+        path = ctx.attr.cc_path,
         with_features = [
             with_feature_set(not_features = ["dpc++"])
         ]
     )
 
     dpcpp_tool = tool(
-        path = ctx.attr.tool_paths["dpcc"],
+        path = ctx.attr.dpcc_path,
         with_features = [
             with_feature_set(features = ["dpc++"]),
         ],
@@ -221,7 +221,7 @@ def _impl(ctx):
             "linker_param_file",
         ],
         tools = [
-            tool(path = ctx.attr.tool_paths["ar"])
+            tool(path = ctx.attr.ar_path)
         ],
     )
 
@@ -253,7 +253,7 @@ def _impl(ctx):
             ),
         ],
         tools = [
-            tool(path = ctx.attr.tool_paths["strip"])
+            tool(path = ctx.attr.strip_path)
         ],
     )
 
@@ -369,7 +369,8 @@ def _impl(ctx):
         name = "linker_param_file",
         flag_sets = [
             flag_set(
-                actions = all_link_actions,
+                actions = all_link_actions +
+                          [ACTION_NAMES.cpp_link_static_library],
                 flag_groups = [
                     flag_group(
                         flags = [ "@%{linker_param_file}" ],
@@ -1031,8 +1032,11 @@ cc_toolchain_config = rule(
         "target_libc": attr.string(mandatory = True),
         "abi_version": attr.string(mandatory = True),
         "abi_libc_version": attr.string(mandatory = True),
+        "cc_path": attr.string(mandatory = True),
+        "dpcc_path": attr.string(mandatory = True),
+        "ar_path": attr.string(mandatory = True),
+        "strip_path": attr.string(mandatory = True),
         "cxx_builtin_include_directories": attr.string_list(),
-        "tool_paths": attr.string_dict(),
         "compile_flags_cc": attr.string_list(),
         "compile_flags_dpcc": attr.string_list(),
         "dbg_compile_flags": attr.string_list(),

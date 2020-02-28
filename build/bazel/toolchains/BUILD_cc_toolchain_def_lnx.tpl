@@ -13,7 +13,7 @@ filegroup(
 )
 
 cc_toolchain_config(
-    name = "%{cc_toolchain_identifier}",
+    name = "%{cc_toolchain_identifier}_config",
     cpu = "%{target_cpu}",
     compiler = "%{compiler}",
     toolchain_identifier = "%{cc_toolchain_identifier}",
@@ -22,8 +22,11 @@ cc_toolchain_config(
     target_libc = "%{target_libc}",
     abi_version = "%{abi_version}",
     abi_libc_version = "%{abi_libc_version}",
+    cc_path = "%{cc_path}",
+    dpcc_path = "%{dpcc_path}",
+    ar_path = "%{ar_path}",
+    strip_path = "%{strip_path}",
     cxx_builtin_include_directories = [%{cxx_builtin_include_directories}],
-    tool_paths = {%{tool_paths}},
     compile_flags_cc = [%{compile_flags_cc}],
     compile_flags_dpcc = [%{compile_flags_dpcc}],
     opt_compile_flags = [%{opt_compile_flags}],
@@ -40,9 +43,9 @@ cc_toolchain_config(
 )
 
 cc_toolchain(
-    name = "cc_toolchain",
+    name = "%{cc_toolchain_identifier}",
     toolchain_identifier = "%{cc_toolchain_identifier}",
-    toolchain_config = ":%{cc_toolchain_identifier}",
+    toolchain_config = ":%{cc_toolchain_identifier}_config",
     all_files = ":compiler_deps",
     ar_files = ":compiler_deps",
     as_files = ":compiler_deps",
@@ -52,6 +55,11 @@ cc_toolchain(
     objcopy_files = ":empty",
     strip_files = ":empty",
     supports_param_files = %{supports_param_files},
+)
+
+alias(
+    name = "cc_toolchain",
+    actual = ":%{cc_toolchain_identifier}",
 )
 
 toolchain(
@@ -64,6 +72,6 @@ toolchain(
         "@platforms//cpu:x86_64",
         "@platforms//os:linux",
     ],
-    toolchain = ":cc_toolchain",
+    toolchain = ":%{cc_toolchain_identifier}",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )

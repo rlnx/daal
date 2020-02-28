@@ -9,6 +9,7 @@ load(
     "add_compiler_option_if_supported",
     "add_linker_option_if_supported",
     "get_no_canonical_prefixes_opt",
+    "get_toolchain_identifier",
 )
 load(
     "@bazel_tools//tools/cpp:lib_cc_configure.bzl",
@@ -89,34 +90,11 @@ def _find_tool(repo_ctx, tool_name, mandatory=False):
 
 def _find_tools(repo_ctx, reqs):
     # TODO: Use full compiler path from reqs
-    compiler_name = reqs.compiler_id
-    dpcpp_compiler_name = reqs.compiler_dpcpp_id
-    cpp_compiler_name = {
-        "gcc": "g++",
-        "clang": "clang++",
-    }[reqs.compiler_id]
-    # { <key>: ( <tool_name>, <mandatory_flag> ) }
-    tools_meta = {
-        "ar":      ( "ar",                True  ),
-        "ld":      ( "ld",                True  ),
-        "gcc":     ( compiler_name,       True  ),
-        "cpp":     ( cpp_compiler_name,   True  ),
-        "dpcc":    ( dpcpp_compiler_name, False ),
-        "dwp":     ( "dwp",               False ),
-        "gcov":    ( "gcov",              True  ),
-        "nm":      ( "nm",                True  ),
-        "objcopy": ( "objcopy",           False ),
-        "objdump": ( "objdump",           True  ),
-        "strip":   ( "strip",             True  ),
-    }
-    tool_paths = {
-        key: _find_tool(repo_ctx, *meta)
-        for key, meta in tools_meta.items()
-    }
     return struct(
-        cc = tool_paths["gcc"],
-        dpcc = tool_paths["dpcc"],
-        paths = tool_paths,
+        cc    = _find_tool(repo_ctx, reqs.compiler_id, mandatory=True),
+        ar    = _find_tool(repo_ctx, "ar", mandatory=True),
+        strip = _find_tool(repo_ctx, "strip", mandatory=True),
+        dpcc  = _find_tool(repo_ctx, reqs.compiler_dpcc_id, mandatory=False),
     )
 
 
@@ -147,11 +125,6 @@ def _preapre_builtin_include_directory_paths(repo_ctx, reqs, tools, cxx_opts):
     )
     write_builtin_include_directory_paths(repo_ctx, tools.cc, builtin_include_directories)
     return builtin_include_directories
-
-
-def _get_toolchain_identifier(reqs):
-    return "{}-{}-{}-{}".format(reqs.os_id, reqs.target_arch_id,
-                                reqs.compiler_id, reqs.compiler_version)
 
 
 def _get_bin_search_flag(repo_ctx, cc_path):
@@ -194,7 +167,7 @@ def configure_cc_toolchain_lnx(repo_ctx, reqs):
         Label("@onedal//build/bazel/toolchains:BUILD_cc_toolchain_def_lnx.tpl"),
         {
             # Various IDs
-            "%{cc_toolchain_identifier}": _get_toolchain_identifier(reqs),
+            "%{cc_toolchain_identifier}": get_toolchain_identifier(reqs),
             "%{compiler}":                reqs.compiler_id + "-" + reqs.compiler_version,
             "%{abi_version}":             reqs.compiler_abi_version,
             "%{abi_libc_version}":        reqs.libc_abi_version,
@@ -207,9 +180,10 @@ def configure_cc_toolchain_lnx(repo_ctx, reqs):
             "%{cc_compiler_deps}": get_starlark_list(
                 [":builtin_include_directory_paths"]
             ),
-            "%{tool_paths}": ",\n        ".join(
-                ['"%s": "%s"' % (k, v) for k, v in tools.paths.items()],
-            ),
+            "%{cc_path}": tools.cc,
+            "%{dpcc_path}": tools.dpcc,
+            "%{ar_path}": tools.ar,
+            "%{strip_path}": tools.strip,
             "%{cxx_builtin_include_directories}": get_starlark_list(builtin_include_directories),
             "%{compile_flags_cc}": get_starlark_list(
                 [
@@ -362,6 +336,6 @@ def configure_cc_toolchain_lnx(repo_ctx, reqs):
                     # "-O0",
                 ]
             ),
-            "%{supports_start_end_lib}": "True" if gold_linker_path else "False",
+            "%{supports_start_end_lib}": "True" if (gold_linker_path and reqs.compiler_id != "icc") else "False",
         },
     )

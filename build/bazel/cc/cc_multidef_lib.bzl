@@ -1,4 +1,5 @@
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
+load("@onedal//build/bazel/config:def.bzl", "CpuVectorInstructionsProvider")
 
 def _categorize_sources(source_files, cpu_files_supported = True,
                                       fpt_files_supported = True):
@@ -52,8 +53,13 @@ def _compile_multidef(name, my_ctx):
     compilation_ctxs.append(cctx)
     compilation_outs.append(cout)
 
+    cpu_defines = my_ctx.ctx.attr.cpus
+    enabled_cpus = my_ctx.ctx.attr.enabled_cpus[CpuVectorInstructionsProvider].isa_extensions
+    cpu_defiens_filtered = { k: cpu_defines[k] for k in enabled_cpus }
+    # print(cpu_defiens_filtered)
+
     # Compile CPU files
-    for cpu, defines in my_ctx.ctx.attr.cpus.items():
+    for cpu, defines in cpu_defiens_filtered.items():
         cctx, cout = _compile(name + "_" + cpu, my_ctx, sources_by_category.cpu_files,
                               local_defines=defines)
         compilation_ctxs.append(cctx)
@@ -67,7 +73,7 @@ def _compile_multidef(name, my_ctx):
         compilation_outs.append(cout)
 
     # Compile FPT-CPU files
-    for cpu, cpu_defines in my_ctx.ctx.attr.cpus.items():
+    for cpu, cpu_defines in cpu_defiens_filtered.items():
         for fpt, fpt_defines in my_ctx.ctx.attr.fpts.items():
             cctx, cout = _compile(name + "_" + fpt + "_" + cpu, my_ctx,
                                   sources_by_category.fpt_cpu_files,
@@ -89,7 +95,7 @@ def _create_cc_info_from_multiple_compilation_contexts(compilation_ctxs, linking
 
 
 def _create_my_ctx(ctx):
-    toolchain = find_cpp_toolchain(ctx)
+    toolchain = ctx.toolchains["@bazel_tools//tools/cpp:toolchain_type"]
     feature_config = cc_common.configure_features(
         ctx = ctx,
         cc_toolchain = toolchain,
@@ -145,8 +151,11 @@ cc_multidef_lib = rule(
         "fpts": attr.string_list_dict(),
         "copts": attr.string_list(),
         "local_defines": attr.string_list(),
+        "enabled_cpus": attr.label(
+            default = "@config//:cpu",
+        ),
         "_cc_toolchain": attr.label(
-            default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")
+            default = Label("@onedal_cc_toolchain//:cc_toolchain")
         ),
     },
     toolchains = ["@bazel_tools//tools/cpp:toolchain_type"],
