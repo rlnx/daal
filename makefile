@@ -360,9 +360,10 @@ release.HEADERS.COMMON := $(filter-out $(subst _$(_OS),,$(release.HEADERS.OSSPEC
 # List examples files to populate release/examples.
 expat = %.java %.cpp %.h %.txt %.csv
 expat += $(if $(OS_is_win),%.bat %.vcxproj %.filters %.user %.sln %makefile_$(_OS),%_$(_OS).lst %makefile_$(_OS) %_$(_OS).sh)
-release.EXAMPLES.CPP   := $(filter $(expat),$(shell find examples/cpp  -type f)) $(filter $(expat),$(shell find examples/cpp_sycl -type f))
-release.EXAMPLES.DATA  := $(filter $(expat),$(shell find examples/data -type f))
-release.EXAMPLES.JAVA  := $(filter $(expat),$(shell find examples/java -type f))
+release.EXAMPLES.CPP   := $(filter $(expat),$(shell find examples/daal/simple/cpp  -type f)) \
+                          $(filter $(expat),$(shell find examples/daal/simple/cpp_sycl -type f))
+release.EXAMPLES.DATA  := $(filter $(expat),$(shell find examples/_data -type f))
+release.EXAMPLES.JAVA  := $(filter $(expat),$(shell find examples/daal/simple/java -type f))
 
 # List env files to populate release.
 release.ENV = $(DIR)/build/release/vars_$(_OS).$(scr)
@@ -705,9 +706,10 @@ _release_jj: $(addprefix $(RELEASEDIR.jardir)/,$(release.JARS))
 $(RELEASEDIR.jardir)/%.jar: $(WORKDIR.lib)/%.jar | $(RELEASEDIR.jardir)/. ; $(cpy)
 
 #----- releasing examples
+replace_examples_path = $(subst _$(_OS),,$(subst examples/_data,examples/data,$(subst examples/daal/simple/,examples/,$1)))
 define .release.x
-$3: $2/$(subst _$(_OS),,$1)
-$2/$(subst _$(_OS),,$1): $(DIR)/$1 | $(dir $2/$1)/.
+$3: $2/$(call replace_examples_path,$1)
+$2/$(call replace_examples_path,$1): $(DIR)/$1 | $(dir $2/$(call replace_examples_path,$1))/.
 	$(if $(filter %makefile_win,$1),python $(DIR)/build/scripts/generate_win_makefile.py $(dir $(DIR)/$1) $(dir $2/$1),$(value cpy))
 	$(if $(filter %.sh %.bat,$1),chmod +x $$@)
 endef

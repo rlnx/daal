@@ -22,6 +22,7 @@
 */
 #include "src/externals/service_math.h"
 #include "src/services/service_utils.h"
+#include "src/services/service_data_utils.h"
 #include "src/externals/service_ittnotify.h"
 
 DAAL_ITTNOTIFY_DOMAIN(logistic_loss.dense.default.batch);

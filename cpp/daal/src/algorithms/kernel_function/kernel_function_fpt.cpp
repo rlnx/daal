@@ -21,7 +21,7 @@
 //--
 */
 
-#include "src/algorithms_function/kernel_function_types.h"
+#include "algorithms/kernel_function/kernel_function_types.h"
 
 namespace daal
 {

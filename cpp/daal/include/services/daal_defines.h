@@ -29,9 +29,8 @@
 #include <cstddef> // for size_t
 
 #if (!defined(__INTEL_COMPILER) && !defined(_MSC_VER))
-    #include <stdint.h>
-    #define __int32 int32_t
-    #define __int64 int64_t
+    #define __int32 int
+    #define __int64 long long
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
