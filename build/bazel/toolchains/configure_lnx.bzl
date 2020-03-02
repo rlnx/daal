@@ -1,6 +1,14 @@
 load(
+    "@bazel_tools//tools/cpp:lib_cc_configure.bzl",
+    "auto_configure_fail",
+    "auto_configure_warning",
+    "get_starlark_list",
+    "write_builtin_include_directory_paths",
+)
+load(
     "@onedal//build/bazel:utils.bzl",
-    "unique"
+    "get_starlark_dict",
+    "unique",
 )
 load(
     "@onedal//build/bazel/toolchains:common.bzl",
@@ -10,13 +18,8 @@ load(
     "add_linker_option_if_supported",
     "get_no_canonical_prefixes_opt",
     "get_toolchain_identifier",
-)
-load(
-    "@bazel_tools//tools/cpp:lib_cc_configure.bzl",
-    "auto_configure_fail",
-    "auto_configure_warning",
-    "get_starlark_list",
-    "write_builtin_include_directory_paths",
+    "get_default_compiler_options",
+    "get_cpu_specific_options",
 )
 
 _TEST_CPP_FILE = "empty.cpp"
@@ -144,7 +147,7 @@ def _get_gcc_toolchain_path(repo_ctx, tools):
 
 def configure_cc_toolchain_lnx(repo_ctx, reqs):
     if reqs.os_id != "lnx":
-        auto_configure_fail("Cannot configure Linunx toolchain for '{}'".format(reqs.os_id))
+        auto_configure_fail("Cannot configure Linux toolchain for '{}'".format(reqs.os_id))
     repo_ctx.file(_TEST_CPP_FILE, "int main() { return 0; }")
 
     # Default compilations/link options
@@ -186,50 +189,13 @@ def configure_cc_toolchain_lnx(repo_ctx, reqs):
             "%{strip_path}": tools.strip,
             "%{cxx_builtin_include_directories}": get_starlark_list(builtin_include_directories),
             "%{compile_flags_cc}": get_starlark_list(
-                [
-                    # TODO: Add gcc toolchain to clang?
-                    # "--gcc-toolchain=",
-
-                    "-U_FORTIFY_SOURCE",
-                    "-fstack-protector",
-                    "-Wall",
-                ] + (
-                    add_compiler_option_if_supported(repo_ctx, tools.cc, "-Wthread-safety") +
-                    add_compiler_option_if_supported(repo_ctx, tools.cc, "-Wself-assign")
-                ) + (
-                    # Disable problematic warnings.
-                    add_compiler_option_if_supported(repo_ctx, tools.cc, "-Wunused-but-set-parameter") +
-                    # has false positives
-                    add_compiler_option_if_supported(repo_ctx, tools.cc, "-Wno-free-nonheap-object") +
-                    # Enable coloring even if there's no attached terminal. Bazel removes the
-                    # escape sequences if --nocolor is specified.
-                    add_compiler_option_if_supported(repo_ctx, tools.cc, "-fcolor-diagnostics")
-                ) + [
-                    # Keep stack frames for debugging, even in opt mode.
-                    "-fno-omit-frame-pointer",
-                ],
+                get_default_compiler_options(repo_ctx, reqs, tools.cc, is_dpcc=False)
             ),
             "%{compile_flags_dpcc}": get_starlark_list(
                 [
                     "--gcc-toolchain={}".format(_get_gcc_toolchain_path(repo_ctx, tools)),
-                    "-U_FORTIFY_SOURCE",
-                    "-fstack-protector",
-                    "-Wall",
-                ] + (
-                    add_compiler_option_if_supported(repo_ctx, tools.dpcc, "-Wthread-safety") +
-                    add_compiler_option_if_supported(repo_ctx, tools.dpcc, "-Wself-assign")
-                ) + (
-                    # Disable problematic warnings.
-                    add_compiler_option_if_supported(repo_ctx, tools.dpcc, "-Wunused-but-set-parameter") +
-                    # has false positives
-                    add_compiler_option_if_supported(repo_ctx, tools.dpcc, "-Wno-free-nonheap-object") +
-                    # Enable coloring even if there's no attached terminal. Bazel removes the
-                    # escape sequences if --nocolor is specified.
-                    add_compiler_option_if_supported(repo_ctx, tools.dpcc, "-fcolor-diagnostics")
-                ) + [
-                    # Keep stack frames for debugging, even in opt mode.
-                    "-fno-omit-frame-pointer",
-                ],
+                ] +
+                get_default_compiler_options(repo_ctx, reqs, tools.dpcc, is_dpcc=True)
             ),
             "%{cxx_flags}": get_starlark_list(cxx_opts),
             "%{link_flags_cc}": get_starlark_list(
@@ -337,5 +303,8 @@ def configure_cc_toolchain_lnx(repo_ctx, reqs):
                 ]
             ),
             "%{supports_start_end_lib}": "True" if (gold_linker_path and reqs.compiler_id != "icc") else "False",
+            "%{cpu_flags}": get_starlark_dict(
+                get_cpu_specific_options(reqs)
+            )
         },
     )

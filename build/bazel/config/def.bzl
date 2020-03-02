@@ -1,3 +1,4 @@
+load("@onedal//build/bazel:utils.bzl", "unique")
 
 CpuVectorInstructionsProvider = provider(
     fields = ["isa_extensions"]
@@ -12,6 +13,7 @@ def _onedal_cpu_isa_extension_config_impl(ctx):
     else:
         isa_extensions = ctx.build_setting_value.split(" ")
         isa_extensions = [x.strip() for x in isa_extensions]
+        isa_extensions = unique(["sse2"] + isa_extensions)
     return CpuVectorInstructionsProvider(
         isa_extensions = isa_extensions
     )

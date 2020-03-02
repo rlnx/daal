@@ -963,46 +963,54 @@ def _impl(ctx):
         enabled = True,
     )
 
-    features = [
-        no_legacy_features_feature,
-        dpcpp_feature,
-        dbg_feature,
-        opt_feature,
-        supports_pic_feature,
-        supports_dynamic_linker_feature,
+    features = []
+    features.append(no_legacy_features_feature)
+    features.append(dpcpp_feature)
+    features.append(dbg_feature)
+    features.append(opt_feature)
+    features.append(supports_pic_feature)
+    features.append(supports_dynamic_linker_feature)
+    features.append(sysroot_feature)
 
-        # Compilation
-        default_compile_flags_feature,
-        force_pic_flags_feature,
-        pic_feature,
-        user_compile_flags_feature,
-        preprocessor_defines_feature,
-        includes_feature,
-        include_paths_feature,
-        unfiltered_compile_flags_feature,
-        dependency_file_feature,
-        random_seed_feature,
-        compiler_input_flags_feature,
-        compiler_output_flags_feature,
+    # Compilation
+    features.append(default_compile_flags_feature)
+    features.append(force_pic_flags_feature)
+    features.append(pic_feature)
+    for cpu_id, flag_value in ctx.attr.cpu_flags.items():
+        cpu_opt_feature = feature(
+            name = "{}_flags".format(cpu_id),
+            flag_sets = [
+                flag_set(
+                    actions = all_compile_actions,
+                    flag_groups = [ flag_group(flags = [flag_value]) ],
+                ),
+            ],
+        )
+        features.append(cpu_opt_feature)
+    features.append(user_compile_flags_feature)
+    features.append(preprocessor_defines_feature)
+    features.append(includes_feature)
+    features.append(include_paths_feature)
+    features.append(unfiltered_compile_flags_feature)
+    features.append(dependency_file_feature)
+    features.append(random_seed_feature)
+    features.append(compiler_input_flags_feature)
+    features.append(compiler_output_flags_feature)
 
-        # Dynamic linking
-        strip_debug_symbols_feature,
-        shared_flag_feature,
-        output_execpath_flags_feature,
-        default_link_flags_feature,
-        dpcpp_linking_pic_feature,
-        library_search_directories_feature,
-        runtime_library_search_directories_feature,
-        libraries_to_link_feature,
-        user_link_flags_feature,
+    # Dynamic linking
+    features.append(strip_debug_symbols_feature)
+    features.append(shared_flag_feature)
+    features.append(output_execpath_flags_feature)
+    features.append(default_link_flags_feature)
+    features.append(dpcpp_linking_pic_feature)
+    features.append(library_search_directories_feature)
+    features.append(runtime_library_search_directories_feature)
+    features.append(libraries_to_link_feature)
+    features.append(user_link_flags_feature)
 
-        # Static linking
-        archiver_flags_feature,
-        linker_param_file_feature,
-
-        sysroot_feature,
-    ]
-
+    # Static linking
+    features.append(archiver_flags_feature)
+    features.append(linker_param_file_feature)
     if ctx.attr.supports_start_end_lib:
         features.append(supports_start_end_lib_feature)
 
@@ -1050,6 +1058,7 @@ cc_toolchain_config = rule(
         "no_canonical_system_headers_flags_dpcc": attr.string_list(),
         "deterministic_compile_flags": attr.string_list(),
         "supports_start_end_lib": attr.bool(),
+        "cpu_flags": attr.string_dict(),
     },
     provides = [CcToolchainConfigInfo],
 )

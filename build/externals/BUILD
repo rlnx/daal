@@ -27,6 +27,11 @@ cc_library(
         # "tbb/mac/include/tbb",
         # "tbb/mac/include",
     ],
+    defines = [
+        "TBB_SUPPRESS_DEPRECATED_MESSAGES",
+        "__TBB_LEGACY_MODE",
+        "__TBB_NO_IMPLICIT_LINKAGE",
+    ],
     visibility = [ "//visibility:public" ],
 )
 

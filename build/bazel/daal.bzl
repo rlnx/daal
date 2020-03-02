@@ -1,48 +1,22 @@
 load("@onedal//build/bazel/cc:cc_multidef_lib.bzl", "cc_multidef_lib")
 load("@onedal//build/bazel/cc:cc_shared_lib.bzl", "cc_shared_lib")
 
-def _daal_cpu_copts_gcc(cpu):
-  march = {
-    "sse2":       "nocona",
-    "ssse3":      "nocona",
-    "sse42":      "corei7",
-    "avx":        "sandybridge",
-    "avx2":       "haswell",
-    "avx512_mic": "haswell",
-    "avx512":     "haswell",
-  }
-  return [ "-march={}".format(march[cpu]) ]
+_daal_extra_copts = [
+    "-w", # Temporary options to disable warning
+]
 
-def _daal_cpu_copts_clang(cpu):
-  march = {
-    "sse2":       "nocona",
-    "ssse3":      "core2",
-    "sse42":      "nehalem",
-    "avx":        "sandybridge",
-    "avx2":       "haswell",
-    "avx512_mic": "knl",
-    "avx512":     "skx",
-  }
-  return [ "-march={}".format(march[cpu]) ]
-
-def _daal_common_copts_gcc():
-  return [
-    "-w",
-    "-fwrapv",
-    "-fno-strict-overflow",
-    "-fno-delete-null-pointer-checks",
-  ]
-
-def _daal_common_defines_gcc():
-  return []
+_daal_extra_defines = [
+    "DAAL_HIDE_DEPRECATED",
+    "DAAL_NOTHROW_EXCEPTIONS",
+]
 
 def daal_module(name, copts=[], local_defines=[], **kwargs):
-  native.cc_library(
-    name = name,
-    copts = copts + _daal_common_copts_gcc(),
-    local_defines = local_defines + _daal_common_defines_gcc(),
-    **kwargs,
-  )
+    native.cc_library(
+        name = name,
+        copts = copts + _daal_extra_copts,
+        local_defines = local_defines + _daal_extra_defines,
+        **kwargs,
+    )
 
 def daal_kernel_module(name, hdrs=[], copts=[],
                        local_defines=[], deps=[], **kwargs):
@@ -65,8 +39,8 @@ def daal_kernel_module(name, hdrs=[], copts=[],
             "float":  [ "DAAL_FPTYPE=float"  ],
             "double": [ "DAAL_FPTYPE=double" ],
         },
-        copts = copts + _daal_common_copts_gcc(),
-        local_defines = local_defines + _daal_common_defines_gcc(),
+        copts = copts + _daal_extra_copts,
+        local_defines = local_defines + _daal_extra_defines,
         deps = deps + [":" + name + "_headers"],
         **kwargs
     )

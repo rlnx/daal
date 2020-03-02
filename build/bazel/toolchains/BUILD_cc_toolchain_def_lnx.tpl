@@ -40,6 +40,7 @@ cc_toolchain_config(
     no_canonical_system_headers_flags_dpcc = [%{no_canonical_system_headers_flags_dpcc}],
     deterministic_compile_flags = [%{deterministic_compile_flags}],
     supports_start_end_lib = %{supports_start_end_lib},
+    cpu_flags = {%{cpu_flags}},
 )
 
 cc_toolchain(

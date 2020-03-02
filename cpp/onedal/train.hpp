@@ -23,6 +23,6 @@ namespace dal {
 template <typename... Args>
 auto train(Args&&... args) {
     return detail::train_dispatch_by_ctx(std::forward<Args>(args)...);
-};
+}
 
 } // namespace dal

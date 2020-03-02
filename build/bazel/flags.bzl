@@ -1,51 +1,51 @@
 
 # Always flags
-# -fwrapv
-# -fno-strict-overflow
-# -fno-delete-null-pointer-checks
-# -Wformat
-# -Wformat-security
-# -D_FORTIFY_SOURCE=2
-# -fstack-protector-strong
-# -fPIC
-# -std=c++11
-# -DTBB_SUPPRESS_DEPRECATED_MESSAGES
-# -D__TBB_LEGACY_MODE
-# -D__TBB_NO_IMPLICIT_LINKAGE
-# -DDAAL_NOTHROW_EXCEPTIONS
-# -DDAAL_HIDE_DEPRECATED
-# -Werror=return-type
-# -Werror=uninitialized
-# -Werror=unknown-pragmas
-# -pedantic
-# -Wall
-# -Wextra
 
 # Opt flags
 # -O2
+# -D_FORTIFY_SOURCE=2
 
 # Dbg flags
 # -g
 # -DDEBUG_ASSERT
 
-lnx_icc_flags = [
-    "-U_FORTIFY_SOURCE",
-    "-fstack-protector",
+lnx_cc_common_flags = [
+    "-fwrapv",
+    "-fstack-protector-strong",
+    "-fno-strict-overflow",
+    "-fno-delete-null-pointer-checks",
     "-Wall",
-    "-Wthread-safety",
-    "-Wself-assign",
-    "-Wunused-but-set-parameter",
-    "-fcolor-diagnostics",
-    "-fno-omit-frame-pointer",
+    "-Wextra",
+    "-Wformat",
+    "-Wformat-security",
+    "-Werror=unknown-pragmas",
+    "-Werror=uninitialized",
+    "-Werror=return-type",
+    "-Wno-unused-parameter",
+    "-pedantic",
 ]
 
-lnx_gcc_flags = [
+def get_default_flags(arch_id, os_id, compiler_id):
+    arch_flags = {
+        "ia32": ["-m32"],
+        "intel64": ["-m64"],
+    }[arch_id]
+    return (
+        arch_flags +
+        lnx_cc_common_flags
+    )
 
-]
 
-all_flags = {
-    "lnx": {
-        "icc": icc_lnx_flags,
-        "gcc": gcc_lnx_flags,
-    },
-}
+def get_cpu_flags(arch_id, os_id, compiler_id):
+    cpu_flag_pattern = "-march={}"
+    if compiler_id == "gcc":
+        cpu_flags = {
+            "sse2":       "pentium4" if arch_id == "ia32" else "nocona",
+            "ssse3":      "pentium4" if arch_id == "ia32" else "nocona",
+            "sse42":      "corei7",
+            "avx":        "sandybridge",
+            "avx2":       "haswell",
+            "avx512_mic": "haswell",
+            "avx512":     "haswell",
+        }
+    return { k: cpu_flag_pattern.format(v) for k, v in cpu_flags.items() }

@@ -1,3 +1,9 @@
+load(
+    "@onedal//build/bazel:flags.bzl",
+    "get_default_flags",
+    "get_cpu_flags",
+)
+
 TEST_CPP_FILE = "empty.cpp"
 
 _INC_DIR_MARKER_BEGIN = "#include <...>"
@@ -6,27 +12,6 @@ _INC_DIR_MARKER_END = "End of search list"
 # OSX add " (framework directory)" at the end of line, strip it.
 _MAC_FRAMEWORK_SUFFIX = " (framework directory)"
 _MAC_FRAMEWORK_SUFFIX_LEN = len(_MAC_FRAMEWORK_SUFFIX)
-
-def _prepare_include_path(repo_ctx, path):
-    """Resolve and sanitize include path before outputting it into the crosstool.
-    Args:
-      repo_ctx: repository_ctx object.
-      path: an include path to be sanitized.
-    Returns:
-      Sanitized include path that can be written to the crosstoot. Resulting path
-      is absolute if it is outside the repository and relative otherwise.
-    """
-    path = path.strip()
-    if path.endswith(_MAC_FRAMEWORK_SUFFIX):
-        path = path[:-_MAC_FRAMEWORK_SUFFIX_LEN].strip()
-
-    # We're on UNIX, so the path delimiter is '/'.
-    repo_root = str(repo_ctx.path(".")) + "/"
-    path = str(repo_ctx.path(path))
-    if path.startswith(repo_root):
-        return path[len(repo_root):]
-    return path
-
 
 def get_cxx_inc_directories(repo_ctx, cc, lang_flag, additional_flags = []):
     """Compute the list of default C++ include directories."""
@@ -98,3 +83,42 @@ def get_no_canonical_prefixes_opt(repo_ctx, cc):
 def get_toolchain_identifier(reqs):
     return "{}-{}-{}-{}".format(reqs.os_id, reqs.target_arch_id,
                                 reqs.compiler_id, reqs.compiler_version)
+
+
+def get_default_compiler_options(repo_ctx, reqs, cc, is_dpcc=False):
+    options = _get_unfiltered_default_compiler_options(reqs, is_dpcc)
+    return _filter_out_unsupported_compiler_options(repo_ctx, cc, options)
+
+def get_cpu_specific_options(reqs):
+    return get_cpu_flags(reqs.target_arch_id, reqs.os_id, reqs.compiler_id)
+
+def _get_unfiltered_default_compiler_options(reqs, is_dpcc=False):
+    compiler_id = reqs.compiler_dpcc_id if is_dpcc else reqs.compiler_id
+    return get_default_flags(reqs.target_arch_id, reqs.os_id, compiler_id)
+
+def _filter_out_unsupported_compiler_options(repo_ctx, cc, options):
+    filtered_options = []
+    for option in options:
+        filtered_options += add_compiler_option_if_supported(repo_ctx, cc, option)
+    return filtered_options
+
+
+def _prepare_include_path(repo_ctx, path):
+    """Resolve and sanitize include path before outputting it into the crosstool.
+    Args:
+      repo_ctx: repository_ctx object.
+      path: an include path to be sanitized.
+    Returns:
+      Sanitized include path that can be written to the crosstoot. Resulting path
+      is absolute if it is outside the repository and relative otherwise.
+    """
+    path = path.strip()
+    if path.endswith(_MAC_FRAMEWORK_SUFFIX):
+        path = path[:-_MAC_FRAMEWORK_SUFFIX_LEN].strip()
+
+    # We're on UNIX, so the path delimiter is '/'.
+    repo_root = str(repo_ctx.path(".")) + "/"
+    path = str(repo_ctx.path(path))
+    if path.startswith(repo_root):
+        return path[len(repo_root):]
+    return path

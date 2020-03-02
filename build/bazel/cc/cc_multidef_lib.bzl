@@ -26,7 +26,7 @@ def _categorize_sources(source_files, cpu_files_supported = True,
     )
 
 
-def _compile(name, my_ctx, srcs, local_defines=[]):
+def _compile(name, my_ctx, srcs, feature_config, local_defines=[]):
     return cc_common.compile(
         name = name,
         srcs = srcs,
@@ -35,7 +35,7 @@ def _compile(name, my_ctx, srcs, local_defines=[]):
         local_defines = my_ctx.ctx.attr.local_defines + local_defines,
         user_compile_flags = my_ctx.ctx.attr.copts,
         compilation_contexts = my_ctx.dep_compilation_ctxs,
-        feature_configuration = my_ctx.feature_config,
+        feature_configuration = feature_config,
     )
 
 
@@ -49,34 +49,43 @@ def _compile_multidef(name, my_ctx):
     compilation_outs = []
 
     # Compile normal files
-    cctx, cout = _compile(name, my_ctx, sources_by_category.normal_files)
+    cctx, cout = _compile(name, my_ctx, sources_by_category.normal_files, my_ctx.feature_config)
     compilation_ctxs.append(cctx)
     compilation_outs.append(cout)
 
     cpu_defines = my_ctx.ctx.attr.cpus
     enabled_cpus = my_ctx.ctx.attr.enabled_cpus[CpuVectorInstructionsProvider].isa_extensions
-    cpu_defiens_filtered = { k: cpu_defines[k] for k in enabled_cpus }
-    # print(cpu_defiens_filtered)
+    cpu_defines_filtered = { k: cpu_defines[k] for k in enabled_cpus }
+
+    cpu_feature_configs = {}
+    for cpu in enabled_cpus:
+        cpu_feature_configs[cpu] = cc_common.configure_features(
+            ctx = my_ctx.ctx,
+            cc_toolchain = my_ctx.toolchain,
+            requested_features = my_ctx.ctx.features + [ "{}_flags".format(cpu) ],
+            unsupported_features = my_ctx.ctx.disabled_features,
+        )
 
     # Compile CPU files
-    for cpu, defines in cpu_defiens_filtered.items():
+    for cpu, defines in cpu_defines_filtered.items():
         cctx, cout = _compile(name + "_" + cpu, my_ctx, sources_by_category.cpu_files,
-                              local_defines=defines)
+                              cpu_feature_configs[cpu], local_defines=defines)
         compilation_ctxs.append(cctx)
         compilation_outs.append(cout)
 
     # Compile FPT files
     for fpt, defines in my_ctx.ctx.attr.fpts.items():
         cctx, cout = _compile(name + "_" + fpt, my_ctx, sources_by_category.fpt_files,
-                              local_defines=defines)
+                              cpu_feature_configs[cpu], local_defines=defines)
         compilation_ctxs.append(cctx)
         compilation_outs.append(cout)
 
     # Compile FPT-CPU files
-    for cpu, cpu_defines in cpu_defiens_filtered.items():
+    for cpu, cpu_defines in cpu_defines_filtered.items():
         for fpt, fpt_defines in my_ctx.ctx.attr.fpts.items():
             cctx, cout = _compile(name + "_" + fpt + "_" + cpu, my_ctx,
                                   sources_by_category.fpt_cpu_files,
+                                  cpu_feature_configs[cpu],
                                   local_defines=cpu_defines + fpt_defines)
             compilation_ctxs.append(cctx)
             compilation_outs.append(cout)
