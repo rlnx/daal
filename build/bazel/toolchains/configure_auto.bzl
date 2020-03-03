@@ -1,12 +1,16 @@
 load("@onedal//build/bazel/toolchains:configure_lnx.bzl", "configure_cc_toolchain_lnx")
 load("@onedal//build/bazel/toolchains:configure_mac.bzl", "configure_cc_toolchain_mac")
+load("@onedal//build/bazel/toolchains:configure_win.bzl", "configure_cc_toolchain_win")
 
 def _detect_os(repo_ctx):
     # TODO: Detect OS, os_ids = [lnx, mac, win]
+    print(repo_ctx.os.name)
     if "linux" in repo_ctx.os.name:
         return "lnx"
-    else:
+    elif "mac" in repo_ctx.os.name:
         return "mac"
+    elif "windows" in repo_ctx.os.name:
+        return "win"
 
 def _detect_default_compiler(repo_ctx, os_id):
     compiler_id = "icc"
@@ -52,7 +56,7 @@ def _detect_requirements(repo_ctx):
         compiler_version = "9.1.0",
 
         # TODO: Detect DPC++ compiler, use $env{DPCC}
-        compiler_dpcc_id = "dpcpp",
+        compiler_dpcc_id = "dpcpp" if os_id != "win" else "dpcpp-cl",
 
         # TODO: Detect compiler version
         compiler_dpcc_version = "2021.1",
@@ -62,6 +66,7 @@ def _configure_cc_toolchain(repo_ctx, reqs):
     configure_cc_toolchain_os = {
         "lnx": configure_cc_toolchain_lnx,
         "mac": configure_cc_toolchain_mac,
+        "win": configure_cc_toolchain_win,
     }[reqs.os_id]
     return configure_cc_toolchain_os(repo_ctx, reqs)
 
@@ -73,6 +78,9 @@ onedal_cc_toolchain = repository_rule(
     implementation = _onedal_cc_toolchain_impl,
     environ = [
         "CC",
+        "PATH",
+        "INCLUDE",
+        "LIB",
     ],
 )
 

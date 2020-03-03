@@ -47,9 +47,16 @@ def _cc_shared_lib_impl(ctx):
         linking_contexts = [ aggregated_deps.linking_context ],
         user_link_flags = aggregated_deps.user_link_flags,
     )
-    return [DefaultInfo(
-        files = depset([link_out.library_to_link.resolved_symlink_dynamic_library])
-    )]
+
+    dynamic_library_file = (link_out.library_to_link.resolved_symlink_dynamic_library or
+                            link_out.library_to_link.dynamic_library)
+    iface_library_file = (link_out.library_to_link.resolved_symlink_interface_library or
+                          link_out.library_to_link.interface_library)
+    library_files = [ dynamic_library_file ]
+    if iface_library_file:
+        library_files.append(iface_library_file)
+
+    return [DefaultInfo(files = depset(library_files))]
 
 
 cc_shared_lib = rule(

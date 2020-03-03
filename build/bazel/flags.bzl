@@ -26,18 +26,30 @@ lnx_cc_common_flags = [
 ]
 
 def get_default_flags(arch_id, os_id, compiler_id):
-    arch_flags = {
-        "ia32": ["-m32"],
-        "intel64": ["-m64"],
-    }[arch_id]
-    return (
-        arch_flags +
-        lnx_cc_common_flags
-    )
+    if os_id == "lnx":
+        arch_flags = {
+            "ia32": ["-m32"],
+            "intel64": ["-m64"],
+        }[arch_id]
+        return (
+            arch_flags +
+            lnx_cc_common_flags
+        )
+    else:
+        return []
 
 
 def get_cpu_flags(arch_id, os_id, compiler_id):
     cpu_flag_pattern = "-march={}"
+    cpu_flags = {
+        "sse2":       "",
+        "ssse3":      "",
+        "sse42":      "",
+        "avx":        "",
+        "avx2":       "",
+        "avx512_mic": "",
+        "avx512":     "",
+    }
     if compiler_id == "gcc":
         cpu_flags = {
             "sse2":       "pentium4" if arch_id == "ia32" else "nocona",
