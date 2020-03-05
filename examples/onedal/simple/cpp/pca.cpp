@@ -34,7 +34,7 @@ int main(int argc, char const *argv[]) {
 
     const auto data_table = dal::table_homogen(data, row_count, column_count);
 
-    const auto pca_desc = pca::descriptor()
+    const auto pca_desc = pca::descriptor<>()
         .set_component_count(3)
         .set_is_deterministic(true);
 

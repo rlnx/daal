@@ -33,7 +33,8 @@ DAL_DEFAULT_CPUS = [ 'default', 'avx', 'avx2', 'avx512' ]
 def dal_module(name, copts=[], **kwargs):
   native.cc_library(
     name = name,
-    copts = ['-std=c++17', '-Icpp', '-w'] + copts,
+    # copts = ['-std=c++17', '-Icpp', '-w'] + copts,
+    copts = ['/std:c++17', '/Icpp', '-w'] + copts,
     **kwargs,
   )
 

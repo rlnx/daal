@@ -93,12 +93,12 @@ def configure_cc_toolchain_win(repo_ctx, reqs):
             "%{lib_path}": tools.lib,
             "%{link_path}": tools.link,
             "%{cxx_builtin_include_directories}": get_starlark_list(builtin_include_directories),
-            # "%{msvc_env_lib}": repo_ctx.os.environ["LIB"].replace("\\", "\\\\"),
-            "%{msvc_env_lib}": " ",
-            # "%{msvc_env_include}": repo_ctx.os.environ["INCLUDE"].replace("\\", "\\\\"),
-            "%{msvc_env_include}": " ",
-            # "%{msvc_env_path}": repo_ctx.os.environ["PATH"].replace("\\", "\\\\"),
-            "%{msvc_env_path}": " ",
+            "%{msvc_env_lib}": repo_ctx.os.environ["LIB"].replace("\\", "\\\\"),
+            # "%{msvc_env_lib}": " ",
+            "%{msvc_env_include}": repo_ctx.os.environ["INCLUDE"].replace("\\", "\\\\"),
+            # "%{msvc_env_include}": " ",
+            "%{msvc_env_path}": repo_ctx.os.environ["PATH"].replace("\\", "\\\\").replace("%", "%%"),
+            # "%{msvc_env_path}": " ",
 
             "%{compile_flags_cc}": get_starlark_list(
                 get_default_compiler_options(repo_ctx, reqs, tools.cc, is_dpcc=False)
@@ -126,9 +126,9 @@ def configure_cc_toolchain_win(repo_ctx, reqs):
             "%{deterministic_compile_flags}": get_starlark_list(
                 [
                     "/wd4117",
-                    "-D__DATE__=\\\"redacted\\\"",
-                    "-D__TIMESTAMP__=\\\"redacted\\\"",
-                    "-D__TIME__=\\\"redacted\\\"",
+                    "/D__DATE__=\\\"redacted\\\"",
+                    "/D__TIMESTAMP__=\\\"redacted\\\"",
+                    "/D__TIME__=\\\"redacted\\\"",
                 ],
             ),
             "%{cpu_flags}": get_starlark_dict(

@@ -3,8 +3,6 @@ load("@onedal//build/bazel/toolchains:configure_mac.bzl", "configure_cc_toolchai
 load("@onedal//build/bazel/toolchains:configure_win.bzl", "configure_cc_toolchain_win")
 
 def _detect_os(repo_ctx):
-    # TODO: Detect OS, os_ids = [lnx, mac, win]
-    print(repo_ctx.os.name)
     if "linux" in repo_ctx.os.name:
         return "lnx"
     elif "mac" in repo_ctx.os.name:

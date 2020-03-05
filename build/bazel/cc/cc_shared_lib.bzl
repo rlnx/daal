@@ -14,8 +14,16 @@ def _aggregate_deps(ctx):
             elif lib_to_link.pic_objects:
                 pic_objects_to_link += lib_to_link.pic_objects
             else:
+                # print(lib_to_link)
                 libs_to_link.append(lib_to_link)
         link_flags += local_link_ctx.user_link_flags
+
+    libraries_to_link = cc_common.create_linking_context(
+        libraries_to_link = libs_to_link,
+    ).libraries_to_link.to_list()
+    if len(libraries_to_link) > 0:
+        print(libraries_to_link[0])
+
     return struct(
         compilation_outputs = cc_common.create_compilation_outputs(
             objects = depset(objects_to_link),
@@ -37,6 +45,8 @@ def _cc_shared_lib_impl(ctx):
         unsupported_features = ctx.disabled_features,
     )
     aggregated_deps = _aggregate_deps(ctx)
+    # print(aggregated_deps)
+
     link_out = cc_common.link(
         name = ctx.label.name,
         actions = ctx.actions,

@@ -1,4 +1,5 @@
-COMMON_COPTS = ["-std=c++17", "-Icpp"]
+# COMMON_COPTS = ["-std=c++17", "-Icpp"]
+COMMON_COPTS = ["/std:c++17", "/Icpp"]
 
 cc_binary(
   name = "pca",

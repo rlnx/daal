@@ -567,6 +567,14 @@ def _impl(ctx):
                     ),
                 ] if ctx.attr.compile_flags_cc else []),
             ),
+            flag_set(
+                actions = all_cpp_compile_actions + [ACTION_NAMES.lto_backend],
+                flag_groups = ([
+                    flag_group(
+                        flags = ctx.attr.cxx_flags,
+                    ),
+                ] if ctx.attr.cxx_flags else []),
+            ),
         ],
     )
 
@@ -960,7 +968,14 @@ def _impl(ctx):
         ],
         implies = ["msvc_compile_env", "msvc_link_env"],
     )
+
+    has_configured_linker_path_feature = feature(
+        name = "has_configured_linker_path",
+        enabled = True,
+    )
+
     features = [
+        has_configured_linker_path_feature,
         no_legacy_features_feature,
         nologo_feature,
         no_stripping_feature,

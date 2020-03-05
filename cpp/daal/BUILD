@@ -76,6 +76,8 @@ daal_module(
   deps = [
     ":services",
     ":algorithms",
+    ":threading_tbb",
+    "//build/externals:mklfpk",
   ],
 )
 

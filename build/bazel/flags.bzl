@@ -35,6 +35,12 @@ def get_default_flags(arch_id, os_id, compiler_id):
             arch_flags +
             lnx_cc_common_flags
         )
+    elif os_id == "win":
+        return [
+            # "-nologo",
+            "/EHsc",
+            "/WX",
+        ]
     else:
         return []
 

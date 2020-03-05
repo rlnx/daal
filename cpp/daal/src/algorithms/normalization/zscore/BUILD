@@ -1,15 +1,11 @@
 load("//build/bazel:daal.bzl", "daal_kernel_module")
 
 daal_kernel_module(
-  name = "pca",
+  name = "zscore",
   hdrs = glob(["**/*.h", "**/*.i", "**/*.cl"]),
   srcs = glob(["**/*.cpp"]),
   deps = [
     "//cpp/daal:services",
-    "//cpp/daal/src/algorithms/covariance",
-    "//cpp/daal/src/algorithms/low_order_moments",
-    "//cpp/daal/src/algorithms/svd",
-    "//cpp/daal/src/algorithms/normalization/zscore",
   ],
   visibility = [ "//visibility:public" ],
 )
