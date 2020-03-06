@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <iostream>
 #include "onedal/decomposition/pca/train_types.hpp"
 
 namespace dal {

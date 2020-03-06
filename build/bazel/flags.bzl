@@ -40,6 +40,8 @@ def get_default_flags(arch_id, os_id, compiler_id):
             # "-nologo",
             "/EHsc",
             "/WX",
+            "/DEBUG",
+            "/Z7",
         ]
     else:
         return []

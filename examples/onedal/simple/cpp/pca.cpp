@@ -19,10 +19,14 @@ std::ostream &operator <<(std::ostream& stream, const dal::table& table) {
 }
 
 int main(int argc, char const *argv[]) {
+    // int x;
+    // std::cin >> x;
+
     using namespace dal::decomposition;
 
     constexpr std::int64_t row_count = 5;
     constexpr std::int64_t column_count = 3;
+
 
     const float data[] = {
         1.f,  2.f,  3.f,
@@ -39,7 +43,9 @@ int main(int argc, char const *argv[]) {
         .set_is_deterministic(true);
 
     const auto result = dal::train(pca_desc, data_table);
+    // dal::train(pca_desc, data_table);
 
+    // std::cout << "dd" << std::endl;
     std::cout << "Eigenvectors:" << std::endl
               << result.get_eigenvectors() << std::endl;
 

@@ -8,7 +8,7 @@ _daal_extra_copts = [
 _daal_extra_defines = [
     "DAAL_HIDE_DEPRECATED",
     "DAAL_NOTHROW_EXCEPTIONS",
-    "__DAAL_IMPLEMENTATION", # Valid only for DLL
+    # "__DAAL_IMPLEMENTATION", # Valid only for DLL
 ]
 
 def daal_module(name, copts=[], local_defines=[], **kwargs):

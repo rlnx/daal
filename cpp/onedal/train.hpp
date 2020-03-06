@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <iostream>
 #include "onedal/detail/train_ops.hpp"
 
 namespace dal {
