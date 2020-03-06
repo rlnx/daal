@@ -36,13 +36,17 @@ def _find_tool(repo_ctx, tool_name, mandatory=False):
 
 def _find_tools(repo_ctx, reqs):
     # TODO: Use full compiler path from reqs
+    cl_path = _find_tool(repo_ctx, "cl", mandatory=True)
+    lib_path = repo_ctx.path(str(repo_ctx.path(cl_path).dirname) + "/lib.exe")
+    link_path = repo_ctx.path(str(repo_ctx.path(cl_path).dirname) + "/link.exe")
+    if not lib_path.exists or not link_path.exists:
+        auto_configure_fail("Cannot find lib.exe or link.exe; Make sure MSVC toolchain is installed correctly")
     return struct(
         cc    = _find_tool(repo_ctx, reqs.compiler_id, mandatory=True),
-        lib   = _find_tool(repo_ctx, "lib", mandatory=True),
-        link  = _find_tool(repo_ctx, "link", mandatory=True),
+        lib   = str(lib_path),
+        link  = str(link_path),
         dpcc  = _find_tool(repo_ctx, reqs.compiler_dpcc_id, mandatory=False),
     )
-
 
 def _preapre_builtin_include_directory_paths(repo_ctx, reqs, tools, cxx_opts):
     include_paths = ""
