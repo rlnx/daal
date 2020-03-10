@@ -1,6 +1,8 @@
 load("@onedal//build/bazel/cc:cc_multidef_lib.bzl", "cc_multidef_lib")
 load("@onedal//build/bazel/cc:cc_shared_lib.bzl", "cc_shared_lib")
 
+
+
 def _filter_cpu_cpps(srcs):
   filter_str = '_cpu.cpp'
   filter_len = len(filter_str)
@@ -33,8 +35,7 @@ DAL_DEFAULT_CPUS = [ 'default', 'avx', 'avx2', 'avx512' ]
 def dal_module(name, copts=[], **kwargs):
   native.cc_library(
     name = name,
-    # copts = ['-std=c++17', '-Icpp', '-w'] + copts,
-    copts = ['/std:c++17', '/Icpp', '-w'] + copts,
+    copts = ["-w", "-Icpp"] + copts,
     **kwargs,
   )
 
@@ -66,4 +67,10 @@ def dal_cpu_kernel(name, srcs, cpus=DAL_DEFAULT_CPUS, hdrs=[], deps=[], **kwargs
 def dal_gpu_kernel(**kwargs):
   dal_module(**kwargs)
 
-
+def dal_cc_example(name, **kwargs):
+    native.cc_binary(
+        name = name,
+        srcs = ["{}.cpp".format(name)],
+        includes = ["cpp"],
+        **kwargs,
+    )
