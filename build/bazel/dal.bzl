@@ -72,5 +72,6 @@ def dal_cc_example(name, **kwargs):
         name = name,
         srcs = ["{}.cpp".format(name)],
         includes = ["cpp"],
+        copts = ["-w", "-Icpp"],
         **kwargs,
     )
