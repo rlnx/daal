@@ -16,39 +16,34 @@
 
 #pragma once
 
-#include <cstdint>
+#include "onedal/common.hpp"
 
-namespace dal {
+namespace dal::detail {
 
-using byte_t = std::uint8_t;
+template <typename T> inline data_type make_data_type_impl();
 
-class base {
-public:
-    virtual ~base() = default;
-};
+template<> inline data_type make_data_type_impl<std::int32_t>() {
+    return data_type::int32;
+}
 
-enum class data_type {
-    int32,
-    int64,
-    uint32,
-    uint64,
-    float32,
-    float64
-};
+template<> inline data_type make_data_type_impl<std::int64_t>() {
+    return data_type::int64;
+}
 
-struct range {
-public:
-    range(std::int64_t start = 0, std::int64_t end = -1)
-        : start_idx(start), end_idx(end) {}
+template<> inline data_type make_data_type_impl<std::uint32_t>() {
+    return data_type::uint32;
+}
 
-    std::int64_t get_element_count(std::int64_t max_end_index) const noexcept {
-        // TODO: handle error if (max_end_index + end_idx) < 0
-        std::int64_t final_row = (end_idx < 0) ? max_end_index + end_idx + 1 : end_idx;
-        return (final_row - start_idx - 1) + 1;
-    }
+template<> inline data_type make_data_type_impl<std::uint64_t>() {
+    return data_type::uint64;
+}
 
-    std::int64_t start_idx;
-    std::int64_t end_idx;
-};
+template<> inline data_type make_data_type_impl<float>() {
+    return data_type::float32;
+}
 
-} // namespace dal
+template<> inline data_type make_data_type_impl<double>() {
+    return data_type::float64;
+}
+
+} // namespace dal::detail

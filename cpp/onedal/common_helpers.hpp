@@ -16,39 +16,33 @@
 
 #pragma once
 
-#include <cstdint>
+#include "onedal/common.hpp"
+#include "onedal/detail/common_helpers.hpp"
 
 namespace dal {
-
-using byte_t = std::uint8_t;
-
-class base {
-public:
-    virtual ~base() = default;
-};
-
-enum class data_type {
-    int32,
-    int64,
-    uint32,
-    uint64,
-    float32,
-    float64
-};
-
-struct range {
-public:
-    range(std::int64_t start = 0, std::int64_t end = -1)
-        : start_idx(start), end_idx(end) {}
-
-    std::int64_t get_element_count(std::int64_t max_end_index) const noexcept {
-        // TODO: handle error if (max_end_index + end_idx) < 0
-        std::int64_t final_row = (end_idx < 0) ? max_end_index + end_idx + 1 : end_idx;
-        return (final_row - start_idx - 1) + 1;
+    template <typename T>
+    inline data_type make_data_type() {
+        return detail::make_data_type_impl<std::decay_t<T>>();
     }
 
-    std::int64_t start_idx;
-    std::int64_t end_idx;
-};
-
+    constexpr auto get_data_type_size(data_type t) {
+        if (t == data_type::float32) {
+            return sizeof(float);
+        }
+        else if (t == data_type::float64) {
+            return sizeof(double);
+        }
+        else if (t == data_type::int32) {
+            return sizeof(int32_t);
+        }
+        else if (t == data_type::int64) {
+            return sizeof(int64_t);
+        }
+        else if (t == data_type::uint32) {
+            return sizeof(uint32_t);
+        }
+        else if (t == data_type::uint64) {
+            return sizeof(uint64_t);
+        }
+    }
 } // namespace dal

@@ -16,51 +16,58 @@
 
 #include "onedal/table.hpp"
 
-#include "onedal/array.hpp"
-#include "onedal/table_impl.hpp"
+#include "onedal/detail/homogen_table_impl.hpp"
+#include "onedal/detail/table_impl.hpp"
+
+using std::int64_t;
 
 namespace dal {
 
-table::table(detail::table_impl* impl)
-    : impl_(impl) {}
-
-std::int64_t table::get_row_count() const noexcept {
-    return impl_->get_row_count();
+bool table::is_empty() const noexcept {
+    return impl_ == nullptr;
 }
 
-std::int64_t table::get_column_count() const noexcept {
-    return impl_->get_column_count();
+int64_t table::get_feature_count() const {
+    return impl_->get_feature_count();
 }
 
-template <typename T>
-struct slice_array_deleter {
-    explicit slice_array_deleter(const detail::slice<T>& slice)
-        : slice(slice) {}
-
-    void operator() (T*) const {
-        slice.get_table()->release_slice(slice);
-    }
-
-    detail::slice<T> slice;
-};
-
-template <typename T, access_mode Mode>
-array<T> flatten(const table& t, const range& rows, const range& columns) {
-    auto& table_impl = detail::get_impl<detail::table_impl>(t);
-    auto slice = table_impl.get_slice<T>(rows, columns, Mode);
-    return array<T>{slice.get_data(), slice.get_element_count(), slice_array_deleter<T>(slice)};
+int64_t table::get_observation_count() const {
+    return impl_->get_observation_count();
 }
 
-#define INSTANTIATE(T, M) \
-    template array<T> flatten<T, M>(const table&, const range&, const range&);
+const table_metadata& table::get_metadata() const {
+    return impl_->get_metadata();
+}
 
-INSTANTIATE(float, access_mode::read)
-INSTANTIATE(float, access_mode::write)
+table::table(const detail::table_impl* impl)
+    : impl_(impl)
+{ }
 
-INSTANTIATE(double, access_mode::read)
-INSTANTIATE(double, access_mode::write)
+table::table(const detail::data_storage_iface* storage)
+    : impl_(new detail::table_impl(0, 0, {}))
+{ }
 
-INSTANTIATE(std::int32_t, access_mode::read)
-INSTANTIATE(std::int32_t, access_mode::write)
+homogen_table::homogen_table(int64_t observation_count, int64_t feature_count,
+                             feature_info feature, data_layout layout)
+    : table(new detail::homogen_table_impl(observation_count, feature_count, feature, layout))
+{ }
+
+template <typename DataType>
+homogen_table::homogen_table(int64_t observation_count, int64_t feature_count,
+                             const DataType* data_pointer,
+                             data_layout layout)
+    : table(new detail::homogen_table_impl(observation_count, feature_count, data_pointer, layout))
+{ }
+
+template <typename DataType>
+const DataType* homogen_table::get_data_pointer() const {
+    return detail::get_impl<const detail::homogen_table_impl>(*this).get_data_pointer<DataType>();
+}
+
+template homogen_table::homogen_table(int64_t, int64_t, const float*, data_layout);
+template homogen_table::homogen_table(int64_t, int64_t, const double*, data_layout);
+
+template const float* homogen_table::get_data_pointer() const;
+template const double* homogen_table::get_data_pointer() const;
 
 } // namespace dal

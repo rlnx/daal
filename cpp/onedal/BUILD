@@ -1,5 +1,6 @@
 load("//build/bazel:dal.bzl", "dal_module",
-                              "dal_dpcpp_module")
+                              "dal_dpcpp_module",
+                              "dal_test")
 
 dal_module(
   name = "headers",
@@ -19,9 +20,18 @@ dal_dpcpp_module(
 # TODO: no difference between public and private headers
 dal_module(
   name = "common",
-  srcs = glob(["**/*.cpp"], exclude=["**/*_dp.cpp"]),
+  srcs = glob(["**/*.cpp"], exclude=["**/*_dp.cpp", "**/*_test.cpp"]),
   deps = [
     ":headers",
+  ],
+  visibility = ["//visibility:public"],
+)
+
+dal_test(
+  name = "table",
+  srcs = ["table_test.cpp"],
+  deps = [
+    ":common",
   ],
   visibility = ["//visibility:public"],
 )

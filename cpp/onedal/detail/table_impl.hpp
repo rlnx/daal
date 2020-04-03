@@ -14,15 +14,39 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include "onedal/table_homogen.hpp"
-#include "onedal/table_homogen_impl.hpp"
+#pragma once
 
-namespace dal {
+#include "onedal/common.hpp"
+#include "onedal/detail/data_storage.hpp"
+#include "onedal/table_metadata.hpp"
 
-table_homogen::table_homogen(const array<byte_t>& data,
-                             detail::type_id type_id,
-                             std::int64_t row_count,
-                             std::int64_t column_count)
-    : table(new dal::detail::table_homogen_impl{data, type_id, row_count, column_count}) {}
+namespace dal::detail {
 
-} // namespace dal
+class table_impl : public base {
+public:
+    table_impl(std::int64_t N, std::int64_t p,
+               const table_metadata& meta)
+        : N_(N),
+          p_(p),
+          meta_(meta) { }
+
+    std::int64_t get_feature_count() const noexcept {
+        return p_;
+    }
+
+    std::int64_t get_observation_count() const noexcept {
+        return N_;
+    }
+
+    const table_metadata& get_metadata() const noexcept {
+        return meta_;
+    }
+
+private:
+    std::int64_t N_;
+    std::int64_t p_;
+
+    table_metadata meta_;
+};
+
+} // namespace dal::detail

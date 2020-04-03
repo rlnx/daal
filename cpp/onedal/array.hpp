@@ -32,9 +32,19 @@ class array {
   friend array<Y> const_array_cast(const array<U>&);
 
   public:
-    explicit array(std::int64_t element_count)
+    array()
+        : data_(nullptr),
+          size_(0) {}
+
+    explicit array(std::int64_t element_count, T element = {})
         : data_(new T[element_count]), // TODO: Use custom oneDAL allocator
-          size_(element_count) {}
+          size_(element_count) {
+
+        auto* ptr = data_.get();
+        for (std::int64_t i = 0; i < size_; i++) {
+            ptr[i] = element;
+        }
+    }
 
     explicit array(const detail::shared<T>& data, std::int64_t size)
         : data_(data),

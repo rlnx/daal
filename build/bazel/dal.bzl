@@ -39,6 +39,14 @@ def dal_module(name, copts=[], **kwargs):
     **kwargs,
   )
 
+def dal_test(name, copts=[], deps=[], **kwargs):
+  native.cc_test(
+    name = name,
+    copts = ["-w", "-Icpp"] + copts,
+    deps = ["@gtest//:gtest_main"] + deps,
+    **kwargs,
+  )
+
 def dal_dpcpp_module(name, **kwargs):
   dal_module(name, **kwargs)
 
