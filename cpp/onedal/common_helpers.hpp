@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include "onedal/common.hpp"
 #include "onedal/detail/common_helpers.hpp"
 

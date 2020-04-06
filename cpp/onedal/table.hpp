@@ -16,14 +16,29 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include "onedal/detail/common.hpp"
 #include "onedal/detail/data_storage.hpp"
+#include "onedal/detail/table_impl.hpp"
+#include "onedal/detail/type_traits.hpp"
 #include "onedal/table_metadata.hpp"
 
 namespace dal {
-namespace detail {
-class table_impl;
-} // namespace detail
+
+template <typename T>
+struct is_table_impl {
+    INSTANTIATE_HAS_METHOD(get_feature_count,     std::int64_t,          () const);
+    INSTANTIATE_HAS_METHOD(get_observation_count, std::int64_t,          () const);
+    INSTANTIATE_HAS_METHOD(get_metadata,          const table_metadata&, () const);
+
+    static constexpr bool value = has_method_get_feature_count_v<T> &&
+                                  has_method_get_observation_count_v<T> &&
+                                  has_method_get_metadata_v<T>;
+};
+
+template <typename T>
+inline constexpr bool is_table_impl_v = is_table_impl<T>::value;
 
 class table {
     friend detail::pimpl_accessor;
@@ -33,11 +48,10 @@ public:
     table(const table&) = default;
     table(table&&) = default;
 
-    /*template <typename TableImpl,
-              typename = std::enable_if_t<is_table_impl_v<TableImpl>>>
-    table(TableImpl&& impl) {
-
-    }*/
+    template <typename TableImpl,
+              typename = std::enable_if_t<is_table_impl_v<std::decay_t<TableImpl>>> >
+    table(TableImpl&& impl)
+        : table(new detail::table_impl_wrapper(std::forward<TableImpl>(impl))) { }
 
     table& operator=(const table&) = default;
     table& operator=(table&&) = default;

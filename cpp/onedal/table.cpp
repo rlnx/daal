@@ -14,10 +14,8 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include "onedal/table.hpp"
-
 #include "onedal/detail/homogen_table_impl.hpp"
-#include "onedal/detail/table_impl.hpp"
+#include "onedal/table.hpp"
 
 using std::int64_t;
 

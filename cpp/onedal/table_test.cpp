@@ -25,6 +25,27 @@ TEST(table_test, can_construct_empty_table) {
     ASSERT_TRUE(t.is_empty());
 }
 
+TEST(table_test, can_set_custom_implementation) {
+    struct table_impl {
+        std::int64_t get_feature_count() const noexcept {
+            return 10;
+        }
+
+        std::int64_t get_observation_count() const noexcept {
+            return 1000;
+        }
+
+        const table_metadata& get_metadata() const noexcept {
+            return m;
+        }
+
+        table_metadata m;
+    };
+
+    table t { table_impl{} };
+    ASSERT_FALSE(t.is_empty());
+}
+
 TEST(homogen_table_test, can_construct_empty_table) {
     homogen_table t;
 

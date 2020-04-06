@@ -49,4 +49,13 @@ private:
     table_metadata meta_;
 };
 
+template <typename TableImpl>
+class table_impl_wrapper : public table_impl {
+public:
+    table_impl_wrapper(TableImpl&& obj)
+        : table_impl(obj.get_feature_count(),
+                     obj.get_observation_count(),
+                     obj.get_metadata()) { }
+};
+
 } // namespace dal::detail
