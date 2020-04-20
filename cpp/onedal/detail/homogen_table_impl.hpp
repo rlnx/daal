@@ -40,9 +40,21 @@ public:
         return reinterpret_cast<const DataType*>(data_.get());
     }
 
-    virtual void pull_rows(array<float>& block, const range& rows) const override;
-    virtual void pull_rows(array<double>& block, const range& r) const override { }
-    virtual void pull_rows(array<std::int32_t>& block, const range& r) const override { }
+    virtual void pull_rows(array<float>& a, const range& r) const override {
+        pull_rows_impl(a, r);
+    }
+
+    virtual void pull_rows(array<double>& a, const range& r) const override {
+        pull_rows_impl(a, r);
+    }
+
+    virtual void pull_rows(array<std::int32_t>& a, const range& r) const override {
+        pull_rows_impl(a, r);
+    }
+
+private:
+    template <typename T>
+    void pull_rows_impl(array<T>&, const range&) const;
 
 private:
     shared<byte_t> data_;

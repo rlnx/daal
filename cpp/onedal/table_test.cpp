@@ -47,8 +47,6 @@ TEST(table_test, can_set_custom_implementation) {
         table_metadata m;
     };
 
-    ASSERT_TRUE(is_table_impl_v<table_impl>);
-
     table t { table_impl{} };
     ASSERT_FALSE(t.is_empty());
 }
@@ -59,12 +57,14 @@ TEST(homogen_table_test, can_construct_empty_table) {
     ASSERT_TRUE(t.is_empty());
 }
 
-static float dummy_float_data_ptr[] = { 0.0f };
-static double dummy_double_data_ptr[] = { 0.0 };
-static std::int32_t dummy_int32_data_ptr[] = { 0 };
-
 TEST(homogen_table_test, can_construct_rowmajor_table_3x2) {
-    homogen_table t { 3, 2, dummy_float_data_ptr };
+    float data[] = {
+        1.f, 2.f,
+        3.f, 4.f,
+        5.f, 6.f
+    };
+
+    homogen_table t { 3, 2, data };
 
     ASSERT_FALSE(t.is_empty());
     EXPECT_EQ(3, t.get_row_count());
@@ -79,46 +79,43 @@ TEST(homogen_table_test, can_construct_rowmajor_table_3x2) {
         EXPECT_EQ(data_type::float32, features[i].dtype);
         EXPECT_EQ(feature_type::contiguous, features[i].ftype);
     }
-}
 
-TEST(homogen_table_test, can_construct_rowmajor_int32_table) {
-    homogen_table t { 1000, 10, dummy_int32_data_ptr };
-
-    ASSERT_FALSE(t.is_empty());
-    EXPECT_EQ(1000, t.get_row_count());
-    EXPECT_EQ(10, t.get_column_count());
-
-    EXPECT_EQ(data_layout::row_major, t.get_metadata().layout);
-
-    auto features = t.get_metadata().features;
-
-    EXPECT_EQ(10, features.get_size());
-    for (std::int64_t i = 0; i < features.get_size(); i++) {
-        EXPECT_EQ(data_type::int32, features[i].dtype);
-        EXPECT_EQ(feature_type::nominal, features[i].ftype);
-    }
+    EXPECT_EQ(data, t.get_data_pointer<float>());
+    // TODO: now have no ctor to specify feature_type of the data
 }
 
 TEST(homogen_table_test, can_construct_colmajor_float64_table) {
-    homogen_table t { 1000, 10, dummy_double_data_ptr, data_layout::column_major };
+    double data[] = {
+        1., 2., 3.,
+        4., 5., 6.
+    };
+    homogen_table t { 2, 3, data, data_layout::column_major };
 
     ASSERT_FALSE(t.is_empty());
-    EXPECT_EQ(1000, t.get_row_count());
-    EXPECT_EQ(10, t.get_column_count());
+    EXPECT_EQ(2, t.get_row_count());
+    EXPECT_EQ(3, t.get_column_count());
 
     EXPECT_EQ(data_layout::column_major, t.get_metadata().layout);
 
     auto features = t.get_metadata().features;
 
-    EXPECT_EQ(10, features.get_size());
+    EXPECT_EQ(3, features.get_size());
     for (std::int64_t i = 0; i < features.get_size(); i++) {
         EXPECT_EQ(data_type::float64, features[i].dtype);
         EXPECT_EQ(feature_type::contiguous, features[i].ftype);
     }
+
+    EXPECT_EQ(data, t.get_data_pointer<double>());
 }
 
 TEST(homogen_table_test, can_construct_table_reference) {
-    homogen_table t1 { 3, 2, dummy_float_data_ptr };
+    float data[] = {
+        1.f, 2.f,
+        3.f, 4.f,
+        5.f, 6.f
+    };
+
+    homogen_table t1 { 3, 2, data };
     homogen_table t2 = t1;
 
     ASSERT_FALSE(t1.is_empty());
@@ -127,6 +124,8 @@ TEST(homogen_table_test, can_construct_table_reference) {
     EXPECT_EQ(t1.get_row_count(), t2.get_row_count());
     EXPECT_EQ(t1.get_column_count(), t2.get_column_count());
     EXPECT_EQ(t1.get_data_pointer<float>(), t2.get_data_pointer<float>());
+    EXPECT_EQ(data, t1.get_data_pointer<float>());
+    EXPECT_EQ(data, t2.get_data_pointer<float>());
 
     const auto& m1 = t1.get_metadata();
     const auto& m2 = t2.get_metadata();
@@ -137,7 +136,13 @@ TEST(homogen_table_test, can_construct_table_reference) {
 }
 
 TEST(homogen_table_test, can_construct_table_with_move) {
-    homogen_table t1 { 3, 2, dummy_float_data_ptr };
+    float data[] = {
+        1.f, 2.f,
+        3.f, 4.f,
+        5.f, 6.f
+    };
+
+    homogen_table t1 { 3, 2, data };
     homogen_table t2 = std::move(t1);
 
     ASSERT_TRUE(t1.is_empty());
@@ -153,11 +158,25 @@ TEST(homogen_table_test, can_construct_table_with_move) {
     EXPECT_EQ(2, m2.features.get_size());
     EXPECT_EQ(data_type::float32, m2.features[0].dtype);
     EXPECT_EQ(data_type::float32, m2.features[1].dtype);
+    EXPECT_EQ(data, t2.get_data_pointer<float>());
 }
 
 TEST(homogen_table_test, can_assign_two_table_references) {
-    homogen_table t1 { 3, 2, dummy_float_data_ptr };
-    homogen_table t2 { 4, 3, dummy_int32_data_ptr };
+    float data_float[] = {
+        1.f, 2.f,
+        3.f, 4.f,
+        5.f, 6.f
+    };
+
+    std::int32_t data_int[] = {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9,
+        10, 11, 12
+    };
+
+    homogen_table t1 { 3, 2, data_float };
+    homogen_table t2 { 4, 3, data_int };
 
     t1 = t2;
 
@@ -167,15 +186,30 @@ TEST(homogen_table_test, can_assign_two_table_references) {
     EXPECT_EQ(4, t1.get_row_count());
     EXPECT_EQ(3, t1.get_column_count());
     EXPECT_EQ(data_type::int32, t1.get_metadata().features[0].dtype);
+    EXPECT_EQ(data_int, t1.get_data_pointer<std::int32_t>());
 
     EXPECT_EQ(4, t2.get_row_count());
     EXPECT_EQ(3, t2.get_column_count());
     EXPECT_EQ(data_type::int32, t2.get_metadata().features[0].dtype);
+    EXPECT_EQ(data_int, t2.get_data_pointer<std::int32_t>());
 }
 
 TEST(homogen_table_test, can_move_assigned_table_reference) {
-    homogen_table t1 { 3, 2, dummy_float_data_ptr };
-    homogen_table t2 { 4, 3, dummy_int32_data_ptr };
+    float data_float[] = {
+        1.f, 2.f,
+        3.f, 4.f,
+        5.f, 6.f
+    };
+
+    std::int32_t data_int[] = {
+        1, 2, 3,
+        4, 5, 6,
+        7, 8, 9,
+        10, 11, 12
+    };
+
+    homogen_table t1 { 3, 2, data_float };
+    homogen_table t2 { 4, 3, data_int };
 
     t1 = std::move(t2);
 
@@ -185,39 +219,22 @@ TEST(homogen_table_test, can_move_assigned_table_reference) {
     EXPECT_EQ(4, t1.get_row_count());
     EXPECT_EQ(3, t1.get_column_count());
     EXPECT_EQ(data_type::int32, t1.get_metadata().features[0].dtype);
+    EXPECT_EQ(data_int, t1.get_data_pointer<std::int32_t>());
 }
 
 TEST(homogen_table_test, can_upcast_table) {
-    table t = homogen_table { 3, 2, dummy_float_data_ptr };
+    float data_float[] = {
+        1.f, 2.f,
+        3.f, 4.f,
+        5.f, 6.f
+    };
+
+    table t = homogen_table { 3, 2, data_float };
 
     ASSERT_FALSE(t.is_empty());
     EXPECT_EQ(3, t.get_row_count());
     EXPECT_EQ(2, t.get_column_count());
     EXPECT_EQ(data_type::float32, t.get_metadata().features[0].dtype);
-}
-
-TEST(homogen_table_test, can_set_user_defined_memory) {
-    double data[] = {
-        1.0, 2.0, 3.0,
-        -1.0, -2.0, -3.0
-    };
-
-    homogen_table t { 2, 3, data };
-
-    ASSERT_FALSE(t.is_empty());
-    EXPECT_EQ(2, t.get_row_count());
-    EXPECT_EQ(3, t.get_column_count());
-
-    const auto& meta = t.get_metadata();
-    EXPECT_EQ(data_layout::row_major, meta.layout);
-    EXPECT_EQ(t.get_column_count(), meta.features.get_size());
-
-    for (std::int64_t i = 0; i < meta.features.get_size(); i++) {
-        EXPECT_EQ(data_type::float64, meta.features[i].dtype);
-        EXPECT_EQ(feature_type::contiguous, meta.features[i].ftype);
-    }
-
-    EXPECT_EQ(data, t.get_data_pointer<double>());
 }
 
 TEST(homogen_table_test, can_read_table_data_via_row_accessor) {
@@ -227,10 +244,56 @@ TEST(homogen_table_test, can_read_table_data_via_row_accessor) {
     };
 
     homogen_table t { 2, 3, data };
-    row_accessor<const double> acc { t };
-    array<const double> rows = acc.pull({0, -1});
+    auto rows_block = row_accessor<const double>(t).pull({0, -1});
 
-    // array<double> rows;
-    // acc.get_array({0, 1}, rows);
+    EXPECT_EQ(t.get_row_count() * t.get_column_count(), rows_block.get_size());
+    EXPECT_EQ(data, rows_block.get_pointer());
+    EXPECT_FALSE(rows_block.is_data_owner());
+
+    for (std::int64_t i = 0; i < rows_block.get_size(); i++) {
+        EXPECT_EQ(rows_block[i], data[i]);
+    }
+}
+
+TEST(homogen_table_test, can_read_table_data_via_row_accessor_with_conversion) {
+    float data[] = {
+         1.0f,  2.0f,  3.0f,
+        -1.0f, -2.0f, -3.0f
+    };
+
+    homogen_table t { 2, 3, data };
+    auto rows_block = row_accessor<const double>(t).pull({0, -1});
+
+    EXPECT_EQ(t.get_row_count() * t.get_column_count(), rows_block.get_size());
+    EXPECT_NE((void*)data, (void*)rows_block.get_pointer());
+    EXPECT_TRUE(rows_block.is_data_owner());
+
+    for (std::int64_t i = 0; i < rows_block.get_size(); i++) {
+        EXPECT_DOUBLE_EQ(rows_block[i], static_cast<double>(data[i]));
+    }
+}
+
+TEST(homogen_table_test, can_read_table_data_via_row_accessor_and_array_outside) {
+    float data[] = {
+         1.0f,  2.0f,  3.0f,
+        -1.0f, -2.0f, -3.0f
+    };
+
+    homogen_table t { 2, 3, data };
+    array<float> arr { 10 };
+
+    auto rows_ptr = row_accessor<const float>(t).pull(arr, {0, -1});
+
+    EXPECT_EQ(t.get_row_count() * t.get_column_count(), arr.get_size());
+    EXPECT_EQ(arr.get_capacity(), 10);
+    EXPECT_FALSE(arr.is_data_owner());
+
+    EXPECT_EQ(data, rows_ptr);
+    EXPECT_EQ(data, arr.get_pointer());
+
+    for (std::int64_t i = 0; i < arr.get_size(); i++) {
+        EXPECT_EQ(rows_ptr[i], data[i]);
+        EXPECT_EQ(arr[i], data[i]);
+    }
 }
 

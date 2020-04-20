@@ -19,23 +19,26 @@
 
 namespace dal::detail {
 
-void homogen_table_impl::pull_rows(array<float>& block, const range& rows) const {
+using std::int32_t;
+
+template <typename T>
+void homogen_table_impl::pull_rows_impl(array<T>& block, const range& rows) const {
     // TODO: check range correctness
     // TODO: check array size if non-zero
 
-    const std::int64_t N = get_row_count();
-    const std::int64_t p = get_column_count();
-    const std::int64_t block_size = rows.get_element_count(N)*p;
-    const data_type block_dtype = make_data_type<float>();
+    const int64_t N = get_row_count();
+    const int64_t p = get_column_count();
+    const int64_t block_size = rows.get_element_count(N)*p;
+    const data_type block_dtype = make_data_type<T>();
 
     if (layout_ != data_layout::row_major) {
         throw std::runtime_error("unsupported data layout");
     }
 
     if (block_dtype == finfo_.dtype) {
-        auto row_data = reinterpret_cast<float*>(data_.get());
+        auto row_data = reinterpret_cast<T*>(data_.get());
         auto row_start_pointer = row_data + rows.start_idx * p;
-        block.reset(row_start_pointer, block_size, empty_deleter<float>());
+        block.reset_not_owning(row_start_pointer, block_size);
     } else {
         if (!block.is_data_owner() || block.get_capacity() < block_size) {
             block.reset(block_size);
@@ -47,6 +50,10 @@ void homogen_table_impl::pull_rows(array<float>& block, const range& rows) const
                                 finfo_.dtype, block_dtype, block_size);
     }
 }
+
+template void homogen_table_impl::pull_rows_impl(array<float>&, const range&) const;
+template void homogen_table_impl::pull_rows_impl(array<double>&, const range&) const;
+template void homogen_table_impl::pull_rows_impl(array<int32_t>&, const range&) const;
 
 } // namespace dal::detail
 

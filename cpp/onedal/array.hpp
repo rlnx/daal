@@ -33,85 +33,89 @@ class array {
 
   public:
     array()
-        : data_(nullptr),
+        : data_owned_ptr_(nullptr),
+          data_ptr_(nullptr),
           size_(0),
-          capacity_(0),
-          is_owner_(false) {}
+          capacity_(0) {}
 
     explicit array(std::int64_t element_count, T element = {})
-        : data_(new T[element_count], // TODO: Use custom oneDAL allocator
+        : data_owned_ptr_(new T[element_count], // TODO: Use custom oneDAL allocator
                 [](T* obj){ delete[] obj; }),
+          data_ptr_(data_owned_ptr_.get()),
           size_(element_count),
-          capacity_(element_count),
-          is_owner_(true) {
-
-        auto* ptr = data_.get();
+          capacity_(element_count) {
         for (std::int64_t i = 0; i < size_; i++) {
-            ptr[i] = element;
+            data_ptr_[i] = element;
         }
     }
 
-    explicit array(const detail::shared<T>& data, std::int64_t size, bool is_owner = false)
-        : data_(data),
+    explicit array(const detail::shared<T>& data, std::int64_t size)
+        : data_owned_ptr_(data),
+          data_ptr_(data_owned_ptr_.get()),
           size_(size),
-          capacity_(size),
-          is_owner_(is_owner) {}
+          capacity_(size) {}
 
     template <typename Deleter>
-    explicit array(T* data, std::int64_t size, Deleter&& deleter, bool is_owner = false)
-        : data_(data, std::forward<Deleter>(deleter)),
+    explicit array(T* data, std::int64_t size, Deleter&& deleter)
+        : data_owned_ptr_(data, std::forward<Deleter>(deleter)),
+          data_ptr_(data),
           size_(size),
-          capacity_(size),
-          is_owner_(is_owner) {}
+          capacity_(size) {}
 
     template <typename U>
     array(const array<U>& other)
-        : data_(other.data_),
+        : data_owned_ptr_(other.data_owned_ptr_),
+          data_ptr_(other.data_ptr_),
           size_(other.size_),
-          capacity_(other.capacity_),
-          is_owner_(false) {}
+          capacity_(other.capacity_) {}
 
     T* get_pointer() const {
-        return data_.get();
+        return data_ptr_;
     }
 
-    std::int64_t get_size() const noexcept {
+    std::int64_t get_size() const {
         return size_;
     }
 
-    std::int64_t get_capacity() const noexcept {
+    std::int64_t get_capacity() const {
         return capacity_;
     }
 
-    bool is_data_owner() const noexcept {
-        return is_owner_;
+    bool is_data_owner() const {
+        return data_ptr_ == data_owned_ptr_.get();
     }
 
     void reset() {
-        data_.reset();
+        data_owned_ptr_.reset();
+        data_ptr_ = nullptr;
         size_ = 0;
         capacity_ = 0;
     }
 
     void reset(std::int64_t size) {
-        data_.reset(new T[size], [](T* obj){ delete[] obj; });
+        data_owned_ptr_.reset(new T[size], [](T* obj){ delete[] obj; });
+        data_ptr_ = data_owned_ptr_.get();
         size_ = size;
         capacity_ = size;
-        is_owner_ = true;
     }
 
     template <typename Deleter>
-    void reset(T* data, std::int64_t size, Deleter&& deleter, bool is_owner = false) {
+    void reset(T* data, std::int64_t size, Deleter&& deleter) {
         // TODO: check input parameters
-        data_.reset(data, std::forward<Deleter>(deleter));
+        data_owned_ptr_.reset(data, std::forward<Deleter>(deleter));
+        data_ptr_ = data_owned_ptr_.get();
         size_ = size;
         capacity_ = size;
-        is_owner_ = is_owner;
+    }
+
+    void reset_not_owning(T* data, std::int64_t size) {
+        data_ptr_ = data;
+        size_ = size;
     }
 
     void resize(std::int64_t size) {
         if (size <= 0) {
-            reset();
+            reset_not_owning(nullptr, 0);
         } else if (!is_data_owner() || get_capacity() < size) {
             T* new_data = new T[size];
             std::int64_t min_size = std::min(size, get_size());
@@ -120,7 +124,7 @@ class array {
                 new_data[i] = (*this)[i];
             }
 
-            reset(new_data, size, [](T* obj){ delete[] obj; }, true);
+            reset(new_data, size, [](T* obj){ delete[] obj; });
         } else {
             size_ = size;
         }
@@ -135,10 +139,11 @@ class array {
     }
 
 private:
-    detail::shared<T> data_;
+    detail::shared<T> data_owned_ptr_;
+    T* data_ptr_;
+
     std::int64_t size_;
     std::int64_t capacity_;
-    bool is_owner_;
 };
 
 template <typename T, typename U>

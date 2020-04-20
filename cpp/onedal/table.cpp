@@ -59,5 +59,6 @@ template homogen_table::homogen_table(int64_t, int64_t, const std::int32_t*, dat
 
 template const float* homogen_table::get_data_pointer() const;
 template const double* homogen_table::get_data_pointer() const;
+template const std::int32_t* homogen_table::get_data_pointer() const;
 
 } // namespace dal

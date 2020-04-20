@@ -22,65 +22,67 @@
 #include "onedal/detail/common_helpers.hpp"
 
 namespace dal {
-    template <typename T>
-    constexpr data_type make_data_type() {
-        return detail::make_data_type_impl<std::decay_t<T>>();
+
+template <typename T>
+constexpr data_type make_data_type() {
+    return detail::make_data_type_impl<std::decay_t<T>>();
+}
+
+constexpr auto get_data_type_size(data_type t) {
+    if (t == data_type::float32) {
+        return sizeof(float);
     }
-
-    constexpr auto get_data_type_size(data_type t) {
-        if (t == data_type::float32) {
-            return sizeof(float);
-        }
-        else if (t == data_type::float64) {
-            return sizeof(double);
-        }
-        else if (t == data_type::int32) {
-            return sizeof(int32_t);
-        }
-        else if (t == data_type::int64) {
-            return sizeof(int64_t);
-        }
-        else if (t == data_type::uint32) {
-            return sizeof(uint32_t);
-        }
-        else if (t == data_type::uint64) {
-            return sizeof(uint64_t);
-        }
+    else if (t == data_type::float64) {
+        return sizeof(double);
     }
+    else if (t == data_type::int32) {
+        return sizeof(int32_t);
+    }
+    else if (t == data_type::int64) {
+        return sizeof(int64_t);
+    }
+    else if (t == data_type::uint32) {
+        return sizeof(uint32_t);
+    }
+    else if (t == data_type::uint64) {
+        return sizeof(uint64_t);
+    }
+}
 
-    template <data_type t>
-    struct integral_data_type { };
+template <data_type t>
+struct integral_data_type { };
 
-    template <>
-    struct integral_data_type<data_type::float32> {
-        using type = float;
-    };
+template <>
+struct integral_data_type<data_type::float32> {
+    using type = float;
+};
 
-    template <>
-    struct integral_data_type<data_type::float64> {
-        using type = double;
-    };
+template <>
+struct integral_data_type<data_type::float64> {
+    using type = double;
+};
 
-    template <>
-    struct integral_data_type<data_type::int32> {
-        using type = int32_t;
-    };
+template <>
+struct integral_data_type<data_type::int32> {
+    using type = int32_t;
+};
 
-    template <>
-    struct integral_data_type<data_type::int64> {
-        using type = int64_t;
-    };
+template <>
+struct integral_data_type<data_type::int64> {
+    using type = int64_t;
+};
 
-    template <>
-    struct integral_data_type<data_type::uint32> {
-        using type = uint32_t;
-    };
+template <>
+struct integral_data_type<data_type::uint32> {
+    using type = uint32_t;
+};
 
-    template <>
-    struct integral_data_type<data_type::uint64> {
-        using type = uint64_t;
-    };
+template <>
+struct integral_data_type<data_type::uint64> {
+    using type = uint64_t;
+};
 
-    template <data_type t>
-    using integral_data_type_t = typename integral_data_type<t>::type;
+template <data_type t>
+using integral_data_type_t = typename integral_data_type<t>::type;
+
 } // namespace dal
