@@ -18,25 +18,10 @@
 
 #include "onedal/common.hpp"
 
-namespace dal::detail {
+namespace dal::backend {
 
-template <typename T>
-constexpr auto make_data_type_impl() {
-    if constexpr (std::is_same_v<std::int32_t, T>) {
-        return data_type::int32;
-    } else if constexpr (std::is_same_v<std::int64_t, T>) {
-        return data_type::int64;
-    } else if constexpr (std::is_same_v<std::uint32_t, T>) {
-        return data_type::uint32;
-    } else if constexpr (std::is_same_v<std::uint64_t, T>) {
-        return data_type::uint64;
-    } else if constexpr (std::is_same_v<float, T>) {
-        return data_type::float32;
-    } else if constexpr (std::is_same_v<double, T>) {
-        return data_type::float64;
-    } else {
-        return;
-    }
-}
+void convert_vector(const void* src, void* dst,
+                    data_type src_type, data_type dest_type,
+                    std::int64_t size);
 
-} // namespace dal::detail
+} // namespace dal::backend

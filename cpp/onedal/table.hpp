@@ -18,8 +18,6 @@
 
 #include <type_traits>
 
-#include "onedal/detail/common.hpp"
-#include "onedal/detail/data_storage.hpp"
 #include "onedal/detail/table_impl.hpp"
 #include "onedal/detail/type_traits.hpp"
 #include "onedal/table_metadata.hpp"
@@ -28,13 +26,20 @@ namespace dal {
 
 template <typename T>
 struct is_table_impl {
-    INSTANTIATE_HAS_METHOD(get_feature_count,     std::int64_t,          () const);
-    INSTANTIATE_HAS_METHOD(get_observation_count, std::int64_t,          () const);
-    INSTANTIATE_HAS_METHOD(get_metadata,          const table_metadata&, () const);
+    INSTANTIATE_HAS_METHOD_DEFAULT_CHECKER(get_column_count, std::int64_t, () const);
+    INSTANTIATE_HAS_METHOD_DEFAULT_CHECKER(get_row_count, std::int64_t, () const);
+    INSTANTIATE_HAS_METHOD_DEFAULT_CHECKER(get_metadata, const table_metadata&, () const);
 
-    static constexpr bool value = has_method_get_feature_count_v<T> &&
-                                  has_method_get_observation_count_v<T> &&
-                                  has_method_get_metadata_v<T>;
+    INSTANTIATE_HAS_METHOD_CHECKER(pull_rows, void, (array<float>&, const range&) const, pull_float);
+    INSTANTIATE_HAS_METHOD_CHECKER(pull_rows, void, (array<double>&, const range&) const, pull_double);
+    INSTANTIATE_HAS_METHOD_CHECKER(pull_rows, void, (array<std::int32_t>&, const range&) const, pull_int32);
+
+    static constexpr bool value = has_method_get_column_count_v<T> &&
+                                  has_method_get_row_count_v<T> &&
+                                  has_method_get_metadata_v<T> &&
+                                  has_method_pull_float_v<T> &&
+                                  has_method_pull_double_v<T> &&
+                                  has_method_pull_int32_v<T>;
 };
 
 template <typename T>
@@ -49,7 +54,7 @@ public:
     table(table&&) = default;
 
     template <typename TableImpl,
-              typename = std::enable_if_t<is_table_impl_v<std::decay_t<TableImpl>>> >
+              typename = std::enable_if_t<is_table_impl_v<std::decay_t<TableImpl>>>>
     table(TableImpl&& impl)
         : table(new detail::table_impl_wrapper(std::forward<TableImpl>(impl))) { }
 
@@ -57,16 +62,15 @@ public:
     table& operator=(table&&) = default;
 
     bool is_empty() const noexcept;
-    std::int64_t get_feature_count() const;
-    std::int64_t get_observation_count() const;
+    std::int64_t get_column_count() const;
+    std::int64_t get_row_count() const;
     const table_metadata& get_metadata() const;
 
 protected:
-    table(const detail::table_impl* impl);
-    table(const detail::data_storage_iface* storage);
+    table(detail::table_impl* impl);
 
 private:
-    detail::pimpl<const detail::table_impl> impl_;
+    detail::pimpl<detail::table_impl> impl_;
 };
 
 class homogen_table : public table {
@@ -75,12 +79,8 @@ public:
     homogen_table(const homogen_table&) = default;
     homogen_table(homogen_table&&) = default;
 
-    homogen_table(std::int64_t observation_count, std::int64_t feature_count,
-                  feature_info feature = feature_info{ data_type::float32 },
-                  data_layout layout = data_layout::row_major);
-
     template <typename DataType>
-    homogen_table(std::int64_t observation_count, std::int64_t feature_count,
+    homogen_table(std::int64_t row_count, std::int64_t column_count,
                   const DataType* data_pointer,
                   data_layout layout = data_layout::row_major);
 

@@ -38,7 +38,7 @@ enum class data_type {
 
 struct range {
 public:
-    range(std::int64_t start = 0, std::int64_t end = -1)
+    range(std::int64_t start, std::int64_t end)
         : start_idx(start), end_idx(end) {}
 
     std::int64_t get_element_count(std::int64_t max_end_index) const noexcept {

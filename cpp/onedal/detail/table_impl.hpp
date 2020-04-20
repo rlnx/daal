@@ -17,12 +17,12 @@
 #pragma once
 
 #include "onedal/common.hpp"
-#include "onedal/detail/data_storage.hpp"
+#include "onedal/detail/storage_iface.hpp"
 #include "onedal/table_metadata.hpp"
 
 namespace dal::detail {
 
-class table_impl : public base {
+class table_impl : public dense_storage_iface<storage_readonly> {
 public:
     table_impl(std::int64_t N, std::int64_t p,
                const table_metadata& meta)
@@ -30,11 +30,11 @@ public:
           p_(p),
           meta_(meta) { }
 
-    std::int64_t get_feature_count() const noexcept {
+    std::int64_t get_column_count() const noexcept {
         return p_;
     }
 
-    std::int64_t get_observation_count() const noexcept {
+    std::int64_t get_row_count() const noexcept {
         return N_;
     }
 
@@ -52,10 +52,28 @@ private:
 template <typename TableImpl>
 class table_impl_wrapper : public table_impl {
 public:
+    //TODO: do we want to have a copy-constructor for impl?
+
     table_impl_wrapper(TableImpl&& obj)
-        : table_impl(obj.get_feature_count(),
-                     obj.get_observation_count(),
-                     obj.get_metadata()) { }
+        : table_impl(obj.get_column_count(),
+                     obj.get_row_count(),
+                     obj.get_metadata()),
+          impl_(std::move(obj)) { }
+
+    virtual void pull_rows(array<float>& block, const range& r) const override {
+        impl_.pull_rows(block, r);
+    }
+
+    virtual void pull_rows(array<double>& block, const range& r) const override {
+        impl_.pull_rows(block, r);
+    }
+
+    virtual void pull_rows(array<std::int32_t>& block, const range& r) const override {
+        impl_.pull_rows(block, r);
+    }
+
+private:
+    TableImpl impl_;
 };
 
 } // namespace dal::detail

@@ -23,32 +23,31 @@ namespace dal::detail {
 
 class homogen_table_impl : public table_impl {
 public:
-    homogen_table_impl(std::int64_t N, std::int64_t p, feature_info finfo, data_layout layout)
-        : table_impl(N, p, table_metadata{ p, finfo, layout }) {
-            std::int64_t size = N * p * sizeof(get_data_type_size(finfo.dtype));
-            data_ = shared<const byte_t> {
-                new byte_t[size],
-                [](const byte_t* b) { delete[] b; }
-            };
-        }
-
     template <typename DataType>
     homogen_table_impl(std::int64_t N, std::int64_t p, const DataType* data_pointer, data_layout layout)
         : table_impl(N, p,
-                     table_metadata{ p, feature_info{ make_data_type<DataType>() }, layout }) {
-            data_ = shared<const byte_t> {
-                reinterpret_cast<const byte_t*>(data_pointer),
-                empty_deleter<const byte_t>()
-            };
-        }
+                     table_metadata{ p, feature_info{ make_data_type<DataType>() }, layout }),
+          finfo_(feature_info{ make_data_type<DataType>() }),
+          layout_(layout) {
+        data_ = shared<byte_t> {
+            const_cast<byte_t*>(reinterpret_cast<const byte_t*>(data_pointer)),
+            empty_deleter<byte_t>()
+        };
+    }
 
     template <typename DataType>
-    const DataType* get_data_pointer() const noexcept {
+    const DataType* get_data_pointer() const {
         return reinterpret_cast<const DataType*>(data_.get());
     }
 
+    virtual void pull_rows(array<float>& block, const range& rows) const override;
+    virtual void pull_rows(array<double>& block, const range& r) const override { }
+    virtual void pull_rows(array<std::int32_t>& block, const range& r) const override { }
+
 private:
-    shared<const byte_t> data_;
+    shared<byte_t> data_;
+    feature_info finfo_;
+    data_layout layout_;
 };
 
 } // namespace dal::detail

@@ -23,7 +23,7 @@
 
 namespace dal {
     template <typename T>
-    inline data_type make_data_type() {
+    constexpr data_type make_data_type() {
         return detail::make_data_type_impl<std::decay_t<T>>();
     }
 
@@ -47,4 +47,40 @@ namespace dal {
             return sizeof(uint64_t);
         }
     }
+
+    template <data_type t>
+    struct integral_data_type { };
+
+    template <>
+    struct integral_data_type<data_type::float32> {
+        using type = float;
+    };
+
+    template <>
+    struct integral_data_type<data_type::float64> {
+        using type = double;
+    };
+
+    template <>
+    struct integral_data_type<data_type::int32> {
+        using type = int32_t;
+    };
+
+    template <>
+    struct integral_data_type<data_type::int64> {
+        using type = int64_t;
+    };
+
+    template <>
+    struct integral_data_type<data_type::uint32> {
+        using type = uint32_t;
+    };
+
+    template <>
+    struct integral_data_type<data_type::uint64> {
+        using type = uint64_t;
+    };
+
+    template <data_type t>
+    using integral_data_type_t = typename integral_data_type<t>::type;
 } // namespace dal

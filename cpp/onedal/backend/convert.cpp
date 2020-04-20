@@ -14,24 +14,15 @@
  * limitations under the License.
  *******************************************************************************/
 
-#pragma once
+#include "onedal/backend/convert.hpp"
+#include "onedal/backend/interop/data_conversion.hpp"
 
-#include "onedal/common.hpp"
+namespace dal::backend {
 
-namespace dal::detail {
+void convert_vector(const void* src, void* dst,
+                    data_type src_type, data_type dest_type,
+                    std::int64_t size) {
+    interop::daal_convert(src, dst, src_type, dest_type, size);
+}
 
-class data_storage_iface : public base {
-public:
-};
-
-template <typename StorageImpl>
-class data_storage_wrapper : public data_storage_iface {
-public:
-    data_storage_wrapper(StorageImpl&& impl)
-        : impl_(impl)
-    { }
-private:
-    StorageImpl impl_;
-};
-
-} // namespace dal::detail
+} // namespace dal::backend

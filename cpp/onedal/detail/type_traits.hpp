@@ -18,9 +18,9 @@
 
 namespace dal::detail {
 
-#define INSTANTIATE_HAS_METHOD(method_name, return_value, params)                                       \
+#define INSTANTIATE_HAS_METHOD_CHECKER(method_name, return_value, params, checker_name)                 \
 template<typename _Type>                                                                                \
-struct has_method_##method_name                                                                         \
+struct has_method_##checker_name                                                                        \
 {                                                                                                       \
 private:                                                                                                \
 	using pass = std::true_type;                                                                        \
@@ -36,6 +36,9 @@ public:                                                                         
 };                                                                                                      \
                                                                                                         \
 template <typename _Type>                                                                               \
-static inline constexpr bool has_method_##method_name ##_v = has_method_##method_name<_Type>::value;
+static inline constexpr bool has_method_##checker_name ##_v = has_method_##checker_name<_Type>::value;
+
+#define INSTANTIATE_HAS_METHOD_DEFAULT_CHECKER(method_name, return_value, params)						\
+INSTANTIATE_HAS_METHOD_CHECKER(method_name, return_value, params, method_name)
 
 } // namespace dal::detail
