@@ -50,16 +50,11 @@ class table {
 
 public:
     table() = default;
-    table(const table&) = default;
-    table(table&&) = default;
 
     template <typename TableImpl,
               typename = std::enable_if_t<is_table_impl_v<std::decay_t<TableImpl>>>>
     table(TableImpl&& impl)
         : table(new detail::table_impl_wrapper(std::forward<TableImpl>(impl))) { }
-
-    table& operator=(const table&) = default;
-    table& operator=(table&&) = default;
 
     bool is_empty() const noexcept;
     std::int64_t get_column_count() const;
@@ -76,16 +71,11 @@ private:
 class homogen_table : public table {
 public:
     homogen_table() = default;
-    homogen_table(const homogen_table&) = default;
-    homogen_table(homogen_table&&) = default;
 
     template <typename DataType>
     homogen_table(std::int64_t row_count, std::int64_t column_count,
                   const DataType* data_pointer,
                   data_layout layout = data_layout::row_major);
-
-    homogen_table& operator=(const homogen_table&) = default;
-    homogen_table& operator=(homogen_table&&) = default;
 
     template <typename DataType>
     const DataType* get_data_pointer() const;
