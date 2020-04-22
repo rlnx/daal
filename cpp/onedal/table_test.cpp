@@ -132,7 +132,7 @@ TEST(homogen_table_test, can_construct_table_reference) {
 
     EXPECT_EQ(m1.layout, m2.layout);
     EXPECT_EQ(m1.features.get_size(), m2.features.get_size());
-    EXPECT_EQ(m1.features.get_pointer(), m2.features.get_pointer());
+    EXPECT_EQ(m1.features.get_data(), m2.features.get_data());
 }
 
 TEST(homogen_table_test, can_construct_table_with_move) {
@@ -244,10 +244,10 @@ TEST(homogen_table_test, can_read_table_data_via_row_accessor) {
     };
 
     homogen_table t { 2, 3, data };
-    auto rows_block = row_accessor<const double>(t).pull({0, -1});
+    const auto rows_block = row_accessor<const double>(t).pull({0, -1});
 
     EXPECT_EQ(t.get_row_count() * t.get_column_count(), rows_block.get_size());
-    EXPECT_EQ(data, rows_block.get_pointer());
+    EXPECT_EQ(data, rows_block.get_data());
     EXPECT_FALSE(rows_block.is_data_owner());
 
     for (std::int64_t i = 0; i < rows_block.get_size(); i++) {
@@ -265,7 +265,7 @@ TEST(homogen_table_test, can_read_table_data_via_row_accessor_with_conversion) {
     auto rows_block = row_accessor<const double>(t).pull({0, -1});
 
     EXPECT_EQ(t.get_row_count() * t.get_column_count(), rows_block.get_size());
-    EXPECT_NE((void*)data, (void*)rows_block.get_pointer());
+    EXPECT_NE((void*)data, (void*)rows_block.get_data());
     EXPECT_TRUE(rows_block.is_data_owner());
 
     for (std::int64_t i = 0; i < rows_block.get_size(); i++) {
@@ -289,11 +289,12 @@ TEST(homogen_table_test, can_read_table_data_via_row_accessor_and_array_outside)
     EXPECT_FALSE(arr.is_data_owner());
 
     EXPECT_EQ(data, rows_ptr);
-    EXPECT_EQ(data, arr.get_pointer());
+    EXPECT_EQ(data, arr.get_data());
 
+    auto data_ptr = arr.get_data();
     for (std::int64_t i = 0; i < arr.get_size(); i++) {
         EXPECT_EQ(rows_ptr[i], data[i]);
-        EXPECT_EQ(arr[i], data[i]);
+        EXPECT_EQ(data_ptr[i], data[i]);
     }
 }
 

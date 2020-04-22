@@ -46,15 +46,6 @@ dal_module(
   visibility = ["//visibility:public"],
 )
 
-dal_test(
-  name = "table",
-  srcs = ["table_test.cpp"],
-  deps = [
-    ":common",
-  ],
-  visibility = ["//visibility:public"],
-)
-
 dal_dpcpp_module(
   name = "common_dp",
   hdrs = ["execution_context_dp.hpp"],
@@ -75,6 +66,15 @@ dal_dpcpp_module(
   deps = [
     ":common_dp",
     "//cpp/onedal/decomposition/pca:pca_dp",
+  ],
+  visibility = ["//visibility:public"],
+)
+
+dal_test(
+  name = "common_test",
+  srcs = glob(["*_test.cpp"]),
+  deps = [
+    ":common",
   ],
   visibility = ["//visibility:public"],
 )

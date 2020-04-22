@@ -39,9 +39,13 @@ public:
         return block;
     }
 
-    data_t* pull(array<data_t>& block, const range& rows = {0, -1}) const {
+    auto pull(array<data_t>& block, const range& rows = {0, -1}) const {
         storage_.pull_rows(block, rows);
-        return block.get_pointer();
+        if constexpr (is_readonly) {
+            return block.get_data();
+        } else {
+            return block.get_mutable_data();
+        }
     }
 
     template<typename T = AccessType>

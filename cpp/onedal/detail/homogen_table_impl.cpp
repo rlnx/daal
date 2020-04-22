@@ -46,7 +46,7 @@ void homogen_table_impl::pull_rows_impl(array<T>& block, const range& rows) cons
             block.resize(block_size);
         }
 
-        backend::convert_vector(data_.get(), block.get_pointer(),
+        backend::convert_vector(data_.get(), block.get_mutable_data(),
                                 finfo_.dtype, block_dtype, block_size);
     }
 }
