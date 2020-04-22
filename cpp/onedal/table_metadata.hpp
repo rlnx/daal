@@ -64,7 +64,10 @@ struct feature_info {
 };
 
 struct table_metadata {
-    table_metadata(std::int64_t features_count = 1,
+    table_metadata()
+        : layout(data_layout::row_major) {}
+
+    table_metadata(std::int64_t features_count,
                    feature_info feature = {},
                    data_layout layout = data_layout::row_major)
         : layout(layout),

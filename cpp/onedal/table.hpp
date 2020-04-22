@@ -49,23 +49,28 @@ class table {
     friend detail::pimpl_accessor;
 
 public:
-    table() = default;
+    table();
+    table(const table&) = default;
+    table(table&&);
 
     template <typename TableImpl,
               typename = std::enable_if_t<is_table_impl_v<std::decay_t<TableImpl>>>>
     table(TableImpl&& impl)
         : table(new detail::table_impl_wrapper(std::forward<TableImpl>(impl))) { }
 
-    bool is_empty() const noexcept;
+    table& operator=(const table&) = default;
+    table& operator=(table&&);
+
+    bool has_data() const noexcept;
     std::int64_t get_column_count() const;
     std::int64_t get_row_count() const;
     const table_metadata& get_metadata() const;
 
 protected:
-    table(detail::table_impl* impl);
+    table(detail::table_impl_iface* impl);
 
 private:
-    detail::pimpl<detail::table_impl> impl_;
+    detail::pimpl<detail::table_impl_iface> impl_;
 };
 
 class homogen_table : public table {

@@ -21,12 +21,12 @@
 
 namespace dal::detail {
 
-class homogen_table_impl : public table_impl {
+class homogen_table_impl : public table_impl_base {
 public:
     template <typename DataType>
     homogen_table_impl(std::int64_t N, std::int64_t p, const DataType* data_pointer, data_layout layout)
-        : table_impl(N, p,
-                     table_metadata{ p, feature_info{ make_data_type<DataType>() }, layout }),
+        : table_impl_base(N, p,
+                          table_metadata{ p, feature_info{ make_data_type<DataType>() }, layout }),
           finfo_(feature_info{ make_data_type<DataType>() }),
           layout_(layout) {
         data_ = shared<byte_t> {

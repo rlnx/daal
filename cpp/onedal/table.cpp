@@ -21,8 +21,21 @@ using std::int64_t;
 
 namespace dal {
 
-bool table::is_empty() const noexcept {
-    return impl_ == nullptr;
+table::table()
+    : table(new detail::empty_table_impl()) {}
+
+table::table(table&& t)
+    : impl_(std::move(t.impl_)) {
+    t.impl_ = detail::shared<detail::table_impl_iface>(new detail::empty_table_impl());
+}
+
+table& table::operator=(table&& t) {
+    this->impl_ = std::move(t.impl_);
+    t.impl_ = detail::shared<detail::table_impl_iface>(new detail::empty_table_impl());
+}
+
+bool table::has_data() const noexcept {
+    return impl_->get_column_count() > 0 && impl_->get_row_count() > 0;
 }
 
 int64_t table::get_column_count() const {
@@ -37,16 +50,14 @@ const table_metadata& table::get_metadata() const {
     return impl_->get_metadata();
 }
 
-table::table(detail::table_impl* impl)
-    : impl_(impl)
-{ }
+table::table(detail::table_impl_iface* impl)
+    : impl_(impl) {}
 
 template <typename DataType>
 homogen_table::homogen_table(int64_t row_count, int64_t column_count,
                              const DataType* data_pointer,
                              data_layout layout)
-    : table(new detail::homogen_table_impl(row_count, column_count, data_pointer, layout))
-{ }
+    : table(new detail::homogen_table_impl(row_count, column_count, data_pointer, layout)) {}
 
 template <typename DataType>
 const DataType* homogen_table::get_data_pointer() const {

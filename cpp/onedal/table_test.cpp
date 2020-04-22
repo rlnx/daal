@@ -23,7 +23,11 @@ using namespace dal;
 TEST(table_test, can_construct_empty_table) {
     table t;
 
-    ASSERT_TRUE(t.is_empty());
+    ASSERT_FALSE(t.has_data());
+    EXPECT_EQ(t.get_row_count(), 0);
+    EXPECT_EQ(t.get_column_count(), 0);
+    EXPECT_EQ(t.get_metadata().layout, data_layout::row_major);
+    EXPECT_EQ(t.get_metadata().features.get_size(), 0);
 }
 
 TEST(table_test, can_set_custom_implementation) {
@@ -48,13 +52,17 @@ TEST(table_test, can_set_custom_implementation) {
     };
 
     table t { table_impl{} };
-    ASSERT_FALSE(t.is_empty());
+    ASSERT_TRUE(t.has_data());
 }
 
 TEST(homogen_table_test, can_construct_empty_table) {
     homogen_table t;
 
-    ASSERT_TRUE(t.is_empty());
+    ASSERT_FALSE(t.has_data());
+    EXPECT_EQ(t.get_row_count(), 0);
+    EXPECT_EQ(t.get_column_count(), 0);
+    EXPECT_EQ(t.get_metadata().layout, data_layout::row_major);
+    EXPECT_EQ(t.get_metadata().features.get_size(), 0);
 }
 
 TEST(homogen_table_test, can_construct_rowmajor_table_3x2) {
@@ -66,7 +74,7 @@ TEST(homogen_table_test, can_construct_rowmajor_table_3x2) {
 
     homogen_table t { 3, 2, data };
 
-    ASSERT_FALSE(t.is_empty());
+    ASSERT_TRUE(t.has_data());
     EXPECT_EQ(3, t.get_row_count());
     EXPECT_EQ(2, t.get_column_count());
 
@@ -91,7 +99,7 @@ TEST(homogen_table_test, can_construct_colmajor_float64_table) {
     };
     homogen_table t { 2, 3, data, data_layout::column_major };
 
-    ASSERT_FALSE(t.is_empty());
+    ASSERT_TRUE(t.has_data());
     EXPECT_EQ(2, t.get_row_count());
     EXPECT_EQ(3, t.get_column_count());
 
@@ -118,8 +126,8 @@ TEST(homogen_table_test, can_construct_table_reference) {
     homogen_table t1 { 3, 2, data };
     homogen_table t2 = t1;
 
-    ASSERT_FALSE(t1.is_empty());
-    ASSERT_FALSE(t2.is_empty());
+    ASSERT_TRUE(t1.has_data());
+    ASSERT_TRUE(t2.has_data());
 
     EXPECT_EQ(t1.get_row_count(), t2.get_row_count());
     EXPECT_EQ(t1.get_column_count(), t2.get_column_count());
@@ -145,8 +153,8 @@ TEST(homogen_table_test, can_construct_table_with_move) {
     homogen_table t1 { 3, 2, data };
     homogen_table t2 = std::move(t1);
 
-    ASSERT_TRUE(t1.is_empty());
-    ASSERT_FALSE(t2.is_empty());
+    ASSERT_FALSE(t1.has_data());
+    ASSERT_TRUE(t2.has_data());
 
     EXPECT_EQ(3, t2.get_row_count());
     EXPECT_EQ(2, t2.get_column_count());
@@ -180,8 +188,8 @@ TEST(homogen_table_test, can_assign_two_table_references) {
 
     t1 = t2;
 
-    ASSERT_FALSE(t1.is_empty());
-    ASSERT_FALSE(t2.is_empty());
+    ASSERT_TRUE(t1.has_data());
+    ASSERT_TRUE(t2.has_data());
 
     EXPECT_EQ(4, t1.get_row_count());
     EXPECT_EQ(3, t1.get_column_count());
@@ -213,8 +221,8 @@ TEST(homogen_table_test, can_move_assigned_table_reference) {
 
     t1 = std::move(t2);
 
-    ASSERT_FALSE(t1.is_empty());
-    ASSERT_TRUE(t2.is_empty());
+    ASSERT_TRUE(t1.has_data());
+    ASSERT_FALSE(t2.has_data());
 
     EXPECT_EQ(4, t1.get_row_count());
     EXPECT_EQ(3, t1.get_column_count());
@@ -231,7 +239,7 @@ TEST(homogen_table_test, can_upcast_table) {
 
     table t = homogen_table { 3, 2, data_float };
 
-    ASSERT_FALSE(t.is_empty());
+    ASSERT_TRUE(t.has_data());
     EXPECT_EQ(3, t.get_row_count());
     EXPECT_EQ(2, t.get_column_count());
     EXPECT_EQ(data_type::float32, t.get_metadata().features[0].dtype);
