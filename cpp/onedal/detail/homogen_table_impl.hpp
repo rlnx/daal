@@ -29,9 +29,9 @@ public:
                           table_metadata{ p, feature_info{ make_data_type<DataType>() }, layout }),
           finfo_(feature_info{ make_data_type<DataType>() }),
           layout_(layout) {
-        data_ = shared<byte_t> {
-            const_cast<byte_t*>(reinterpret_cast<const byte_t*>(data_pointer)),
-            empty_deleter<byte_t>()
+        data_ = shared<const byte_t> {
+            reinterpret_cast<const byte_t*>(data_pointer),
+            empty_deleter<const byte_t>()
         };
     }
 
@@ -57,7 +57,7 @@ private:
     void pull_rows_impl(array<T>&, const range&) const;
 
 private:
-    shared<byte_t> data_;
+    shared<const byte_t> data_;
     feature_info finfo_;
     data_layout layout_;
 };

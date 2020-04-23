@@ -36,7 +36,7 @@ void homogen_table_impl::pull_rows_impl(array<T>& block, const range& rows) cons
     }
 
     if (block_dtype == finfo_.dtype) {
-        auto row_data = reinterpret_cast<T*>(data_.get());
+        auto row_data = reinterpret_cast<const T*>(data_.get());
         auto row_start_pointer = row_data + rows.start_idx * p;
         block.reset_not_owning(row_start_pointer, block_size);
     } else {
