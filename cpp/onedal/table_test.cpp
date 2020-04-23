@@ -222,8 +222,6 @@ TEST(homogen_table_test, can_move_assigned_table_reference) {
     t1 = std::move(t2);
 
     ASSERT_TRUE(t1.has_data());
-    ASSERT_FALSE(t2.has_data());
-
     EXPECT_EQ(4, t1.get_row_count());
     EXPECT_EQ(3, t1.get_column_count());
     EXPECT_EQ(data_type::int32, t1.get_metadata().features[0].dtype);

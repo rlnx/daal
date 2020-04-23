@@ -30,8 +30,7 @@ table::table(table&& t)
 }
 
 table& table::operator=(table&& t) {
-    this->impl_ = std::move(t.impl_);
-    t.impl_ = detail::shared<detail::table_impl_iface>(new detail::empty_table_impl());
+    this->impl_.swap(t.impl_);
 }
 
 bool table::has_data() const noexcept {
