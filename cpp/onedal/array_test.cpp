@@ -55,25 +55,6 @@ TEST(array_test, can_construct_array_of_ones) {
     }
 }
 
-TEST(array_test, can_construct_array_from_shared_pointer) {
-    constexpr int64_t size = 10;
-    std::shared_ptr<float> ptr(new float[size]);
-    for (int64_t i = 0; i < size; i++) {
-        ptr.get()[i] = float(i);
-    }
-
-    array arr(ptr, size);
-
-    EXPECT_EQ(arr.get_size(), size);
-    EXPECT_EQ(arr.get_capacity(), size);
-    EXPECT_TRUE(arr.is_data_owner());
-    EXPECT_TRUE(arr.has_mutable_data());
-
-    for (int32_t i = 0; i < arr.get_size(); i++) {
-        EXPECT_FLOAT_EQ(arr[i], ptr.get()[i]);
-    }
-}
-
 TEST(array_test, can_construct_array_from_raw_pointer) {
     constexpr int64_t size = 10;
     auto ptr = new float[size];

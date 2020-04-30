@@ -6,7 +6,7 @@ dal_module(
     hdrs = ["common.hpp", "data_conversion.hpp"],
     deps = [
         "//cpp/daal:core",
-        "//cpp/onedal:common_types"
+        "//cpp/onedal:headers"
     ]
 )
 

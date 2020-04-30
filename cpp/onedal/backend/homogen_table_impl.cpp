@@ -15,9 +15,9 @@
  *******************************************************************************/
 
 #include "onedal/backend/convert.hpp"
-#include "onedal/detail/homogen_table_impl.hpp"
+#include "onedal/backend/homogen_table_impl.hpp"
 
-namespace dal::detail {
+namespace dal::backend {
 
 using std::int32_t;
 
@@ -31,12 +31,12 @@ void homogen_table_impl::pull_rows_impl(array<T>& block, const range& rows) cons
     const int64_t block_size = rows.get_element_count(N)*p;
     const data_type block_dtype = make_data_type<T>();
 
-    if (layout_ != data_layout::row_major) {
+    if (meta_.layout != data_layout::row_major) {
         throw std::runtime_error("unsupported data layout");
     }
 
     if (block_dtype == finfo_.dtype) {
-        auto row_data = reinterpret_cast<const T*>(data_.get());
+        auto row_data = reinterpret_cast<const T*>(data_.get_data());
         auto row_start_pointer = row_data + rows.start_idx * p;
         block.reset_not_owning(row_start_pointer, block_size);
     } else {
@@ -46,7 +46,7 @@ void homogen_table_impl::pull_rows_impl(array<T>& block, const range& rows) cons
             block.resize(block_size);
         }
 
-        backend::convert_vector(data_.get(), block.get_mutable_data(),
+        backend::convert_vector(data_.get_data(), block.get_mutable_data(),
                                 finfo_.dtype, block_dtype, block_size);
     }
 }
@@ -55,5 +55,5 @@ template void homogen_table_impl::pull_rows_impl(array<float>&, const range&) co
 template void homogen_table_impl::pull_rows_impl(array<double>&, const range&) const;
 template void homogen_table_impl::pull_rows_impl(array<int32_t>&, const range&) const;
 
-} // namespace dal::detail
+} // namespace dal::backend
 

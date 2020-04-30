@@ -14,7 +14,8 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include "onedal/detail/homogen_table_impl.hpp"
+#include "onedal/backend/empty_table_impl.hpp"
+#include "onedal/backend/homogen_table_impl.hpp"
 #include "onedal/table.hpp"
 
 using std::int64_t;
@@ -22,11 +23,14 @@ using std::int64_t;
 namespace dal {
 
 table::table()
-    : table(new detail::empty_table_impl()) {}
+    : table(backend::empty_table_impl{}) {}
 
 table::table(table&& t)
     : impl_(std::move(t.impl_)) {
-    t.impl_ = detail::shared<detail::table_impl_iface>(new detail::empty_table_impl());
+    using wrapper = detail::table_impl_wrapper<backend::empty_table_impl>;
+    using wrapper_ptr = detail::shared<wrapper>;
+
+    t.impl_ = wrapper_ptr(new wrapper(backend::empty_table_impl{}));
 }
 
 table& table::operator=(table&& t) {
@@ -49,26 +53,30 @@ const table_metadata& table::get_metadata() const {
     return impl_->get_metadata();
 }
 
-table::table(detail::table_impl_iface* impl)
-    : impl_(impl) {}
+void table::init_impl(detail::table_impl_iface* impl) {
+    impl_ = pimpl { impl };
+}
 
 template <typename DataType>
 homogen_table::homogen_table(int64_t row_count, int64_t column_count,
                              const DataType* data_pointer,
                              data_layout layout)
-    : table(new detail::homogen_table_impl(row_count, column_count, data_pointer, layout)) {}
+    : table(backend::homogen_table_impl(row_count, column_count, data_pointer, layout)) {}
 
 template <typename DataType>
-const DataType* homogen_table::get_data_pointer() const {
-    return detail::get_impl<const detail::homogen_table_impl>(*this).get_data_pointer<DataType>();
+const DataType* homogen_table::get_data() const {
+    using wrapper = detail::table_impl_wrapper<backend::homogen_table_impl>;
+
+    auto& impl = detail::get_impl<wrapper>(*this).get();
+    return impl.get_data<DataType>();
 }
 
 template homogen_table::homogen_table(int64_t, int64_t, const float*, data_layout);
 template homogen_table::homogen_table(int64_t, int64_t, const double*, data_layout);
 template homogen_table::homogen_table(int64_t, int64_t, const std::int32_t*, data_layout);
 
-template const float* homogen_table::get_data_pointer() const;
-template const double* homogen_table::get_data_pointer() const;
-template const std::int32_t* homogen_table::get_data_pointer() const;
+template const float* homogen_table::get_data() const;
+template const double* homogen_table::get_data() const;
+template const std::int32_t* homogen_table::get_data() const;
 
 } // namespace dal

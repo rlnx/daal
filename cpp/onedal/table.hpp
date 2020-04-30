@@ -20,7 +20,6 @@
 
 #include "onedal/detail/table_impl.hpp"
 #include "onedal/detail/type_traits.hpp"
-#include "onedal/table_metadata.hpp"
 
 namespace dal {
 
@@ -48,15 +47,25 @@ inline constexpr bool is_table_impl_v = is_table_impl<T>::value;
 class table {
     friend detail::pimpl_accessor;
 
+protected:
+    using pimpl = detail::pimpl<detail::table_impl_iface>;
+
 public:
     table();
     table(const table&) = default;
     table(table&&);
 
     template <typename TableImpl,
-              typename = std::enable_if_t<is_table_impl_v<std::decay_t<TableImpl>>>>
-    table(TableImpl&& impl)
-        : table(new detail::table_impl_wrapper(std::forward<TableImpl>(impl))) { }
+              typename = std::enable_if_t<!std::is_base_of_v<table, std::decay_t<TableImpl>>>>
+    table(TableImpl&& impl) {
+        using impl_t = std::decay_t<TableImpl>;
+
+        if constexpr (is_table_impl_v<impl_t>) {
+            init_impl(new detail::table_impl_wrapper(std::forward<TableImpl>(impl)));
+        } else {
+            static_assert("implementation does not meet requirements");
+        }
+    }
 
     table& operator=(const table&) = default;
     table& operator=(table&&);
@@ -67,13 +76,18 @@ public:
     const table_metadata& get_metadata() const;
 
 protected:
-    table(detail::table_impl_iface* impl);
+    table(const pimpl& impl)
+        : impl_(impl) {}
+
+    void init_impl(pimpl::element_type* impl);
 
 private:
-    detail::pimpl<detail::table_impl_iface> impl_;
+    pimpl impl_;
 };
 
 class homogen_table : public table {
+    friend detail::pimpl_accessor;
+
 public:
     homogen_table() = default;
 
@@ -83,7 +97,11 @@ public:
                   data_layout layout = data_layout::row_major);
 
     template <typename DataType>
-    const DataType* get_data_pointer() const;
+    const DataType* get_data() const;
+
+private:
+    homogen_table(const pimpl& impl)
+        : table(impl) {}
 };
 
 } // namespace dal

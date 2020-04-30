@@ -50,12 +50,6 @@ class array {
         }
     }
 
-    explicit array(const detail::shared<T>& data, std::int64_t size)
-        : data_owned_ptr_(data),
-          data_(data_owned_ptr_.get()),
-          size_(size),
-          capacity_(size) {}
-
     template <typename Deleter>
     explicit array(T* data, std::int64_t size, Deleter&& deleter)
         : data_owned_ptr_(data, std::forward<Deleter>(deleter)),

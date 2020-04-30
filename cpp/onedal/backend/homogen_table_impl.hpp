@@ -17,39 +17,61 @@
 #pragma once
 
 #include "onedal/common_helpers.hpp"
-#include "onedal/detail/table_impl.hpp"
+#include "onedal/table_metadata.hpp"
 
-namespace dal::detail {
+namespace dal::backend {
 
-class homogen_table_impl : public table_impl_base {
+class homogen_table_impl {
 public:
     template <typename DataType>
     homogen_table_impl(std::int64_t N, std::int64_t p, const DataType* data_pointer, data_layout layout)
-        : table_impl_base(N, p,
-                          table_metadata{ p, feature_info{ make_data_type<DataType>() }, layout }),
+        : row_count_(N),
+          column_count_(p),
           finfo_(feature_info{ make_data_type<DataType>() }),
-          layout_(layout) {
-        data_ = shared<const byte_t> {
-            reinterpret_cast<const byte_t*>(data_pointer),
-            empty_deleter<const byte_t>()
-        };
+          meta_(table_metadata{ p, finfo_, layout }) {
+        data_.reset_not_owning(reinterpret_cast<const byte_t*>(data_pointer),
+                               N * p * sizeof(DataType));
+    }
+
+    std::int64_t get_column_count() const {
+        return column_count_;
+    }
+
+    std::int64_t get_row_count() const {
+        return row_count_;
+    }
+
+    const table_metadata& get_metadata() const {
+        return meta_;
     }
 
     template <typename DataType>
-    const DataType* get_data_pointer() const {
-        return reinterpret_cast<const DataType*>(data_.get());
+    const DataType* get_data() const {
+        return reinterpret_cast<const DataType*>(data_.get_data());
     }
 
-    virtual void pull_rows(array<float>& a, const range& r) const override {
+    void pull_rows(array<float>& a, const range& r) const {
         pull_rows_impl(a, r);
     }
 
-    virtual void pull_rows(array<double>& a, const range& r) const override {
+    void pull_rows(array<double>& a, const range& r) const {
         pull_rows_impl(a, r);
     }
 
-    virtual void pull_rows(array<std::int32_t>& a, const range& r) const override {
+    void pull_rows(array<std::int32_t>& a, const range& r) const {
         pull_rows_impl(a, r);
+    }
+
+    void push_back_rows(const array<float>&, const range&) {
+
+    }
+
+    void push_back_rows(const array<double>&, const range&) {
+
+    }
+
+    void push_back_rows(const array<std::int32_t>&, const range&) {
+
     }
 
 private:
@@ -57,9 +79,11 @@ private:
     void pull_rows_impl(array<T>&, const range&) const;
 
 private:
-    shared<const byte_t> data_;
+    std::int64_t row_count_;
+    std::int64_t column_count_;
     feature_info finfo_;
-    data_layout layout_;
+    table_metadata meta_;
+    array<byte_t> data_;
 };
 
-} // namespace dal::detail
+} // namespace dal::backend

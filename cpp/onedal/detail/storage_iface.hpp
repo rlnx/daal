@@ -22,15 +22,15 @@
 
 namespace dal::detail {
 
-struct storage_readonly { };
-struct storage_writeonly { };
-struct storage_readwrite { };
+struct storage_readable {};
+struct storage_writable {};
+struct storage_readable_writable {};
 
 template <typename StorageType>
-class dense_storage_iface { };
+class dense_storage_iface {};
 
 template <>
-class dense_storage_iface<storage_readonly> : public base {
+class dense_storage_iface<storage_readable> : public base {
 public:
     virtual void pull_rows(array<float>&, const range&) const = 0;
     virtual void pull_rows(array<double>&, const range&) const = 0;
@@ -38,7 +38,7 @@ public:
 };
 
 template <>
-class dense_storage_iface<storage_writeonly> : public base {
+class dense_storage_iface<storage_writable> : public base {
 public:
     virtual void push_back_rows(const array<float>&, const range&) = 0;
     virtual void push_back_rows(const array<double>&, const range&) = 0;
@@ -46,17 +46,18 @@ public:
 };
 
 template <>
-class dense_storage_iface<storage_readwrite> : public dense_storage_iface<storage_readonly>,
-                                               public dense_storage_iface<storage_writeonly> { };
+class dense_storage_iface<storage_readable_writable> :
+    public dense_storage_iface<storage_readable>,
+    public dense_storage_iface<storage_writable> {};
 
 template <typename AccessType>
 struct get_dense_storage_iface {
-    using type = dense_storage_iface<storage_readwrite>;
+    using type = dense_storage_iface<storage_readable_writable>;
 };
 
 template <typename AccessType>
 struct get_dense_storage_iface<const AccessType> {
-    using type = dense_storage_iface<storage_readonly>;
+    using type = dense_storage_iface<storage_readable>;
 };
 
 template <typename AccessType>
