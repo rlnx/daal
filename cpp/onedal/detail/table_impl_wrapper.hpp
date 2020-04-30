@@ -69,5 +69,60 @@ public:
 private:
     TableImpl impl_;
 };
+
+// TODO: avoid duplication inside wrappers?
+template <typename Impl>
+class homogen_table_impl_wrapper : public homogen_table_impl_iface {
+public:
+    homogen_table_impl_wrapper(Impl&& obj)
+        : impl_(std::move(obj)) { }
+
+    virtual std::int64_t get_column_count() const override {
+        return impl_.get_column_count();
+    }
+
+    virtual std::int64_t get_row_count() const override {
+        return impl_.get_row_count();
+    }
+
+    virtual const table_metadata& get_metadata() const override {
+        return impl_.get_metadata();
+    }
+
+    virtual void pull_rows(array<float>& block, const range& r) const override {
+        impl_.pull_rows(block, r);
+    }
+
+    virtual void pull_rows(array<double>& block, const range& r) const override {
+        impl_.pull_rows(block, r);
+    }
+
+    virtual void pull_rows(array<std::int32_t>& block, const range& r) const override {
+        impl_.pull_rows(block, r);
+    }
+
+    virtual void push_back_rows(const array<float>& block, const range& r) override {
+        impl_.push_back_rows(block, r);
+    }
+
+    virtual void push_back_rows(const array<double>& block, const range& r) override {
+        impl_.push_back_rows(block, r);
+    }
+
+    virtual void push_back_rows(const array<std::int32_t>& block, const range& r) override {
+        impl_.push_back_rows(block, r);
+    }
+
+    virtual const void* get_data() const override {
+        return impl_.get_data();
+    }
+
+    Impl& get() {
+        return impl_;
+    }
+
+private:
+    Impl impl_;
+};
     
 } // namespace dal::detail

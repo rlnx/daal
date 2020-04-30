@@ -40,7 +40,7 @@ TEST(table_builder_test, can_modify_table) {
         row_accessor<float> acc { b };
 
         auto arr = acc.pull({2, -1});
-        EXPECT_EQ(arr.get_size(), 2);
+        ASSERT_EQ(arr.get_size(), 2);
         arr.unique();
         arr[0] = data2[2*2];
         arr[1] = data2[2*2+1];
@@ -53,6 +53,6 @@ TEST(table_builder_test, can_modify_table) {
     auto arr = acc.pull();
 
     for(std::int64_t i = 0; i < arr.get_size(); i++) {
-        EXPECT_FLOAT_EQ(arr.get_data()[i], data2[i]);
+        ASSERT_FLOAT_EQ(arr.get_data()[i], data2[i]);
     }
 }

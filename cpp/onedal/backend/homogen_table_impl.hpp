@@ -45,9 +45,8 @@ public:
         return meta_;
     }
 
-    template <typename DataType>
-    const DataType* get_data() const {
-        return reinterpret_cast<const DataType*>(data_.get_data());
+    const void* get_data() const {
+        return data_.get_data();
     }
 
     void pull_rows(array<float>& a, const range& r) const {

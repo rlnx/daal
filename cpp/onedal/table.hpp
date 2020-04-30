@@ -34,16 +34,10 @@ public:
     table(const table&) = default;
     table(table&&);
 
-    template <typename TableImpl,
-              typename = std::enable_if_t<!std::is_base_of_v<table, std::decay_t<TableImpl>>>>
-    table(TableImpl&& impl) {
-        using impl_t = std::decay_t<TableImpl>;
-
-        if constexpr (is_table_impl_v<impl_t>) {
-            init_impl(new detail::table_impl_wrapper(std::forward<TableImpl>(impl)));
-        } else {
-            static_assert("implementation does not meet requirements");
-        }
+    template <typename Impl,
+              typename = std::enable_if_t<is_table_impl_v<std::decay_t<Impl>>>>
+    table(Impl&& impl) {
+        init_impl(new detail::table_impl_wrapper(std::forward<Impl>(impl)));
     }
 
     table& operator=(const table&) = default;
@@ -70,13 +64,25 @@ class homogen_table : public table {
 public:
     homogen_table() = default;
 
+    template <typename Impl,
+              typename = std::enable_if_t<is_homogen_table_impl_v<std::decay_t<Impl>>>>
+    homogen_table(Impl&& impl) {
+        // TODO: usage of protected method of base class: a point to break inheritance?
+        init_impl(new detail::homogen_table_impl_wrapper(std::forward<Impl>(impl)));
+    }
+
     template <typename DataType>
     homogen_table(std::int64_t row_count, std::int64_t column_count,
                   const DataType* data_pointer,
                   data_layout layout = data_layout::row_major);
 
     template <typename DataType>
-    const DataType* get_data() const;
+    const DataType* get_data() const {
+        using impl_t = detail::homogen_table_impl_iface;
+
+        auto& impl = detail::get_impl<impl_t>(*this);
+        return reinterpret_cast<const DataType*>(impl.get_data());
+    }
 
 private:
     homogen_table(const pimpl& impl)

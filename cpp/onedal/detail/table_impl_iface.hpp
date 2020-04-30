@@ -30,7 +30,7 @@ public:
 
 class homogen_table_impl_iface : public table_impl_iface {
 public:
-    virtual void* get_data() const = 0;
+    virtual const void* get_data() const = 0;
 };
 
 } // namespace dal::detail

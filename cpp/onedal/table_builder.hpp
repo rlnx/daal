@@ -27,13 +27,7 @@ class table_builder {
 public:
     template <typename BuilderImpl>
     table_builder(BuilderImpl&& impl) {
-        using impl_t = std::decay_t<BuilderImpl>;
-
-        if constexpr (/*is_table_builder_impl_v<impl_t>*/true) {
-            init_impl(new detail::table_builder_impl_wrapper(std::forward<BuilderImpl>(impl)));
-        } else {
-            static_assert("implementation does not meet requirements");
-        }
+        init_impl(new detail::table_builder_impl_wrapper(std::forward<BuilderImpl>(impl)));
     }
 
     table_builder(table&&);
