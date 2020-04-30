@@ -59,8 +59,7 @@ public:
 
     homogen_table_builder(homogen_table&&);
 
-    //  TODO:
-    // homogen_table build() const;
+    homogen_table build() const;
 };
 
 } // namespace dal

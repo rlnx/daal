@@ -56,3 +56,30 @@ TEST(table_builder_test, can_modify_table) {
         ASSERT_FLOAT_EQ(arr.get_data()[i], data2[i]);
     }
 }
+
+TEST(homogen_table_builder_test, can_construct_table) {
+    float data[] = {
+        1.f, 2.f,
+        3.f, 4.f,
+        5.f, 6.f
+    };
+
+    auto t = homogen_table_builder(3, 2, data)
+        .build();
+
+    ASSERT_TRUE(t.has_data());
+    ASSERT_EQ(3, t.get_row_count());
+    ASSERT_EQ(2, t.get_column_count());
+
+    ASSERT_EQ(data_layout::row_major, t.get_metadata().layout);
+
+    auto features = t.get_metadata().features;
+
+    ASSERT_EQ(2, features.get_size());
+    for (std::int64_t i = 0; i < features.get_size(); i++) {
+        ASSERT_EQ(data_type::float32, features[i].dtype);
+        ASSERT_EQ(feature_type::contiguous, features[i].ftype);
+    }
+
+    ASSERT_EQ(data, t.get_data<float>());
+}

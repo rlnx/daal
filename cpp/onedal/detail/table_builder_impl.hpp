@@ -42,6 +42,10 @@ public:
         return impl_.get_storage();
     }
 
+    Impl& get() {
+        return impl_;
+    }
+
 private:
     Impl impl_;
 };

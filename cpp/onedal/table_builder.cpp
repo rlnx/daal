@@ -41,11 +41,14 @@ private:
 
 class homogen_table_builder_impl {
     using dense_rw_storage = detail::table_builder_impl_iface::dense_rw_storage;
-    using table_impl = detail::table_impl_iface;
+    using table_impl_t = detail::homogen_table_impl_iface;
+    using pimpl_t = detail::pimpl<table_impl_t>;
 
 public:
-    homogen_table_builder_impl(homogen_table&& t)
-        : table_impl_(detail::pimpl_accessor().get_pimpl(std::move(t))) {}
+    homogen_table_builder_impl(homogen_table&& t) {
+        auto& base_pimpl = detail::pimpl_accessor().get_pimpl(std::move(t));
+        table_impl_ = std::static_pointer_cast<table_impl_t>(base_pimpl);
+    }
 
     auto build_table() {
         return detail::pimpl_accessor().make_from_pimpl<homogen_table>(table_impl_);
@@ -56,7 +59,7 @@ public:
     }
 
 private:
-    detail::pimpl<table_impl> table_impl_;
+    pimpl_t table_impl_;
 };
 
 } // namespace backend
@@ -72,6 +75,14 @@ homogen_table_builder::homogen_table_builder(std::int64_t row_count, std::int64_
 
 homogen_table_builder::homogen_table_builder(homogen_table&& t)
     : table_builder(backend::homogen_table_builder_impl{ std::move(t) }) {}
+
+homogen_table homogen_table_builder::build() const {
+    using impl_t = backend::homogen_table_builder_impl;
+    using wrapper_t = detail::table_builder_impl_wrapper<impl_t>;
+
+    auto& impl = detail::get_impl<wrapper_t>(*this).get();
+    return impl.build_table();
+}
 
 template homogen_table_builder::homogen_table_builder(std::int64_t, std::int64_t, const float*, data_layout);
 template homogen_table_builder::homogen_table_builder(std::int64_t, std::int64_t, const double*, data_layout);

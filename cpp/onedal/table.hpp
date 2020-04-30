@@ -25,8 +25,6 @@ namespace dal {
 
 class table {
     friend detail::pimpl_accessor;
-
-protected:
     using pimpl = detail::pimpl<detail::table_impl_iface>;
 
 public:
@@ -60,6 +58,7 @@ private:
 
 class homogen_table : public table {
     friend detail::pimpl_accessor;
+    using pimpl = detail::pimpl<detail::homogen_table_impl_iface>;
 
 public:
     homogen_table() = default;
