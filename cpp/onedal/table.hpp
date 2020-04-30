@@ -19,30 +19,9 @@
 #include <type_traits>
 
 #include "onedal/detail/table_impl.hpp"
-#include "onedal/detail/type_traits.hpp"
+#include "onedal/type_traits.hpp"
 
 namespace dal {
-
-template <typename T>
-struct is_table_impl {
-    INSTANTIATE_HAS_METHOD_DEFAULT_CHECKER(get_column_count, std::int64_t, () const);
-    INSTANTIATE_HAS_METHOD_DEFAULT_CHECKER(get_row_count, std::int64_t, () const);
-    INSTANTIATE_HAS_METHOD_DEFAULT_CHECKER(get_metadata, const table_metadata&, () const);
-
-    INSTANTIATE_HAS_METHOD_CHECKER(pull_rows, void, (array<float>&, const range&) const, pull_float);
-    INSTANTIATE_HAS_METHOD_CHECKER(pull_rows, void, (array<double>&, const range&) const, pull_double);
-    INSTANTIATE_HAS_METHOD_CHECKER(pull_rows, void, (array<std::int32_t>&, const range&) const, pull_int32);
-
-    static constexpr bool value = has_method_get_column_count_v<T> &&
-                                  has_method_get_row_count_v<T> &&
-                                  has_method_get_metadata_v<T> &&
-                                  has_method_pull_float_v<T> &&
-                                  has_method_pull_double_v<T> &&
-                                  has_method_pull_int32_v<T>;
-};
-
-template <typename T>
-inline constexpr bool is_table_impl_v = is_table_impl<T>::value;
 
 class table {
     friend detail::pimpl_accessor;
