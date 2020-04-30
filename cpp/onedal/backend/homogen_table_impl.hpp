@@ -62,21 +62,24 @@ public:
         pull_rows_impl(a, r);
     }
 
-    void push_back_rows(const array<float>&, const range&) {
-
+    void push_back_rows(const array<float>& a, const range& r) {
+        push_rows_impl(a, r);
     }
 
-    void push_back_rows(const array<double>&, const range&) {
-
+    void push_back_rows(const array<double>& a, const range& r) {
+        push_rows_impl(a, r);
     }
 
-    void push_back_rows(const array<std::int32_t>&, const range&) {
-
+    void push_back_rows(const array<std::int32_t>& a, const range& r) {
+        push_rows_impl(a, r);
     }
 
 private:
     template <typename T>
     void pull_rows_impl(array<T>&, const range&) const;
+
+    template <typename T>
+    void push_rows_impl(const array<T>&, const range&);
 
 private:
     std::int64_t row_count_;

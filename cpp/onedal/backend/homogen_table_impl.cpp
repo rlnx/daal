@@ -17,6 +17,8 @@
 #include "onedal/backend/convert.hpp"
 #include "onedal/backend/homogen_table_impl.hpp"
 
+#include <cstring>
+
 namespace dal::backend {
 
 using std::int32_t;
@@ -46,14 +48,53 @@ void homogen_table_impl::pull_rows_impl(array<T>& block, const range& rows) cons
             block.resize(block_size);
         }
 
-        backend::convert_vector(data_.get_data(), block.get_mutable_data(),
+        auto type_size = get_data_type_size(finfo_.dtype);
+        auto row_start_pointer = data_.get_data() + rows.start_idx * p * type_size; 
+        backend::convert_vector(row_start_pointer, block.get_mutable_data(),
                                 finfo_.dtype, block_dtype, block_size);
+    }
+}
+
+template <typename T>
+void homogen_table_impl::push_rows_impl(const array<T>& block, const range& rows) {
+    // TODO: check range correctness
+    // TODO: check array size if non-zero
+
+    const int64_t N = get_row_count();
+    const int64_t p = get_column_count();
+    const int64_t block_size = rows.get_element_count(N)*p;
+    const data_type block_dtype = make_data_type<T>();
+
+    if (meta_.layout != data_layout::row_major) {
+        throw std::runtime_error("unsupported data layout");
+    }
+
+    data_.unique();
+    if (block_dtype == finfo_.dtype) {
+        auto row_data = reinterpret_cast<T*>(data_.get_mutable_data());
+        auto row_start_pointer = row_data + rows.start_idx * p;
+
+        if (row_start_pointer == block.get_data()) {
+            return;
+        } else {
+            std::memcpy(row_start_pointer, block.get_data(), block_size * sizeof(T));
+        }
+    } else {
+        auto type_size = get_data_type_size(finfo_.dtype);
+        auto row_start_pointer = data_.get_mutable_data() + rows.start_idx * p * type_size; 
+
+        backend::convert_vector(block.get_data(), row_start_pointer,
+                                block_dtype, finfo_.dtype, block_size);
     }
 }
 
 template void homogen_table_impl::pull_rows_impl(array<float>&, const range&) const;
 template void homogen_table_impl::pull_rows_impl(array<double>&, const range&) const;
 template void homogen_table_impl::pull_rows_impl(array<int32_t>&, const range&) const;
+
+template void homogen_table_impl::push_rows_impl(const array<float>&, const range&);
+template void homogen_table_impl::push_rows_impl(const array<double>&, const range&);
+template void homogen_table_impl::push_rows_impl(const array<int32_t>&, const range&);
 
 } // namespace dal::backend
 

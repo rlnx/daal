@@ -58,13 +58,15 @@ public:
                           const DataType* data_pointer,
                           data_layout layout = data_layout::row_major);
 
-    homogen_table_builder(std::int64_t row_count, std::int64_t column_count,
-                          const void* data_pointer, const feature_info& finfo,
-                          data_layout layout = data_layout::row_major);
+    // TODO:
+    // homogen_table_builder(std::int64_t row_count, std::int64_t column_count,
+    //                       const void* data_pointer, const feature_info& finfo,
+    //                       data_layout layout = data_layout::row_major);
 
     homogen_table_builder(homogen_table&&);
 
-    homogen_table get_table() const;
+    //  TODO:
+    // homogen_table build() const;
 };
 
 } // namespace dal

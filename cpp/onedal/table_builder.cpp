@@ -64,4 +64,17 @@ private:
 table_builder::table_builder(table&& t)
     : table_builder(backend::table_builder_impl{ std::move(t) }) {}
 
+template <typename DataType>
+homogen_table_builder::homogen_table_builder(std::int64_t row_count, std::int64_t column_count,
+                                             const DataType* data_pointer,
+                                             data_layout layout)
+    : homogen_table_builder(homogen_table{ row_count, column_count, data_pointer, layout }) {}
+
+homogen_table_builder::homogen_table_builder(homogen_table&& t)
+    : table_builder(backend::homogen_table_builder_impl{ std::move(t) }) {}
+
+template homogen_table_builder::homogen_table_builder(std::int64_t, std::int64_t, const float*, data_layout);
+template homogen_table_builder::homogen_table_builder(std::int64_t, std::int64_t, const double*, data_layout);
+template homogen_table_builder::homogen_table_builder(std::int64_t, std::int64_t, const std::int32_t*, data_layout);
+
 } // namespace dal

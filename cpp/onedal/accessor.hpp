@@ -15,8 +15,7 @@
  *******************************************************************************/
 #pragma once
 
-#include "onedal/array.hpp"
-#include "onedal/table.hpp"
+#include "onedal/table_builder.hpp"
 
 namespace dal {
 
@@ -31,7 +30,10 @@ public:
 
     template <typename T = AccessType>
     row_accessor(const table& t, std::enable_if_t<sizeof(T) && is_readonly>* = nullptr)
-        : storage_(detail::get_impl<storage_t>(t)) { }
+        : storage_(detail::get_impl<storage_t>(t)) {}
+
+    row_accessor(const table_builder& b)
+        : storage_(detail::get_impl<detail::table_builder_impl_iface>(b).get_storage()) {}
 
     array<data_t> pull(const range& rows = {0, -1}) const {
         array<data_t> block;
@@ -51,7 +53,7 @@ public:
     template<typename T = AccessType>
     std::enable_if_t<sizeof(T) && !is_readonly> push(const array<data_t>& block,
                                                      const range& rows = {0, -1}) {
-        storage_.push_rows(block, rows);
+        storage_.push_back_rows(block, rows);
     }
 
 private:
