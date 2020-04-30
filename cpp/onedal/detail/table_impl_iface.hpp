@@ -16,34 +16,21 @@
 
 #pragma once
 
-#include "onedal/table.hpp"
+#include "onedal/detail/storage_iface.hpp"
+#include "onedal/table_metadata.hpp"
 
 namespace dal::detail {
 
-class table_builder_impl_iface : public base {
+class table_impl_iface : public dense_storage_iface<storage_readable_writable> {
 public:
-    using dense_rw_storage = detail::dense_storage_iface<storage_readable_writable>;
-public:
-    virtual table build_table() = 0;
-    virtual dense_rw_storage& get_storage() = 0;
+    virtual std::int64_t get_column_count() const = 0;
+    virtual std::int64_t get_row_count() const = 0;
+    virtual const table_metadata& get_metadata() const = 0;
 };
 
-template <typename Impl>
-class table_builder_impl_wrapper : public table_builder_impl_iface {
+class homogen_table_impl_iface : public table_impl_iface {
 public:
-    table_builder_impl_wrapper(Impl&& obj)
-        : impl_(std::forward<Impl>(obj)) {}
-
-    virtual table build_table() override {
-        return impl_.build_table();
-    }
-
-    virtual dense_rw_storage& get_storage() override {
-        return impl_.get_storage();
-    }
-
-private:
-    Impl impl_;
+    virtual void* get_data() const = 0;
 };
 
 } // namespace dal::detail

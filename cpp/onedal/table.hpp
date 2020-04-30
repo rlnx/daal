@@ -18,7 +18,7 @@
 
 #include <type_traits>
 
-#include "onedal/detail/table_impl.hpp"
+#include "onedal/detail/table_impl_wrapper.hpp"
 #include "onedal/type_traits.hpp"
 
 namespace dal {

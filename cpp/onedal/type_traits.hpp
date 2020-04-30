@@ -50,5 +50,15 @@ struct is_table_impl {
 
 template <typename T>
 inline constexpr bool is_table_impl_v = is_table_impl<T>::value;
+
+template <typename T>
+struct is_homogen_table_impl {
+    INSTANTIATE_HAS_METHOD_DEFAULT_CHECKER(const void*, get_data, () const);
+
+    static constexpr bool value = is_table_impl_v<T> && has_method_get_data_v<T>;
+};
+
+template <typename T>
+inline constexpr bool is_homogen_table_impl_v = is_homogen_table_impl<T>::value;
     
 } // namespace dal
