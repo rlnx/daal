@@ -24,27 +24,32 @@ namespace dal {
 
 template <typename T>
 class array {
-  template <typename U>
-  friend class array;
+    static_assert(!std::is_const_v<T>, 
+                    "array class cannot have const-qualified type of data");
 
-  template <typename Y, typename U>
-  friend array<Y> reinterpret_array_cast(const array<U>&);
+    template <typename U>
+    friend class array;
 
-  template <typename Y, typename U>
-  friend array<Y> const_array_cast(const array<U>&);
+    template <typename Y, typename U>
+    friend array<Y> reinterpret_array_cast(const array<U>&);
 
-  public:
+    template <typename Y, typename U>
+    friend array<Y> const_array_cast(const array<U>&);
+
+public:
+    using default_delete = std::default_delete<T[]>;
+
+public:
     array()
         : data_owned_ptr_(nullptr),
-          size_(0),
-          capacity_(0) {}
+            size_(0),
+            capacity_(0) {}
 
-    explicit array(std::int64_t element_count, T element = {})
-        : data_owned_ptr_(new T[element_count], // TODO: Use custom oneDAL allocator
-                [](T* obj){ delete[] obj; }),
-          data_(data_owned_ptr_.get()),
-          size_(element_count),
-          capacity_(element_count) {
+    explicit array(std::int64_t element_count, T element = {}) // TODO: Use custom oneDAL allocator
+        : data_owned_ptr_(new T[element_count], default_delete{}),
+            data_(data_owned_ptr_.get()),
+            size_(element_count),
+            capacity_(element_count) {
         for (std::int64_t i = 0; i < size_; i++) {
             (*this)[i] = element;
         }
@@ -53,19 +58,12 @@ class array {
     template <typename Deleter>
     explicit array(T* data, std::int64_t size, Deleter&& deleter)
         : data_owned_ptr_(data, std::forward<Deleter>(deleter)),
-          data_(data),
-          size_(size),
-          capacity_(size) {}
-
-    template <typename U>
-    array(const array<U>& other)
-        : data_owned_ptr_(other.data_owned_ptr_),
-          data_(other.data_),
-          size_(other.size_),
-          capacity_(other.capacity_) {}
+            data_(data),
+            size_(size),
+            capacity_(size) {}
 
     T* get_mutable_data() const {
-        return std::get<T*>(data_);
+        return std::get<T*>(data_); // TODO: convert to dal exception
     }
 
     const T* get_data() const {
@@ -91,7 +89,7 @@ class array {
                 copy_data[i] = immutable_data[i];
             }
 
-            reset(copy_data, size_, [](auto obj){ delete[] obj; });
+            reset(copy_data, size_, default_delete{});
         }
     }
 
@@ -123,7 +121,7 @@ class array {
     }
 
     void reset(std::int64_t size) {
-        data_owned_ptr_.reset(new T[size], [](auto obj){ delete[] obj; });
+        data_owned_ptr_.reset(new T[size], default_delete{});
         data_ = data_owned_ptr_.get();
         size_ = size;
         capacity_ = size;
@@ -157,7 +155,13 @@ class array {
                 new_data[i] = (*this)[i];
             }
 
-            reset(new_data, size, [](T* obj){ delete[] obj; });
+            try {
+                reset(new_data, size, default_delete{});
+            } catch (const std::exception&) {
+                delete[] new_data;
+                throw;
+            }
+            
         } else {
             size_ = size;
         }

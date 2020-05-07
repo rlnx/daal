@@ -20,16 +20,19 @@
 
 namespace dal::detail {
 
-class table_builder_impl_iface : public base {
+class table_builder_impl_iface {
 public:
     using dense_rw_storage = detail::dense_storage_iface<storage_readable_writable>;
 public:
+    virtual ~table_builder_impl_iface() = default;
+    
     virtual table build_table() = 0;
     virtual dense_rw_storage& get_storage() = 0;
 };
 
 template <typename Impl>
-class table_builder_impl_wrapper : public table_builder_impl_iface {
+class table_builder_impl_wrapper : public table_builder_impl_iface, 
+                                   public base {
 public:
     table_builder_impl_wrapper(Impl&& obj)
         : impl_(std::forward<Impl>(obj)) {}

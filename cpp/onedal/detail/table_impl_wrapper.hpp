@@ -21,7 +21,8 @@
 namespace dal::detail {
 
 template <typename TableImpl>
-class table_impl_wrapper : public table_impl_iface {
+class table_impl_wrapper : public table_impl_iface,
+                           public base {
 public:
     table_impl_wrapper(TableImpl&& obj)
         : impl_(std::move(obj)) { }
@@ -72,7 +73,8 @@ private:
 
 // TODO: avoid duplication inside wrappers?
 template <typename Impl>
-class homogen_table_impl_wrapper : public homogen_table_impl_iface {
+class homogen_table_impl_wrapper : public homogen_table_impl_iface,
+                                   public base {
 public:
     homogen_table_impl_wrapper(Impl&& obj)
         : impl_(std::move(obj)) { }

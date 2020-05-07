@@ -19,17 +19,17 @@
 
 namespace dal {
 
-template <typename AccessType>
+template <typename T>
 class row_accessor {
 private:
-    using storage_t = detail::get_dense_storage_iface_t<AccessType>;
+    using storage_t = detail::get_dense_storage_iface_t<T>;
 
 public:
-    using data_t = std::remove_const_t<AccessType>;
-    static constexpr bool is_readonly = std::is_const_v<AccessType>;
+    using data_t = std::remove_const_t<T>;
+    static constexpr bool is_readonly = std::is_const_v<T>;
 
-    template <typename T = AccessType>
-    row_accessor(const table& t, std::enable_if_t<sizeof(T) && is_readonly>* = nullptr)
+    template <typename = std::enable_if_t<is_readonly>>
+    row_accessor(const table& t)
         : storage_(detail::get_impl<storage_t>(t)) {}
 
     row_accessor(const table_builder& b)
@@ -41,7 +41,7 @@ public:
         return block;
     }
 
-    auto pull(array<data_t>& block, const range& rows = {0, -1}) const {
+    T* pull(array<data_t>& block, const range& rows = {0, -1}) const {
         storage_.pull_rows(block, rows);
         if constexpr (is_readonly) {
             return block.get_data();
@@ -50,9 +50,8 @@ public:
         }
     }
 
-    template<typename T = AccessType>
-    std::enable_if_t<sizeof(T) && !is_readonly> push(const array<data_t>& block,
-                                                     const range& rows = {0, -1}) {
+    template <typename = std::enable_if_t<!is_readonly>>
+    void push(const array<data_t>& block, const range& rows = {0, -1}) {
         storage_.push_back_rows(block, rows);
     }
 

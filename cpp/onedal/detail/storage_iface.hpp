@@ -30,16 +30,20 @@ template <typename StorageType>
 class dense_storage_iface {};
 
 template <>
-class dense_storage_iface<storage_readable> : public base {
+class dense_storage_iface<storage_readable> {
 public:
+    virtual ~dense_storage_iface<storage_readable>() = default;
+
     virtual void pull_rows(array<float>&, const range&) const = 0;
     virtual void pull_rows(array<double>&, const range&) const = 0;
     virtual void pull_rows(array<std::int32_t>&, const range&) const = 0;
 };
 
 template <>
-class dense_storage_iface<storage_writable> : public base {
+class dense_storage_iface<storage_writable> {
 public:
+    virtual ~dense_storage_iface<storage_writable>() = default;
+
     virtual void push_back_rows(const array<float>&, const range&) = 0;
     virtual void push_back_rows(const array<double>&, const range&) = 0;
     virtual void push_back_rows(const array<std::int32_t>&, const range&) = 0;
