@@ -2,18 +2,10 @@ package(default_visibility = ["//visibility:public"])
 load("//build/bazel:dal.bzl", "dal_module")
 
 dal_module(
-    name = "types",
-    hdrs = ["common.hpp", "data_conversion.hpp"],
+    name = "interop",
+    hdrs = glob(["*.hpp"]),
     deps = [
         "//cpp/daal:core",
-        "//cpp/onedal:headers"
-    ]
-)
-
-dal_module(
-    name = "tables",
-    hdrs = ["table_conversion.hpp"],
-    deps = [
-        "//cpp/onedal:tables"
+        "//cpp/onedal:headers",
     ]
 )

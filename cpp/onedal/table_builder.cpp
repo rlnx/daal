@@ -40,6 +40,7 @@ private:
 };
 
 class homogen_table_builder_impl {
+public:
     using dense_rw_storage = detail::table_builder_impl_iface::dense_rw_storage;
     using table_impl_t = detail::homogen_table_impl_iface;
     using pimpl_t = detail::pimpl<table_impl_t>;
@@ -50,11 +51,18 @@ public:
         table_impl_ = std::static_pointer_cast<table_impl_t>(base_pimpl);
     }
 
-    auto build_table() {
+    homogen_table_builder_impl(const pimpl_t& table_impl) 
+        : table_impl_(table_impl) {}
+
+    table build_table() {
+        return build_homogen_table();
+    }
+
+    homogen_table build_homogen_table() {
         return detail::pimpl_accessor().make_from_pimpl<homogen_table>(table_impl_);
     }
 
-    auto get_storage() -> dense_rw_storage& {
+    dense_rw_storage& get_storage() {
         return *table_impl_;
     }
 
@@ -73,6 +81,26 @@ homogen_table_builder::homogen_table_builder(std::int64_t row_count, std::int64_
                                              data_layout layout)
     : homogen_table_builder(homogen_table{ row_count, column_count, data_pointer, layout }) {}
 
+template <typename DataType, typename>
+homogen_table_builder::homogen_table_builder(std::int64_t row_count, std::int64_t column_count,
+                                             DataType value,
+                                             data_layout layout)
+    : table_builder(backend::homogen_table_builder_impl {
+        backend::homogen_table_builder_impl::pimpl_t { 
+            new detail::homogen_table_impl_wrapper { backend::homogen_table_impl{ row_count, column_count, value, layout } }
+        }
+    }) {}
+
+template <typename DataType>
+homogen_table_builder::homogen_table_builder(std::int64_t column_count, 
+                                             const array<DataType>& data,
+                                             data_layout layout)
+    : table_builder(backend::homogen_table_builder_impl {
+        backend::homogen_table_builder_impl::pimpl_t { 
+            new detail::homogen_table_impl_wrapper { backend::homogen_table_impl{ column_count, data, layout } }
+        }
+    }) {}
+
 homogen_table_builder::homogen_table_builder(homogen_table&& t)
     : table_builder(backend::homogen_table_builder_impl{ std::move(t) }) {}
 
@@ -81,11 +109,19 @@ homogen_table homogen_table_builder::build() const {
     using wrapper_t = detail::table_builder_impl_wrapper<impl_t>;
 
     auto& impl = detail::get_impl<wrapper_t>(*this).get();
-    return impl.build_table();
+    return impl.build_homogen_table();
 }
 
 template homogen_table_builder::homogen_table_builder(std::int64_t, std::int64_t, const float*, data_layout);
 template homogen_table_builder::homogen_table_builder(std::int64_t, std::int64_t, const double*, data_layout);
 template homogen_table_builder::homogen_table_builder(std::int64_t, std::int64_t, const std::int32_t*, data_layout);
+
+template homogen_table_builder::homogen_table_builder(std::int64_t, std::int64_t, float, data_layout);
+template homogen_table_builder::homogen_table_builder(std::int64_t, std::int64_t, double, data_layout);
+template homogen_table_builder::homogen_table_builder(std::int64_t, std::int64_t, std::int32_t, data_layout);
+
+template homogen_table_builder::homogen_table_builder(std::int64_t, const array<float>&, data_layout);
+template homogen_table_builder::homogen_table_builder(std::int64_t, const array<double>&, data_layout);
+template homogen_table_builder::homogen_table_builder(std::int64_t, const array<std::int32_t>&, data_layout);
 
 } // namespace dal

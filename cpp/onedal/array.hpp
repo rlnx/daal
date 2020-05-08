@@ -78,9 +78,9 @@ public:
         return std::holds_alternative<T*>(data_) && (get_mutable_data() != nullptr);
     }
 
-    void unique() {
+    array& unique() {
         if (is_data_owner() || size_ == 0) {
-            return;
+            return *this;
         } else {
             auto immutable_data = get_data();
             auto copy_data = new T[size_];
@@ -90,6 +90,7 @@ public:
             }
 
             reset(copy_data, size_, default_delete{});
+            return *this;
         }
     }
 
@@ -182,22 +183,5 @@ private:
     std::int64_t size_;
     std::int64_t capacity_;
 };
-
-template <typename T, typename U>
-inline array<T> reinterpret_array_cast(const array<U>& arr) {
-    // Intentionally do not use std::reinterpret_pointer_cast, libc++ missing it
-    auto p = reinterpret_cast<T*>(arr.get_mutable_data());
-    return array<T>{std::shared_ptr<T>(arr.data_, p), arr.size_};
-}
-
-template <typename T, typename U>
-inline array<T> const_array_cast(const array<U>& arr) {
-    return array<T>{std::const_pointer_cast<T>(arr.data_), arr.size_};
-}
-
-template <typename T, typename U>
-inline array<T> array_cast(const array<U>& arr) {
-    return reinterpret_array_cast<T>(const_array_cast<std::remove_cv_t<U>>(arr));
-}
 
 } // namespace dal

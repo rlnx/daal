@@ -20,6 +20,6 @@ dal_module(
     srcs = glob(["**/*.cpp"], exclude = ["**/*_dp.cpp"]),
     deps = [
         ":headers",
-        "//cpp/onedal/backend/interop:types",
+        "//cpp/onedal/backend/interop",
     ],
 )

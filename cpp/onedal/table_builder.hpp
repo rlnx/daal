@@ -21,18 +21,30 @@
 
 namespace dal {
 
+template <typename T>
+struct is_table_builder_impl {
+    INSTANTIATE_HAS_METHOD_DEFAULT_CHECKER(table, build_table, ());
+    INSTANTIATE_HAS_METHOD_DEFAULT_CHECKER(detail::dense_storage_iface<detail::storage_readable_writable>&, get_storage, ());
+
+    static constexpr bool value = has_method_build_table_v<T> && has_method_get_storage_v<T>;
+};
+
+template <typename T>
+inline constexpr bool is_table_builder_impl_v = is_table_builder_impl<T>::value;
+
 class table_builder {
     friend detail::pimpl_accessor;
 
 public:
-    template <typename BuilderImpl>
+    template <typename BuilderImpl,
+              typename = std::enable_if_t<is_table_builder_impl_v<std::decay_t<BuilderImpl>>>>
     table_builder(BuilderImpl&& impl) {
         init_impl(new detail::table_builder_impl_wrapper(std::forward<BuilderImpl>(impl)));
     }
 
     table_builder(table&&);
 
-    auto build() const {
+    table build() const {
         return impl_->build_table();
     }
 
@@ -47,9 +59,19 @@ private:
 
 class homogen_table_builder : public table_builder {
 public:
+    // TODO: revise - const DataType* or DataType*
     template <typename DataType>
     homogen_table_builder(std::int64_t row_count, std::int64_t column_count,
                           const DataType* data_pointer,
+                          data_layout layout = data_layout::row_major);
+
+    template <typename DataType, typename = std::enable_if_t<!std::is_pointer_v<DataType>>>
+    homogen_table_builder(std::int64_t row_count, std::int64_t column_count,
+                          DataType value,
+                          data_layout layout = data_layout::row_major);
+
+    template <typename DataType>
+    homogen_table_builder(std::int64_t column_count, const array<DataType>& data,
                           data_layout layout = data_layout::row_major);
 
     // TODO:

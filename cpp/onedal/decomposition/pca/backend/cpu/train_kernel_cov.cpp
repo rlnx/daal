@@ -14,14 +14,12 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include <iostream>
-#include "onedal/decomposition/pca/backend/cpu/train_kernel.hpp"
+#include "daal/src/algorithms/pca/pca_dense_correlation_batch_kernel.h"
 
-#include "onedal/table_homogen.hpp"
 #include "onedal/backend/interop/common.hpp"
 #include "onedal/backend/interop/table_conversion.hpp"
+#include "onedal/decomposition/pca/backend/cpu/train_kernel.hpp"
 
-#include "daal/src/algorithms/pca/pca_dense_correlation_batch_kernel.h"
 
 namespace dal {
 namespace decomposition {
@@ -39,18 +37,28 @@ template <typename Float, daal::CpuType Cpu>
 using daal_pca_cor_kernel_t = daal_pca::internal::PCACorrelationKernel<daal::batch, Float, Cpu>;
 
 template <typename Float>
-static void call_daal_kernel(const context_cpu& ctx,
-                             const descriptor_base& desc,
-                             const table& data,
-                             const table& eigenvectors,
-                             const table& eigenvalues,
-                             const table& means,
-                             const table& variances) {
-    const auto daal_data         = interop::convert_to_daal_homogen_table<Float>(data);
-    const auto daal_eigenvectors = interop::convert_to_daal_homogen_table<Float>(eigenvectors);
-    const auto daal_eigenvalues  = interop::convert_to_daal_homogen_table<Float>(eigenvalues);
-    const auto daal_means        = interop::convert_to_daal_homogen_table<Float>(means);
-    const auto daal_variances    = interop::convert_to_daal_homogen_table<Float>(variances);
+static train_result call_daal_kernel(const context_cpu& ctx,
+                                     const descriptor_base& desc,
+                                     const table& data) {
+    const int64_t row_count = data.get_row_count();
+    const int64_t column_count = data.get_column_count();
+    const int64_t component_count = desc.get_component_count();
+    
+    auto arr_data = row_accessor<const Float>{ data }.pull();
+    array<Float> arr_eigvec { column_count * component_count };
+    array<Float> arr_eigval { 1 * component_count };
+    array<Float> arr_means { 1 * component_count };
+    array<Float> arr_vars { 1 * component_count };
+
+    // TODO: read-only access performed with deep copy of data since daal numeric tables are mutable.
+    // Need to create special immutable homogen table on daal interop side
+
+    // TODO: data is table, not a homogen_table. Think better about accessor - is it enough to have just a row_accessor? 
+    const auto daal_data = interop::convert_to_daal_homogen_table(arr_data, row_count, column_count);
+    const auto daal_eigenvectors = interop::convert_to_daal_homogen_table(arr_eigvec, column_count, component_count);
+    const auto daal_eigenvalues  = interop::convert_to_daal_homogen_table(arr_eigval, 1, component_count);
+    const auto daal_means        = interop::convert_to_daal_homogen_table(arr_means, 1, component_count);
+    const auto daal_variances    = interop::convert_to_daal_homogen_table(arr_vars, 1, component_count);
 
     daal_cov::Batch<Float, daal_cov::defaultDense> covariance_alg;
     covariance_alg.input.set(daal_cov::data, daal_data);
@@ -71,28 +79,17 @@ static void call_daal_kernel(const context_cpu& ctx,
         *daal_eigenvalues,
         *daal_means,
         *daal_variances);
+
+    return train_result()
+        .set_model(model().set_eigenvectors(homogen_table_builder{ component_count, arr_eigvec }.build()))
+        .set_eigenvalues(homogen_table_builder{ component_count, arr_eigval }.build());
 }
 
 template <typename Float>
 static train_result train(const context_cpu& ctx,
                           const descriptor_base& desc,
                           const train_input& input) {
-    const auto data = input.get_data();
-
-    const int64_t row_count = data.get_row_count();
-    const int64_t column_count = data.get_column_count();
-    const int64_t component_count = desc.get_component_count();
-
-    const auto eigenvectors = allocate_table<Float>(column_count, component_count);
-    const auto eigenvalues  = allocate_table<Float>(1, component_count);
-    const auto means        = allocate_table<Float>(1, component_count);
-    const auto variances    = allocate_table<Float>(1, component_count);
-
-    call_daal_kernel<Float>(ctx, desc, data, eigenvectors, eigenvalues, means, variances);
-
-    return train_result()
-        .set_model(model().set_eigenvectors(eigenvectors))
-        .set_eigenvalues(eigenvalues);
+    return call_daal_kernel<Float>(ctx, desc, input.get_data());
 }
 
 template <typename Float>

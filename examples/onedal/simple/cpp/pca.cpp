@@ -1,11 +1,14 @@
 #include <iomanip>
 #include <iostream>
 
-#include "onedal/table_homogen.hpp"
+#include "onedal/table.hpp"
+#include "onedal/accessor.hpp"
 #include "onedal/decomposition/pca.hpp"
 
 std::ostream &operator <<(std::ostream& stream, const dal::table& table) {
-    const auto x = dal::flatten<float, dal::access_mode::read>(table);
+    auto arr = dal::row_accessor<const float>(table).pull();
+    const auto x = arr.get_data();
+
     for (std::int64_t i = 0; i < table.get_row_count(); i++) {
         for (std::int64_t j = 0; j < table.get_column_count(); j++) {
             std::cout << std::setw(10)
@@ -19,9 +22,6 @@ std::ostream &operator <<(std::ostream& stream, const dal::table& table) {
 }
 
 int main(int argc, char const *argv[]) {
-    // int x;
-    // std::cin >> x;
-
     using namespace dal::decomposition;
 
     constexpr std::int64_t row_count = 5;
@@ -36,16 +36,14 @@ int main(int argc, char const *argv[]) {
         -4.f, 3.f,  0.f
     };
 
-    const auto data_table = dal::table_homogen(data, row_count, column_count);
+    const auto data_table = dal::homogen_table{ row_count, column_count, data };
 
     const auto pca_desc = pca::descriptor<>()
         .set_component_count(3)
         .set_is_deterministic(true);
 
     const auto result = dal::train(pca_desc, data_table);
-    // dal::train(pca_desc, data_table);
 
-    // std::cout << "dd" << std::endl;
     std::cout << "Eigenvectors:" << std::endl
               << result.get_eigenvectors() << std::endl;
 
