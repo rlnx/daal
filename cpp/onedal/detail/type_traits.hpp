@@ -20,8 +20,7 @@ namespace dal::detail {
 
 #define INSTANTIATE_HAS_METHOD_CHECKER(return_value, method_name, params, checker_name)                 \
 template<typename _Type>                                                                                \
-struct has_method_##checker_name                                                                        \
-{                                                                                                       \
+struct has_method_##checker_name {                                                                      \
 private:                                                                                                \
 	using pass = std::true_type;                                                                        \
 	using fail = std::false_type;                                                                       \

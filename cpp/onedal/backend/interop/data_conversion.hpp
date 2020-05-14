@@ -56,10 +56,10 @@ internal::ConversionDataType getConversionDataType(data_type t) {
     }
 }
 
-void daal_convert(const void* src, void* dst,
-                  data_type src_type, data_type dest_type,
-                  std::int64_t size) {
-
+template <typename DownCast, typename UpCast, typename... Args>
+void daal_convert_dispatcher(data_type src_type, data_type dest_type,
+                             DownCast&& dcast, UpCast&& ucast, 
+                             Args&&... args) {
     auto from_type = getIndexNumType(src_type);
     auto to_type = getConversionDataType(dest_type);
 
@@ -75,11 +75,31 @@ void daal_convert(const void* src, void* dst,
         to_type = getConversionDataType(src_type);
 
         check_types(from_type, to_type);
-        internal::getVectorDownCast(from_type, to_type)(size, src, dst);
+        dcast(from_type, to_type)(std::forward<Args>(args)...);
     } else {
         check_types(from_type, to_type);
-        internal::getVectorUpCast(from_type, to_type)(size, src, dst);
+        ucast(from_type, to_type)(std::forward<Args>(args)...);
     }
+}
+
+void daal_convert(const void* src, void* dst,
+                  data_type src_type, data_type dst_type,
+                  std::int64_t size) {
+
+    daal_convert_dispatcher(src_type, dst_type,
+                            internal::getVectorDownCast,
+                            internal::getVectorUpCast,
+                            size, src, dst);
+}
+
+void daal_convert(const void* src, void* dst,
+                  data_type src_type, data_type dst_type,
+                  std::int64_t src_stride, std::int64_t dst_stride,
+                  std::int64_t size) {
+    daal_convert_dispatcher(src_type, dst_type,
+                            internal::getVectorStrideDownCast,
+                            internal::getVectorStrideUpCast,
+                            size, src, src_stride, dst, dst_stride);
 }
 
 } // namespace dal::backend::interop

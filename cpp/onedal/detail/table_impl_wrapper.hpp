@@ -63,6 +63,30 @@ public:
         impl_.push_back_rows(block, r);
     }
 
+    virtual void pull_column(array<float>& block, std::int64_t idx, const range& r) const override {
+        impl_.pull_column(block, idx, r);
+    }
+
+    virtual void pull_column(array<double>& block, std::int64_t idx, const range& r) const override {
+        impl_.pull_column(block, idx, r);
+    }
+
+    virtual void pull_column(array<std::int32_t>& block, std::int64_t idx, const range& r) const override {
+        impl_.pull_column(block, idx, r);
+    }
+
+    virtual void push_back_column(const array<float>& block, std::int64_t idx, const range& r) override {
+        impl_.push_back_column(block, idx, r);
+    }
+
+    virtual void push_back_column(const array<double>& block, std::int64_t idx, const range& r) override {
+        impl_.push_back_column(block, idx, r);
+    }
+
+    virtual void push_back_column(const array<std::int32_t>& block, std::int64_t idx, const range& r) override {
+        impl_.push_back_column(block, idx, r);
+    }
+
     TableImpl& get() {
         return impl_;
     }
@@ -113,6 +137,30 @@ public:
 
     virtual void push_back_rows(const array<std::int32_t>& block, const range& r) override {
         impl_.push_back_rows(block, r);
+    }
+
+    virtual void pull_column(array<float>& block, std::int64_t idx, const range& r) const override {
+        impl_.pull_column(block, idx, r);
+    }
+
+    virtual void pull_column(array<double>& block, std::int64_t idx, const range& r) const override {
+        impl_.pull_column(block, idx, r);
+    }
+
+    virtual void pull_column(array<std::int32_t>& block, std::int64_t idx, const range& r) const override {
+        impl_.pull_column(block, idx, r);
+    }
+
+    virtual void push_back_column(const array<float>& block, std::int64_t idx, const range& r) override {
+        impl_.push_back_column(block, idx, r);
+    }
+
+    virtual void push_back_column(const array<double>& block, std::int64_t idx, const range& r) override {
+        impl_.push_back_column(block, idx, r);
+    }
+
+    virtual void push_back_column(const array<std::int32_t>& block, std::int64_t idx, const range& r) override {
+        impl_.push_back_column(block, idx, r);
     }
 
     virtual const void* get_data() const override {

@@ -24,4 +24,9 @@ void convert_vector(const void* src, void* dst,
                     data_type src_type, data_type dest_type,
                     std::int64_t size);
 
+void convert_vector(const void* src, void* dst,
+                    data_type src_type, data_type dest_type,
+                    std::int64_t src_stride, std::int64_t dst_stride,
+                    std::int64_t size);
+
 } // namespace dal::backend

@@ -37,6 +37,10 @@ public:
     virtual void pull_rows(array<float>&, const range&) const = 0;
     virtual void pull_rows(array<double>&, const range&) const = 0;
     virtual void pull_rows(array<std::int32_t>&, const range&) const = 0;
+
+    virtual void pull_column(array<float>&, std::int64_t, const range&) const = 0;
+    virtual void pull_column(array<double>&, std::int64_t, const range&) const = 0;
+    virtual void pull_column(array<std::int32_t>&, std::int64_t, const range&) const = 0;
 };
 
 template <>
@@ -47,6 +51,10 @@ public:
     virtual void push_back_rows(const array<float>&, const range&) = 0;
     virtual void push_back_rows(const array<double>&, const range&) = 0;
     virtual void push_back_rows(const array<std::int32_t>&, const range&) = 0;
+
+    virtual void push_back_column(const array<float>&, std::int64_t, const range&) = 0;
+    virtual void push_back_column(const array<double>&, std::int64_t, const range&) = 0;
+    virtual void push_back_column(const array<std::int32_t>&, std::int64_t, const range&) = 0;
 };
 
 template <>

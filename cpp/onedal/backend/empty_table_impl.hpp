@@ -35,33 +35,24 @@ public:
         return tm;
     }
 
-    void pull_rows(array<float>& block, const range& r) const {
-        pull_rows_impl(block);
+    template <typename T>
+    void pull_rows(array<T>& block, const range&) const {
+        block.reset_not_owning();
     }
 
-    void pull_rows(array<double>& block, const range& r) const {
-        pull_rows_impl(block);
-    }
-
-    void pull_rows(array<std::int32_t>& block, const range& r) const {
-        pull_rows_impl(block);
-    }
-
-    void push_back_rows(const array<float>&, const range&) {
+    template <typename T>
+    void push_back_rows(const array<T>&, const range&) {
         // TODO: LSP violation.
     }
 
-    void push_back_rows(const array<double>&, const range&) {
-
+    template <typename T>
+    void pull_column(array<T>& block, std::int64_t, const range&) const {
+        block.reset_not_owning();
     }
 
-    void push_back_rows(const array<std::int32_t>&, const range&) {
-
-    }
-
-private:
-    void pull_rows_impl(auto& array) const {
-        array.reset_not_owning();
+    template <typename T>
+    void push_back_column(const array<T>&, std::int64_t, const range&) {
+        // TODO: LSP violation.
     }
 };
 

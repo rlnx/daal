@@ -80,29 +80,17 @@ public:
         return data_.get_data();
     }
 
-    void pull_rows(array<float>& a, const range& r) const {
-        pull_rows_impl(a, r);
-    }
+    template <typename T>
+    void pull_rows(array<T>& a, const range& r) const;
 
-    void pull_rows(array<double>& a, const range& r) const {
-        pull_rows_impl(a, r);
-    }
+    template <typename T>
+    void push_back_rows(const array<T>& a, const range& r);
 
-    void pull_rows(array<std::int32_t>& a, const range& r) const {
-        pull_rows_impl(a, r);
-    }
+    template <typename T>
+    void pull_column(array<T>& a, std::int64_t idx, const range& r) const;
 
-    void push_back_rows(const array<float>& a, const range& r) {
-        push_rows_impl(a, r);
-    }
-
-    void push_back_rows(const array<double>& a, const range& r) {
-        push_rows_impl(a, r);
-    }
-
-    void push_back_rows(const array<std::int32_t>& a, const range& r) {
-        push_rows_impl(a, r);
-    }
+    template <typename T>
+    void push_back_column(const array<T>& a, std::int64_t idx, const range& r);
 
 private:
     template <typename T>
@@ -113,13 +101,6 @@ private:
 
         return data;
     }
-
-private:
-    template <typename T>
-    void pull_rows_impl(array<T>&, const range&) const;
-
-    template <typename T>
-    void push_rows_impl(const array<T>&, const range&);
 
 private:
     std::int64_t row_count_;
