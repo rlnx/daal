@@ -604,11 +604,11 @@ $(THR.tmpdir_y)/%_seq.res: %.rc | $(THR.tmpdir_y)/. ; $(RC.COMPILE)
 #===============================================================================
 # Java/JNI part
 #===============================================================================
-JAVA.srcdir      := $(DIR)/java/daal
+JAVA.srcdir      := $(DIR)/java
 JAVA.srcdir.full := $(JAVA.srcdir)/com/intel/daal
 JAVA.tmpdir      := $(WORKDIR)/java_tmpdir
 
-JNI.srcdir       := $(DIR)/java/daal
+JNI.srcdir       := $(DIR)/java
 JNI.srcdir.full  := $(JNI.srcdir)/com/intel/daal
 JNI.tmpdir       := $(WORKDIR)/jni_tmpdir
 
