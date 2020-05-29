@@ -28,7 +28,7 @@ public:
     using data_t = std::remove_const_t<T>;
     static constexpr bool is_readonly = std::is_const_v<T>;
 
-    template <typename = std::enable_if_t<is_readonly>>
+    template <typename Q = T, typename = std::enable_if_t<sizeof(Q) && is_readonly>>
     row_accessor(const table& t)
         : storage_(detail::get_impl<storage_t>(t)) {}
 
@@ -50,8 +50,9 @@ public:
         }
     }
 
-    template <typename = std::enable_if_t<!is_readonly>>
-    void push(const array<data_t>& block, const range& rows = {0, -1}) {
+    template <typename Q = T>
+    std::enable_if_t<sizeof(Q) && !is_readonly> push(const array<data_t>& block,
+                                                     const range& rows = {0, -1}) {
         storage_.push_back_rows(block, rows);
     }
 
@@ -68,7 +69,7 @@ public:
     using data_t = std::remove_const_t<T>;
     static constexpr bool is_readonly = std::is_const_v<T>;
 
-    template <typename = std::enable_if_t<is_readonly>>
+    template <typename Q = T, typename = std::enable_if_t<sizeof(Q) && is_readonly>>
     column_accessor(const table& t)
         : storage_(detail::get_impl<storage_t>(t)) {}
 
@@ -90,8 +91,10 @@ public:
         }
     }
 
-    template <typename = std::enable_if_t<!is_readonly>>
-    void push(const array<data_t>& block, std::int64_t column_index, const range& rows = {0, -1}) {
+    template <typename Q = T>
+    std::enable_if_t<sizeof(Q) && !is_readonly> push(const array<data_t>& block,
+                                                     std::int64_t column_index,
+                                                     const range& rows = {0, -1}) {
         storage_.push_back_column(block, column_index, rows);
     }
 
