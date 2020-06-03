@@ -16,39 +16,27 @@
 
 #pragma once
 
-#include <cstdint>
+#include "onedal/common.hpp"
 
-namespace dal {
+namespace dal::detail {
 
-using byte_t = std::uint8_t;
-
-class base {
-public:
-    virtual ~base() = default;
-};
-
-enum class data_type {
-    int32,
-    int64,
-    uint32,
-    uint64,
-    float32,
-    float64
-};
-
-struct range {
-public:
-    range(std::int64_t start, std::int64_t end)
-        : start_idx(start), end_idx(end) {}
-
-    std::int64_t get_element_count(std::int64_t max_end_index) const noexcept {
-        // TODO: handle error if (max_end_index + end_idx) < 0
-        std::int64_t final_row = (end_idx < 0) ? max_end_index + end_idx + 1 : end_idx;
-        return (final_row - start_idx - 1) + 1;
+template <typename T>
+constexpr auto make_data_type_impl() {
+    if constexpr (std::is_same_v<std::int32_t, T>) {
+        return data_type::int32;
+    } else if constexpr (std::is_same_v<std::int64_t, T>) {
+        return data_type::int64;
+    } else if constexpr (std::is_same_v<std::uint32_t, T>) {
+        return data_type::uint32;
+    } else if constexpr (std::is_same_v<std::uint64_t, T>) {
+        return data_type::uint64;
+    } else if constexpr (std::is_same_v<float, T>) {
+        return data_type::float32;
+    } else if constexpr (std::is_same_v<double, T>) {
+        return data_type::float64;
+    } else {
+        return;
     }
+}
 
-    std::int64_t start_idx;
-    std::int64_t end_idx;
-};
-
-} // namespace dal
+} // namespace dal::detail

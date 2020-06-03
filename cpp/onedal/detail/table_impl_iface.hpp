@@ -16,39 +16,21 @@
 
 #pragma once
 
-#include <cstdint>
+#include "onedal/detail/storage_iface.hpp"
+#include "onedal/table_metadata.hpp"
 
-namespace dal {
+namespace dal::detail {
 
-using byte_t = std::uint8_t;
-
-class base {
+class table_impl_iface : public dense_storage_iface<storage_readable_writable> {
 public:
-    virtual ~base() = default;
+    virtual std::int64_t get_column_count() const = 0;
+    virtual std::int64_t get_row_count() const = 0;
+    virtual const table_metadata& get_metadata() const = 0;
 };
 
-enum class data_type {
-    int32,
-    int64,
-    uint32,
-    uint64,
-    float32,
-    float64
-};
-
-struct range {
+class homogen_table_impl_iface : public table_impl_iface {
 public:
-    range(std::int64_t start, std::int64_t end)
-        : start_idx(start), end_idx(end) {}
-
-    std::int64_t get_element_count(std::int64_t max_end_index) const noexcept {
-        // TODO: handle error if (max_end_index + end_idx) < 0
-        std::int64_t final_row = (end_idx < 0) ? max_end_index + end_idx + 1 : end_idx;
-        return (final_row - start_idx - 1) + 1;
-    }
-
-    std::int64_t start_idx;
-    std::int64_t end_idx;
+    virtual const void* get_data() const = 0;
 };
 
-} // namespace dal
+} // namespace dal::detail

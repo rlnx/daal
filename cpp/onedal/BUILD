@@ -1,5 +1,6 @@
 load("//build/bazel:dal.bzl", "dal_module",
-                              "dal_dpcpp_module")
+                              "dal_dpcpp_module",
+                              "dal_test")
 
 dal_module(
   name = "headers",
@@ -10,25 +11,23 @@ dal_module(
 dal_dpcpp_module(
   name = "headers_dp",
   hdrs = glob(["**/*_dp.hpp"]),
-  deps = [
-    ":headers",
-  ],
+  deps = [":headers"],
   visibility = ["//visibility:public"],
 )
 
-# TODO: no difference between public and private headers
 dal_module(
   name = "common",
-  srcs = glob(["**/*.cpp"], exclude=["**/*_dp.cpp"]),
+  srcs = glob(["**/*.cpp"], exclude=["**/*_dp.cpp", "**/*_test.cpp"]),
   deps = [
     ":headers",
+    "//cpp/onedal/backend:common",
   ],
   visibility = ["//visibility:public"],
 )
 
 dal_dpcpp_module(
   name = "common_dp",
-  srcs = glob(["**/*_dp.cpp"]),
+  srcs = glob(["**/*_dp.cpp"], exclude=["**/*_test.cpp"]),
   deps = [
     ":headers_dp",
   ],
@@ -49,6 +48,15 @@ dal_dpcpp_module(
   deps = [
     ":common_dp",
     "//cpp/onedal/decomposition/pca:pca_dp",
+  ],
+  visibility = ["//visibility:public"],
+)
+
+dal_test(
+  name = "common_test",
+  srcs = glob(["*_test.cpp"]),
+  deps = [
+    ":common",
   ],
   visibility = ["//visibility:public"],
 )

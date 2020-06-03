@@ -14,53 +14,57 @@
  * limitations under the License.
  *******************************************************************************/
 
+#include "onedal/backend/empty_table_impl.hpp"
+#include "onedal/backend/homogen_table_impl.hpp"
 #include "onedal/table.hpp"
 
-#include "onedal/array.hpp"
-#include "onedal/table_impl.hpp"
+using std::int64_t;
 
 namespace dal {
 
-table::table(detail::table_impl* impl)
-    : impl_(impl) {}
+table::table()
+    : table(backend::empty_table_impl{}) {}
 
-std::int64_t table::get_row_count() const noexcept {
-    return impl_->get_row_count();
+table::table(table&& t)
+    : impl_(std::move(t.impl_)) {
+    using wrapper = detail::table_impl_wrapper<backend::empty_table_impl>;
+    using wrapper_ptr = detail::shared<wrapper>;
+
+    t.impl_ = wrapper_ptr(new wrapper(backend::empty_table_impl{}));
 }
 
-std::int64_t table::get_column_count() const noexcept {
+table& table::operator=(table&& t) {
+    this->impl_.swap(t.impl_);
+}
+
+bool table::has_data() const noexcept {
+    return impl_->get_column_count() > 0 && impl_->get_row_count() > 0;
+}
+
+int64_t table::get_column_count() const {
     return impl_->get_column_count();
 }
 
-template <typename T>
-struct slice_array_deleter {
-    explicit slice_array_deleter(const detail::slice<T>& slice)
-        : slice(slice) {}
-
-    void operator() (T*) const {
-        slice.get_table()->release_slice(slice);
-    }
-
-    detail::slice<T> slice;
-};
-
-template <typename T, access_mode Mode>
-array<T> flatten(const table& t, const range& rows, const range& columns) {
-    auto& table_impl = detail::get_impl<detail::table_impl>(t);
-    auto slice = table_impl.get_slice<T>(rows, columns, Mode);
-    return array<T>{slice.get_data(), slice.get_element_count(), slice_array_deleter<T>(slice)};
+int64_t table::get_row_count() const {
+    return impl_->get_row_count();
 }
 
-#define INSTANTIATE(T, M) \
-    template array<T> flatten<T, M>(const table&, const range&, const range&);
+const table_metadata& table::get_metadata() const {
+    return impl_->get_metadata();
+}
 
-INSTANTIATE(float, access_mode::read)
-INSTANTIATE(float, access_mode::write)
+void table::init_impl(detail::table_impl_iface* impl) {
+    impl_ = pimpl { impl };
+}
 
-INSTANTIATE(double, access_mode::read)
-INSTANTIATE(double, access_mode::write)
+template <typename DataType>
+homogen_table::homogen_table(int64_t row_count, int64_t column_count,
+                             const DataType* data_pointer,
+                             data_layout layout)
+    : homogen_table(backend::homogen_table_impl(row_count, column_count, data_pointer, layout)) {}
 
-INSTANTIATE(std::int32_t, access_mode::read)
-INSTANTIATE(std::int32_t, access_mode::write)
+template homogen_table::homogen_table(int64_t, int64_t, const float*, data_layout);
+template homogen_table::homogen_table(int64_t, int64_t, const double*, data_layout);
+template homogen_table::homogen_table(int64_t, int64_t, const std::int32_t*, data_layout);
 
 } // namespace dal

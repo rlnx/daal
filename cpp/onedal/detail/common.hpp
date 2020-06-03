@@ -19,47 +19,13 @@
 #include <memory>
 #include "onedal/common.hpp"
 
-namespace dal {
-namespace detail {
-
-template <typename T>
-struct type_tag {};
-
-enum class type_id {
-    i32,
-    f32,
-    f64
-};
-
-template <typename T>
-inline type_id make_type_id_impl();
-
-template <>
-inline type_id make_type_id_impl<std::int32_t>() {
-    return type_id::i32;
-}
-
-template <>
-inline type_id make_type_id_impl<float>() {
-    return type_id::f32;
-}
-
-template <>
-inline type_id make_type_id_impl<double>() {
-    return type_id::f64;
-}
-
-template <typename T>
-inline type_id make_type_id() {
-    return make_type_id_impl<std::decay_t<T>>();
-}
+namespace dal::detail {
 
 template <typename T>
 using shared = std::shared_ptr<T>;
 
 template <typename T>
 using pimpl = shared<T>;
-
 
 template <typename T>
 struct empty_deleter {
@@ -99,5 +65,4 @@ Object make_from_pointer(typename Object::pimpl::element_type* pointer) {
     return pimpl_accessor().template make_from_pointer<Object>(pointer);
 }
 
-}  // namespace detail
-}  // namespace dal
+}  // namespace dal::detail

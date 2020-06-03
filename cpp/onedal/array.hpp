@@ -18,79 +18,170 @@
 
 #include "onedal/detail/common.hpp"
 
+#include <variant>
+
 namespace dal {
 
 template <typename T>
 class array {
-  template <typename U>
-  friend class array;
+    static_assert(!std::is_const_v<T>, 
+                    "array class cannot have const-qualified type of data");
 
-  template <typename Y, typename U>
-  friend array<Y> reinterpret_array_cast(const array<U>&);
+    template <typename U>
+    friend class array;
 
-  template <typename Y, typename U>
-  friend array<Y> const_array_cast(const array<U>&);
+    template <typename Y, typename U>
+    friend array<Y> reinterpret_array_cast(const array<U>&);
 
-  public:
-    explicit array(std::int64_t element_count)
-        : data_(new T[element_count]), // TODO: Use custom oneDAL allocator
-          size_(element_count) {}
+    template <typename Y, typename U>
+    friend array<Y> const_array_cast(const array<U>&);
 
-    explicit array(const detail::shared<T>& data, std::int64_t size)
-        : data_(data),
-          size_(size) {}
+public:
+    using default_delete = std::default_delete<T[]>;
+
+public:
+    array()
+        : data_owned_ptr_(nullptr),
+            size_(0),
+            capacity_(0) {}
+
+    explicit array(std::int64_t element_count, T element = {}) // TODO: Use custom oneDAL allocator
+        : data_owned_ptr_(new T[element_count], default_delete{}),
+            data_(data_owned_ptr_.get()),
+            size_(element_count),
+            capacity_(element_count) {
+        for (std::int64_t i = 0; i < size_; i++) {
+            (*this)[i] = element;
+        }
+    }
 
     template <typename Deleter>
     explicit array(T* data, std::int64_t size, Deleter&& deleter)
-        : data_(data, deleter),
-          size_(size) {}
+        : data_owned_ptr_(data, std::forward<Deleter>(deleter)),
+            data_(data),
+            size_(size),
+            capacity_(size) {}
 
-    template <typename U>
-    array(const array<U>& other)
-        : data_(other.data_),
-          size_(other.size_) {}
-
-    T* get_pointer() const noexcept {
-        return data_.get();
+    T* get_mutable_data() const {
+        return std::get<T*>(data_); // TODO: convert to dal exception
     }
 
-    std::int64_t get_size() const noexcept {
+    const T* get_data() const {
+        if (auto ptr_val = std::get_if<T*>(&data_)) {
+            return *ptr_val;
+        } else {
+            return std::get<const T*>(data_);
+        }
+    }
+
+    bool has_mutable_data() const {
+        return std::holds_alternative<T*>(data_) && (get_mutable_data() != nullptr);
+    }
+
+    array& unique() {
+        if (is_data_owner() || size_ == 0) {
+            return *this;
+        } else {
+            auto immutable_data = get_data();
+            auto copy_data = new T[size_];
+
+            for (std::int64_t i = 0; i < size_; i++) {
+                copy_data[i] = immutable_data[i];
+            }
+
+            reset(copy_data, size_, default_delete{});
+            return *this;
+        }
+    }
+
+    std::int64_t get_size() const {
         return size_;
     }
 
+    std::int64_t get_capacity() const {
+        return capacity_;
+    }
+
+    bool is_data_owner() const {
+        if (data_owned_ptr_ == nullptr) {
+            return false;
+        } else if (auto ptr_val = std::get_if<T*>(&data_)) {
+            return *ptr_val == data_owned_ptr_.get();
+        } else if (auto ptr_val = std::get_if<const T*>(&data_)) {
+            return *ptr_val == data_owned_ptr_.get();
+        } else {
+            return false;
+        }
+    }
+
     void reset() {
-        data_.reset();
+        data_owned_ptr_.reset();
+        data_ = std::variant<T*, const T*>();
         size_ = 0;
+        capacity_ = 0;
     }
 
-    const T& operator [](std::int64_t index) const noexcept {
-        return get_pointer()[index];
+    void reset(std::int64_t size) {
+        data_owned_ptr_.reset(new T[size], default_delete{});
+        data_ = data_owned_ptr_.get();
+        size_ = size;
+        capacity_ = size;
     }
 
-    T& operator [](std::int64_t index) noexcept {
-        return get_pointer()[index];
+    template <typename Deleter>
+    void reset(T* data, std::int64_t size, Deleter&& deleter) {
+        // TODO: check input parameters
+        data_owned_ptr_.reset(data, std::forward<Deleter>(deleter));
+        data_ = data_owned_ptr_.get();
+        size_ = size;
+        capacity_ = size;
+    }
+
+    template <typename U = T*>
+    void reset_not_owning(U data = nullptr, std::int64_t size = 0) {
+        data_ = data;
+        size_ = size;
+    }
+
+    void resize(std::int64_t size) {
+        if (is_data_owner() == false) {
+            throw std::runtime_error("cannot resize array with non-owning data");
+        } else if (size <= 0) {
+            reset_not_owning();
+        } else if (get_capacity() < size) {
+            T* new_data = new T[size];
+            std::int64_t min_size = std::min(size, get_size());
+
+            for (std::int64_t i = 0; i < min_size; i++) {
+                new_data[i] = (*this)[i];
+            }
+
+            try {
+                reset(new_data, size, default_delete{});
+            } catch (const std::exception&) {
+                delete[] new_data;
+                throw;
+            }
+            
+        } else {
+            size_ = size;
+        }
+    }
+
+    const T& operator [](std::int64_t index) const {
+        return get_data()[index];
+    }
+
+    T& operator [](std::int64_t index) {
+        return get_mutable_data()[index];
     }
 
 private:
-    detail::shared<T> data_;
+    detail::shared<T> data_owned_ptr_;
+    std::variant<T*, const T*> data_;
+
     std::int64_t size_;
+    std::int64_t capacity_;
 };
-
-template <typename T, typename U>
-inline array<T> reinterpret_array_cast(const array<U>& arr) {
-    // Intentionally do not use std::reinterpret_pointer_cast, libc++ missing it
-    auto p = reinterpret_cast<T*>(arr.get_pointer());
-    return array<T>{std::shared_ptr<T>(arr.data_, p), arr.size_};
-}
-
-template <typename T, typename U>
-inline array<T> const_array_cast(const array<U>& arr) {
-    return array<T>{std::const_pointer_cast<T>(arr.data_), arr.size_};
-}
-
-template <typename T, typename U>
-inline array<T> array_cast(const array<U>& arr) {
-    return reinterpret_array_cast<T>(const_array_cast<std::remove_cv_t<U>>(arr));
-}
 
 } // namespace dal

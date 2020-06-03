@@ -14,15 +14,19 @@
  * limitations under the License.
  *******************************************************************************/
 
-#include "onedal/table_homogen.hpp"
-#include "onedal/table_homogen_impl.hpp"
+#pragma once
 
-namespace dal {
+#include "onedal/common.hpp"
 
-table_homogen::table_homogen(const array<byte_t>& data,
-                             detail::type_id type_id,
-                             std::int64_t row_count,
-                             std::int64_t column_count)
-    : table(new dal::detail::table_homogen_impl{data, type_id, row_count, column_count}) {}
+namespace dal::backend {
 
-} // namespace dal
+void convert_vector(const void* src, void* dst,
+                    data_type src_type, data_type dest_type,
+                    std::int64_t size);
+
+void convert_vector(const void* src, void* dst,
+                    data_type src_type, data_type dest_type,
+                    std::int64_t src_stride, std::int64_t dst_stride,
+                    std::int64_t size);
+
+} // namespace dal::backend

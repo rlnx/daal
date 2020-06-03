@@ -16,33 +16,76 @@
 
 #pragma once
 
-#include "onedal/array.hpp"
-#include "onedal/detail/common.hpp"
+#include <type_traits>
+
+#include "onedal/detail/table_impl_wrapper.hpp"
+#include "onedal/type_traits.hpp"
 
 namespace dal {
 
-namespace detail {
-class table_impl;
-} // namespace detail
+class table {
+    friend detail::pimpl_accessor;
+    using pimpl = detail::pimpl<detail::table_impl_iface>;
 
-class table : public base {
-  friend detail::pimpl_accessor;
-  public:
-    table() = default;
+public:
+    table();
+    table(const table&) = default;
+    table(table&&);
 
-    std::int64_t get_row_count() const noexcept;
-    std::int64_t get_column_count() const noexcept;
+    template <typename Impl,
+              typename = std::enable_if_t<is_table_impl_v<std::decay_t<Impl>>>>
+    table(Impl&& impl) {
+        init_impl(new detail::table_impl_wrapper(std::forward<Impl>(impl)));
+    }
 
-  protected:
-    explicit table(detail::table_impl* impl);
+    table& operator=(const table&) = default;
+    table& operator=(table&&);
 
-  private:
-    dal::detail::pimpl<detail::table_impl> impl_;
+    bool has_data() const noexcept;
+    std::int64_t get_column_count() const;
+    std::int64_t get_row_count() const;
+    const table_metadata& get_metadata() const;
+
+protected:
+    table(const pimpl& impl)
+        : impl_(impl) {}
+
+    void init_impl(pimpl::element_type* impl);
+
+private:
+    pimpl impl_;
 };
 
-template <typename T, access_mode Mode>
-array<T> flatten(const table& table,
-                 const range& rows = {0, -1},
-                 const range& columns = {0, -1});
+class homogen_table : public table {
+    friend detail::pimpl_accessor;
+    using pimpl = detail::pimpl<detail::homogen_table_impl_iface>;
+
+public:
+    homogen_table() = default;
+
+    template <typename Impl,
+              typename = std::enable_if_t<is_homogen_table_impl_v<std::decay_t<Impl>>>>
+    homogen_table(Impl&& impl) {
+        // TODO: usage of protected method of base class: a point to break inheritance?
+        init_impl(new detail::homogen_table_impl_wrapper(std::forward<Impl>(impl)));
+    }
+
+    template <typename DataType>
+    homogen_table(std::int64_t row_count, std::int64_t column_count,
+                  const DataType* data_pointer,
+                  data_layout layout = data_layout::row_major);
+
+    template <typename DataType>
+    const DataType* get_data() const {
+        using impl_t = detail::homogen_table_impl_iface;
+
+        auto& impl = detail::get_impl<impl_t>(*this);
+        return reinterpret_cast<const DataType*>(impl.get_data());
+    }
+
+private:
+    homogen_table(const pimpl& impl)
+        : table(impl) {}
+};
 
 } // namespace dal

@@ -3,10 +3,9 @@ load("//build/bazel:dal.bzl", "dal_module")
 
 dal_module(
     name = "interop",
-    hdrs = glob(["**/*.hpp"]),
-    srcs = glob(["**/*.cpp"]),
+    hdrs = glob(["*.hpp"]),
     deps = [
-        "//cpp/daal:public_headers",
-        "//cpp/onedal:common"
+        "//cpp/daal:core",
+        "//cpp/onedal:headers",
     ]
 )

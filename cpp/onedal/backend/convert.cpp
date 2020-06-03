@@ -14,41 +14,22 @@
  * limitations under the License.
  *******************************************************************************/
 
-#pragma once
+#include "onedal/backend/convert.hpp"
+#include "onedal/backend/interop/data_conversion.hpp"
 
-#include <cstdint>
+namespace dal::backend {
 
-namespace dal {
+void convert_vector(const void* src, void* dst,
+                    data_type src_type, data_type dest_type,
+                    std::int64_t size) {
+    interop::daal_convert(src, dst, src_type, dest_type, size);
+}
 
-using byte_t = std::uint8_t;
+void convert_vector(const void* src, void* dst,
+                    data_type src_type, data_type dest_type,
+                    std::int64_t src_stride, std::int64_t dst_stride,
+                    std::int64_t size) {
+    interop::daal_convert(src, dst, src_type, dest_type, src_stride, dst_stride, size);
+}
 
-class base {
-public:
-    virtual ~base() = default;
-};
-
-enum class data_type {
-    int32,
-    int64,
-    uint32,
-    uint64,
-    float32,
-    float64
-};
-
-struct range {
-public:
-    range(std::int64_t start, std::int64_t end)
-        : start_idx(start), end_idx(end) {}
-
-    std::int64_t get_element_count(std::int64_t max_end_index) const noexcept {
-        // TODO: handle error if (max_end_index + end_idx) < 0
-        std::int64_t final_row = (end_idx < 0) ? max_end_index + end_idx + 1 : end_idx;
-        return (final_row - start_idx - 1) + 1;
-    }
-
-    std::int64_t start_idx;
-    std::int64_t end_idx;
-};
-
-} // namespace dal
+} // namespace dal::backend
