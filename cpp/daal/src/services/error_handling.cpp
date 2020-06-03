@@ -1,6 +1,6 @@
 /** file error_handling.cpp */
 /*******************************************************************************
-* Copyright 2014-2019 Intel Corporation
+* Copyright 2014-2020 Intel Corporation
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -609,6 +609,17 @@ services::ErrorCollectionPtr Status::getCollection() const
     }
     return services::ErrorCollectionPtr(new services::ErrorCollection());
 }
+
+namespace internal
+{
+
+ErrorID get_error_id(Status &s) {
+    if (s._impl) {
+        return static_cast<SharedErrorCollection *>(s._impl)->at(0)->id();
+    }
+}
+
+} // namespace internal
 
 /////////////////////////////////////////////////////////////////////////////////////////
 

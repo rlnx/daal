@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2014-2019 Intel Corporation
+ * Copyright 2014-2020 Intel Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include "onedal/backend/interop/common.hpp"
 #include "onedal/backend/interop/table_conversion.hpp"
 #include "onedal/decomposition/pca/backend/cpu/train_kernel.hpp"
+#include "onedal/decomposition/pca/backend/cpu/local_error_convertor.hpp"
 
 
 namespace dal {
@@ -43,7 +44,7 @@ static train_result call_daal_kernel(const context_cpu& ctx,
     const int64_t row_count = data.get_row_count();
     const int64_t column_count = data.get_column_count();
     const int64_t component_count = desc.get_component_count();
-    
+
     auto arr_data = row_accessor<const Float>{ data }.pull();
     array<Float> arr_eigvec { column_count * component_count };
     array<Float> arr_eigval { 1 * component_count };
@@ -53,7 +54,7 @@ static train_result call_daal_kernel(const context_cpu& ctx,
     // TODO: read-only access performed with deep copy of data since daal numeric tables are mutable.
     // Need to create special immutable homogen table on daal interop side
 
-    // TODO: data is table, not a homogen_table. Think better about accessor - is it enough to have just a row_accessor? 
+    // TODO: data is table, not a homogen_table. Think better about accessor - is it enough to have just a row_accessor?
     const auto daal_data = interop::convert_to_daal_homogen_table(arr_data, row_count, column_count);
     const auto daal_eigenvectors = interop::convert_to_daal_homogen_table(arr_eigvec, column_count, component_count);
     const auto daal_eigenvalues  = interop::convert_to_daal_homogen_table(arr_eigval, 1, component_count);
@@ -68,7 +69,7 @@ static train_result call_daal_kernel(const context_cpu& ctx,
                                                     daal_pca::variance ||
                                                     daal_pca::eigenvalue);
 
-    interop::call_daal_kernel<Float, daal_pca_cor_kernel_t>(
+    const auto status = interop::call_daal_kernel<Float, daal_pca_cor_kernel_t>(
         ctx,
         is_correlation,
         desc.get_is_deterministic(),
@@ -79,6 +80,8 @@ static train_result call_daal_kernel(const context_cpu& ctx,
         *daal_eigenvalues,
         *daal_means,
         *daal_variances);
+    if (!status)
+        local_status_to_exception(status);
 
     return train_result()
         .set_model(model().set_eigenvectors(homogen_table_builder{ component_count, arr_eigvec }.build()))

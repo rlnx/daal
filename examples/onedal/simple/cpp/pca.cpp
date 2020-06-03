@@ -4,6 +4,7 @@
 #include "onedal/table.hpp"
 #include "onedal/accessor.hpp"
 #include "onedal/decomposition/pca.hpp"
+#include "onedal/exception.hpp"
 
 std::ostream &operator <<(std::ostream& stream, const dal::table& table) {
     auto arr = dal::row_accessor<const float>(table).pull();
@@ -24,7 +25,7 @@ std::ostream &operator <<(std::ostream& stream, const dal::table& table) {
 int main(int argc, char const *argv[]) {
     using namespace dal::decomposition;
 
-    constexpr std::int64_t row_count = 5;
+    constexpr std::int64_t row_count = 50;
     constexpr std::int64_t column_count = 3;
 
 
@@ -42,13 +43,18 @@ int main(int argc, char const *argv[]) {
         .set_component_count(3)
         .set_is_deterministic(true);
 
-    const auto result = dal::train(pca_desc, data_table);
+    try{
+        const auto result = dal::train(pca_desc, data_table);
+    } catch (const dal::invalid_argument& e) {
+        std::cout << e.what() << std::endl;
+    }
 
-    std::cout << "Eigenvectors:" << std::endl
-              << result.get_eigenvectors() << std::endl;
 
-    std::cout << "Eigenvalues:" << std::endl
-              << result.get_eigenvalues() << std::endl;
+    // std::cout << "Eigenvectors:" << std::endl
+    //           << result.get_eigenvectors() << std::endl;
+
+    // std::cout << "Eigenvalues:" << std::endl
+    //           << result.get_eigenvalues() << std::endl;
 
     return 0;
 }

@@ -32,6 +32,7 @@
 #include "services/error_indexes.h"
 #include "services/error_id.h"
 #include "services/collection.h"
+#include "services/internal/error_handling_w_a.h"
 
 namespace daal
 {
@@ -442,6 +443,7 @@ typedef SharedPtr<ErrorCollection> ErrorCollectionPtr;
 class DAAL_EXPORT Status
 {
 public:
+friend ErrorID daal::services::internal::get_error_id(Status &);
     /**
      * Default constructor
      */
@@ -576,5 +578,5 @@ inline Status checkForNullByteInjection(const char * begin, const char * const e
 }
 } // namespace internal
 } // namespace services
-}; // namespace daal
+} // namespace daal
 #endif

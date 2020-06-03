@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include "onedal/decomposition/pca/train_types.hpp"
+#include "onedal/exception.hpp"
 
 namespace dal {
 namespace decomposition {
@@ -40,7 +41,7 @@ struct train_ops {
   using descriptor_base_t = descriptor_base;
 
   void validate(const Descriptor& params, const train_input& input) const {
-
+    // throw invalid_argument("invalid arg");
   }
 
   template <typename Context>
