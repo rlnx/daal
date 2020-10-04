@@ -42,12 +42,13 @@ def dal_module(name, hdrs=[], srcs=[],
         hpp_filt = ["**/*.hpp"]
         cpp_filt = ["**/*.cpp"]
         dpc_filt = ["**/*_dpc.cpp"]
+        win_filt = ["**/*_win.cpp"]
         test_filt = ["**/*_test*", "**/test/**"]
-        hdrs_all = native.glob(hpp_filt, exclude=test_filt)
+        hdrs_all = native.glob(hpp_filt, exclude=win_filt + test_filt)
         dpc_auto_hdrs = hdrs_all
-        dpc_auto_srcs = native.glob(cpp_filt, exclude=test_filt)
+        dpc_auto_srcs = native.glob(cpp_filt, exclude=win_filt + test_filt)
         host_auto_hdrs = hdrs_all
-        host_auto_srcs = native.glob(cpp_filt, exclude=test_filt + dpc_filt)
+        host_auto_srcs = native.glob(cpp_filt, exclude=win_filt + test_filt + dpc_filt)
     else:
         host_auto_hdrs = []
         host_auto_srcs = []
