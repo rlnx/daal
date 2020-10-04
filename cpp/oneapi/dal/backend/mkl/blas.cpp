@@ -32,57 +32,45 @@ namespace oneapi::dal::backend::mkl {
 
 #define GEMM_ARGS(Float) transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc
 
-template <typename Float, typename Cpu = void>
-struct gemm_op {};
-
-template <typename Cpu>
-struct gemm_op<float, Cpu> {
-    void operator()(GEMM_PARAMETERS_FORTRAN(float)) const {
-        fpk_blas_sgemm<Cpu>(GEMM_ARGS(float));
+template <typename Float, typename Cpu>
+inline void gemm_cpu(GEMM_PARAMETERS_C(Float)) {
+    const char ta = transa ? 'T' : 'N';
+    const char tb = transb ? 'T' : 'N';
+    if constexpr (std::is_same_v<Float, float>) {
+        fpk_blas_sgemm<Cpu>(&ta, &tb, &m, &n, &k, &alpha, a, &lda, b, &ldb, &beta, c, &ldc);
     }
-};
-
-template <typename Cpu>
-struct gemm_op<double, Cpu> {
-    void operator()(GEMM_PARAMETERS_FORTRAN(double)) const {
-        fpk_blas_dgemm<Cpu>(GEMM_ARGS(double));
+    else {
+        fpk_blas_dgemm<Cpu>(&ta, &tb, &m, &n, &k, &alpha, a, &lda, b, &ldb, &beta, c, &ldc);
     }
-};
+}
 
 template <typename Float>
-struct gemm_op<Float, void> {
-    void operator()(const context_cpu &ctx, GEMM_PARAMETERS_FORTRAN(Float)) const {
-        dispatch_by_cpu(ctx, [&](auto cpu) {
-            gemm_op<Float, decltype(cpu)>{}(GEMM_ARGS(Float));
-        });
-    }
-
-    void operator()(GEMM_PARAMETERS_FORTRAN(Float)) const {
-        (*this)(context_cpu{}, GEMM_ARGS(Float));
-    }
-};
+inline void gemm_ctx(const context_cpu& ctx, GEMM_PARAMETERS_C(Float)) {
+    dispatch_by_cpu(ctx, [&](auto cpu) {
+        gemm_cpu<Float, decltype(cpu)>(GEMM_ARGS(Float));
+    });
+}
 
 template <typename Float, typename Cpu>
 void gemm(GEMM_PARAMETERS_C(Float)) {
-    using op_t = gemm_op<Float, Cpu>;
-    const char ta = transa ? 'T' : 'N';
-    const char tb = transb ? 'T' : 'N';
-    op_t{}(&ta, &tb, &m, &n, &k, &alpha, a, &lda, b, &ldb, &beta, c, &ldc);
+    if constexpr (std::is_same_v<Cpu, void>) {
+        gemm_ctx<Float>(context_cpu{}, GEMM_ARGS(Float));
+    }
+    else {
+        gemm_cpu<Float, Cpu>(GEMM_ARGS(Float));
+    }
 }
 
 template <typename Float>
 void gemm(const context_cpu& ctx, GEMM_PARAMETERS_C(Float)) {
-    using op_t = gemm_op<Float>;
-    const char ta = transa ? 'T' : 'N';
-    const char tb = transb ? 'T' : 'N';
-    op_t{}(ctx, &ta, &tb, &m, &n, &k, &alpha, a, &lda, b, &ldb, &beta, c, &ldc);
+    gemm_ctx<Float>(ctx, GEMM_ARGS(Float));
 }
 
-#define INSTANTIATE_GEMM_CPU(Float, Cpu)                        \
-    template<> void gemm<Float, Cpu>(GEMM_PARAMETERS_C(Float)); \
+#define INSTANTIATE_GEMM_CPU(Float, Cpu)                      \
+    template void gemm<Float, Cpu>(GEMM_PARAMETERS_C(Float)); \
 
-#define INSTANTIATE_GEMM_CTX(Float)                                            \
-    template<> void gemm<Float>(const context_cpu&, GEMM_PARAMETERS_C(Float)); \
+#define INSTANTIATE_GEMM_CTX(Float)                                          \
+    template void gemm<Float>(const context_cpu&, GEMM_PARAMETERS_C(Float)); \
 
 #define INSTANTIATE_GEMM(Float)                                                     \
     INSTANTIATE_GEMM_CTX(Float)                                                     \

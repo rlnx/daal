@@ -10,6 +10,7 @@ dal_module(
     dal_deps = [
         "@onedal//cpp/oneapi/dal:common",
         "@onedal//cpp/oneapi/dal:table",
+        "@onedal//cpp/oneapi/dal/backend/mkl",
     ],
 )
 

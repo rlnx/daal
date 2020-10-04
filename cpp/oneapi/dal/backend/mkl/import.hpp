@@ -22,7 +22,7 @@
 // clang-format off
 
 #define DECLARE_EXTERN_FUNCTION_ISA(prefix, isa, ReturnType, name, parameters) \
-    ReturnType prefix##isa##_##name (parameters);
+    ReturnType prefix##isa##_##name parameters;
 
 #define DECLARE_EXTERN_FUNCTION(prefix, ReturnType, name, parameters)             \
     extern "C" {                                                                  \
@@ -36,12 +36,12 @@
 
 #define DECLARE_FUNCTION_TEMPLATE(prefix, ReturnType, name, parameters) \
     template <typename Cpu>                                             \
-    inline ReturnType prefix##name(parameters);                         \
+    inline ReturnType prefix##name parameters;                          \
 
 #define DEFINE_FUNCTION_TEMPLATE_SPEC_ISA(prefix, isa, ReturnType, name, parameters, args) \
     template <>                                                                            \
-    inline ReturnType prefix##name<oneapi::dal::backend::cpu_dispatch_##isa>(parameters) { \
-        return prefix##isa##_##name(args);                                                 \
+    inline ReturnType prefix##name<oneapi::dal::backend::cpu_dispatch_##isa> parameters {  \
+        return prefix##isa##_##name args;                                                  \
     }
 
 #define DEFINE_FUNCTION(prefix, ReturnType, name, parameters, args)                           \
@@ -56,16 +56,16 @@
     }
 
 #define IMPORT_MKL_FUNCTION(prefix, ReturnType, name, parameters, args) \
-    DECLARE_EXTERN_FUNCTION(prefix, ReturnType, name, parameters, args) \
+    DECLARE_EXTERN_FUNCTION(prefix, ReturnType, name, parameters)       \
     DEFINE_FUNCTION(prefix, ReturnType, name, parameters, args)
 
-#define GEMM_PARAMETERS(Float)                                                            \
-    const char *transa, const char *transb, const std::int64_t *m, const std::int64_t *n, \
-    const std::int64_t *k, const Float *alpha, const Float *a, const std::int64_t *lda,   \
-    const Float *b, const std::int64_t *ldb, const Float *beta, const Float *c,           \
-    const std::int64_t *ldc
+#define GEMM_PARAMETERS(Float)                                                             \
+    (const char *transa, const char *transb, const std::int64_t *m, const std::int64_t *n, \
+     const std::int64_t *k, const Float *alpha, const Float *a, const std::int64_t *lda,   \
+     const Float *b, const std::int64_t *ldb, const Float *beta, const Float *c,           \
+     const std::int64_t *ldc)
 
-#define GEMM_ARGS(Float) transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc
+#define GEMM_ARGS(Float) (transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc)
 
 IMPORT_MKL_FUNCTION(fpk_blas_, void, sgemm, GEMM_PARAMETERS(float), GEMM_ARGS(float))
 IMPORT_MKL_FUNCTION(fpk_blas_, void, dgemm, GEMM_PARAMETERS(double), GEMM_ARGS(double))

@@ -76,12 +76,16 @@ def dal_collect_modules(name, root, modules, dal_deps=[], **kwargs):
     module_deps = []
     for module_name in modules:
         module_label = "{0}/{1}".format(root, module_name)
-        dal_module(
-            name = module_name,
-            hdrs = native.glob(["{}*.hpp".format(module_name)]),
-            dal_deps = [ module_label ],
-        )
-        module_deps.append(":" + module_name)
+        if '/' in module_name:
+            module_deps.append(module_label)
+        else:
+            module_label = "{0}/{1}".format(root, module_name)
+            dal_module(
+                name = module_name,
+                hdrs = native.glob(["{}.hpp".format(module_name)]),
+                dal_deps = [ module_label ],
+            )
+            module_deps.append(":" + module_name)
     dal_module(
         name = name,
         dal_deps = dal_deps + module_deps,

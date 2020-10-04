@@ -47,6 +47,8 @@ dal_collect_modules(
         "graph",
         "table",
         "util",
+        "backend/linalg",
+        "backend/mkl",
     ],
     dal_deps = [
         ":common",
