@@ -7,6 +7,7 @@ load("@onedal//dev/bazel:dal.bzl",
 dal_module(
     name = "mkl",
     auto = True,
+    auto_exclude = ["*_win_dll.cpp"],
     dal_deps = [
         "@onedal//cpp/oneapi/dal:common",
     ],

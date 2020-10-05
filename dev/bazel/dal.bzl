@@ -32,23 +32,21 @@ load("@onedal//dev/bazel/config:config.bzl",
     "CpuInfo",
 )
 
-def dal_module(name, hdrs=[], srcs=[],
-               dal_deps=[], extra_deps=[],
-               host_hdrs=[], host_srcs=[], host_deps=[],
-               dpc_hdrs=[], dpc_srcs=[], dpc_deps=[],
-               auto=False, host=True, dpc=True, **kwargs):
+def dal_module(name, hdrs=[], srcs=[], dal_deps=[], extra_deps=[],
+               host_hdrs=[], host_srcs=[], host_deps=[], dpc_hdrs=[],
+               dpc_srcs=[], dpc_deps=[], auto=False, host=True, dpc=True,
+               auto_exclude=[], **kwargs):
     _check_target_name(name, host, dpc)
     if auto:
         hpp_filt = ["**/*.hpp"]
         cpp_filt = ["**/*.cpp"]
         dpc_filt = ["**/*_dpc.cpp"]
-        win_filt = ["**/*_win.cpp"]
         test_filt = ["**/*_test*", "**/test/**"]
-        hdrs_all = native.glob(hpp_filt, exclude=win_filt + test_filt)
+        hdrs_all = native.glob(hpp_filt, exclude=auto_exclude + test_filt)
         dpc_auto_hdrs = hdrs_all
-        dpc_auto_srcs = native.glob(cpp_filt, exclude=win_filt + test_filt)
+        dpc_auto_srcs = native.glob(cpp_filt, exclude=auto_exclude + test_filt)
         host_auto_hdrs = hdrs_all
-        host_auto_srcs = native.glob(cpp_filt, exclude=win_filt + test_filt + dpc_filt)
+        host_auto_srcs = native.glob(cpp_filt, exclude=auto_exclude + test_filt + dpc_filt)
     else:
         host_auto_hdrs = []
         host_auto_srcs = []
