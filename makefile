@@ -593,7 +593,7 @@ ONEAPI.srcdirs.detail := $(foreach x,$(ONEAPI.srcdirs.base),$(shell find $x -max
 ONEAPI.srcdirs.backend := $(foreach x,$(ONEAPI.srcdirs.base),$(shell find $x -maxdepth 1 -type d -name backend))
 ONEAPI.srcdirs := $(ONEAPI.srcdirs.base) $(ONEAPI.srcdirs.detail) $(ONEAPI.srcdirs.backend)
 
-ONEAPI.srcs.all.exclude := ! -path "*_test.*" ! -path "*/test/*" $(if $(OS_is_win),,! -path "*/dll/*")
+ONEAPI.srcs.all.exclude := ! -path "*_test.*" ! -path "*/test/*"
 ONEAPI.srcs.all := $(foreach x,$(ONEAPI.srcdirs.base),$(shell find $x -maxdepth 1 -type f -name "*.cpp" $(ONEAPI.srcs.all.exclude))) \
                    $(foreach x,$(ONEAPI.srcdirs.detail),$(shell find $x -type f -name "*.cpp" $(ONEAPI.srcs.all.exclude))) \
                    $(foreach x,$(ONEAPI.srcdirs.backend),$(shell find $x -type f -name "*.cpp" $(ONEAPI.srcs.all.exclude)))
@@ -606,11 +606,11 @@ ONEAPI.srcs.mangled     := $(subst /,-,$(ONEAPI.srcs))
 ONEAPI.srcs.mangled.dpc := $(subst /,-,$(ONEAPI.srcs.dpc))
 
 ONEAPI.objs_a     := $(ONEAPI.srcs.mangled:%.cpp=$(ONEAPI.tmpdir_a)/%.$o)
+ONEAPI.objs_a     := $(filter-out %dll-load_threading.$o,$(ONEAPI.objs_a))
 ONEAPI.objs_y     := $(ONEAPI.srcs.mangled:%.cpp=$(ONEAPI.tmpdir_y)/%.$o)
+ONEAPI.objs_y     := $(if $(OS_is_win),$(ONEAPI.objs_y),$(filter-out %dll-load_threading.$o,$(ONEAPI.objs_y)))
 ONEAPI.objs_a.dpc := $(ONEAPI.srcs.mangled.dpc:%.cpp=$(ONEAPI.tmpdir_a.dpc)/%.$o)
 ONEAPI.objs_y.dpc := $(ONEAPI.srcs.mangled.dpc:%.cpp=$(ONEAPI.tmpdir_y.dpc)/%.$o)
-ONEAPI.objs_a.all := $(ONEAPI.objs_a) $(ONEAPI.objs_a.dpc)
-ONEAPI.objs_y.all := $(ONEAPI.objs_y) $(ONEAPI.objs_y.dpc)
 
 USECPUS.files_no_knl := $(filter-out knl,$(USECPUS.files))
 # Populate _cpu files -> _cpu_%cpu_name%, where %cpu_name% is $(USECPUS.files)

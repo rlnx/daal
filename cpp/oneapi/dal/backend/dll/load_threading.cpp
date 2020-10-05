@@ -36,7 +36,6 @@ static void try_load_threading_layer() {
         threading_layer_dll_handle = load_onedal_thread_dll();
         check_threading_layer();
     }
-    return threading_layer_dll_handle;
 }
 
 static FARPROC get_function_pointer(const char* function_name) {
@@ -55,7 +54,7 @@ static FARPROC get_function_pointer(const char* function_name) {
 #define DEFINE_DLL_FUNCTION_PROXY_ISA(ReturnType, prefix, isa, name, parameters, args) \
     using prefix##isa##_##name##_ptr_t = ReturnType (*) parameters;                    \
     static prefix##isa##_##name##_ptr_t prefix##isa##_##name##_ptr = nullptr;          \
-    ReturnType prefix##isa##_##name parameters                                         \
+    extern "C" ReturnType prefix##isa##_##name parameters                              \
     {                                                                                  \
         if (!prefix##isa##_##name##_ptr) {                                             \
             try_load_threading_layer();                                                \
