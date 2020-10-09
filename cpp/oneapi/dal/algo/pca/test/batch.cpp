@@ -61,8 +61,13 @@ ALGO_TEST_CASE("PCA general flow", (float, double), (method::cov)) {
         }
 
         SECTION("ensure means are correct") {
-            const auto expected_means = data.column_means();
-            REQUIRE(means == ts::all_close<Float>{ expected_means, ts::eps<Float>(1e-4, 1e-10) });
+            const auto expected = data.column_means();
+            REQUIRE(means == ts::all_close<Float>{ expected, ts::eps<Float>(1e-4, 1e-10) });
+        }
+
+        SECTION("ensure variances are correct") {
+            const auto expected = data.column_variances();
+            REQUIRE(variances == ts::all_close<Float>{ expected, ts::eps<Float>(1e-4, 1e-10) });
         }
 
         SECTION("ensure eigenvalues order is descending") {
