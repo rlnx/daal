@@ -25,8 +25,10 @@ dal_module(
     name = "common",
     hdrs = [
         "common.hpp",
-        "macro.hpp",
         "config.hpp",
+        "macro.hpp",
+        "math.hpp",
+        "matchers.hpp",
     ],
     srcs = [
         "config.cpp",
@@ -45,9 +47,20 @@ dal_module(
 )
 
 dal_module(
-    name = "datasets",
-    hdrs = glob(["datasets.hpp"]),
-    srcs = glob(["datasets.cpp"]),
+    name = "tables",
+    hdrs = glob(["tables.hpp"]),
+    srcs = glob(["tables.cpp"]),
+    dal_deps = [
+        ":common",
+        "@onedal//cpp/oneapi/dal:table",
+    ],
+    testonly = True,
+)
+
+dal_module(
+    name = "dataframes",
+    hdrs = glob(["dataframes.hpp"]),
+    srcs = glob(["dataframes.cpp"]),
     dal_deps = [
         ":common",
         "@onedal//cpp/oneapi/dal:table",

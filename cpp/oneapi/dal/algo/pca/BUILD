@@ -19,11 +19,12 @@ dal_test_suite(
     name = "tests",
     framework = "catch2",
     srcs = glob([
-        "test/train.cpp",
+        "test/batch.cpp",
     ]),
     dal_deps = [
         ":pca",
-        "@onedal//cpp/oneapi/dal/test:datasets",
+        "@onedal//cpp/oneapi/dal/test:tables",
+        "@onedal//cpp/oneapi/dal/test:dataframes",
         "@onedal//cpp/oneapi/dal/backend/linalg",
     ],
 )

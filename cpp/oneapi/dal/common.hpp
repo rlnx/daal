@@ -32,6 +32,7 @@
 #ifdef NDEBUG
 #define ONEDAL_ASSERT(...)
 #else
+#define ONEDAL_DEBUG
 #include <cassert>
 #include <iostream>
 #define __ONEDAL_ASSERT_NO_MESSAGE__(condition) assert(condition);

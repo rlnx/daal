@@ -91,6 +91,8 @@
 
 // clang-format on
 
+#define GENERATE_RANGE(...) GENERATE(Catch::Generators::range(__VA_ARGS__))
+
 #ifdef ONEAPI_DAL_DATA_PARALLEL
 #define DECLARE_TEST_POLICY(policy_name) oneapi::dal::test::device_test_policy policy_name
 #else
@@ -100,11 +102,11 @@
 namespace oneapi::dal::test {
 
 template <typename Float>
-inline double get_tolerance(double double_tol, double float_tol) {
+inline double eps(double float_eps, double double_eps) {
     if constexpr (std::is_same_v<std::decay_t<Float>, double>) {
-        return double_tol;
+        return double_eps;
     }
-    return float_tol;
+    return float_eps;
 }
 
 class host_test_policy {};
