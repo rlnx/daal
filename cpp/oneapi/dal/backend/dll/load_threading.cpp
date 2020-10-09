@@ -24,9 +24,8 @@ static HMODULE threading_layer_dll_handle = nullptr;
 
 static void check_threading_layer() {
     if (!threading_layer_dll_handle) {
-        throw oneapi::dal::internal_error{
-            "Cannot load threading layer DLL. "
-            "Make sure 'onedal_thread.dll' is present in PATH"};
+        throw oneapi::dal::internal_error{ "Cannot load threading layer DLL. "
+                                           "Make sure 'onedal_thread.dll' is present in PATH" };
     }
 }
 
@@ -38,24 +37,24 @@ static void try_load_threading_layer() {
     }
 }
 
-static FARPROC get_function_pointer(const char* function_name) {
+static FARPROC get_function_pointer(const char *function_name) {
     check_threading_layer();
 
     FARPROC function_pointer = GetProcAddress(threading_layer_dll_handle, function_name);
     if (!function_pointer) {
         throw oneapi::dal::internal_error{
             "Cannot load function from threading layer DLL. Symbol " +
-            std::string{function_name} + " is not found"};
+            std::string{ function_name } + " is not found"
+        };
     }
 
     return function_pointer;
 }
 
 #define DEFINE_DLL_FUNCTION_PROXY_ISA(ReturnType, prefix, isa, name, parameters, args) \
-    using prefix##isa##_##name##_ptr_t = ReturnType (*) parameters;                    \
+    using prefix##isa##_##name##_ptr_t = ReturnType(*) parameters;                     \
     static prefix##isa##_##name##_ptr_t prefix##isa##_##name##_ptr = nullptr;          \
-    extern "C" ReturnType prefix##isa##_##name parameters                              \
-    {                                                                                  \
+    extern "C" ReturnType prefix##isa##_##name parameters {                            \
         if (!prefix##isa##_##name##_ptr) {                                             \
             try_load_threading_layer();                                                \
             auto f_ptr = get_function_pointer(#prefix #isa "_" #name);                 \
@@ -64,23 +63,32 @@ static FARPROC get_function_pointer(const char* function_name) {
         return prefix##isa##_##name##_ptr args;                                        \
     }
 
-#define DEFINE_DLL_FUNCTION_PROXY(ReturnType, prefix, name, parameters, args)              \
-    DEFINE_DLL_FUNCTION_PROXY_ISA(ReturnType, prefix, sse2, name, parameters, args)        \
-    ONEDAL_IF_CPU_DISPATCH_SSSE3(                                                          \
-        DEFINE_DLL_FUNCTION_PROXY_ISA(ReturnType, prefix, ssse3, name, parameters, args))  \
-    ONEDAL_IF_CPU_DISPATCH_SSE42(                                                          \
-        DEFINE_DLL_FUNCTION_PROXY_ISA(ReturnType, prefix, sse42, name, parameters, args))  \
-    ONEDAL_IF_CPU_DISPATCH_AVX(                                                            \
-        DEFINE_DLL_FUNCTION_PROXY_ISA(ReturnType, prefix, avx, name, parameters, args))    \
-    ONEDAL_IF_CPU_DISPATCH_AVX2(                                                           \
-        DEFINE_DLL_FUNCTION_PROXY_ISA(ReturnType, prefix, avx2, name, parameters, args))   \
-    ONEDAL_IF_CPU_DISPATCH_AVX512(                                                         \
+#define DEFINE_DLL_FUNCTION_PROXY(ReturnType, prefix, name, parameters, args)             \
+    DEFINE_DLL_FUNCTION_PROXY_ISA(ReturnType, prefix, sse2, name, parameters, args)       \
+    ONEDAL_IF_CPU_DISPATCH_SSSE3(                                                         \
+        DEFINE_DLL_FUNCTION_PROXY_ISA(ReturnType, prefix, ssse3, name, parameters, args)) \
+    ONEDAL_IF_CPU_DISPATCH_SSE42(                                                         \
+        DEFINE_DLL_FUNCTION_PROXY_ISA(ReturnType, prefix, sse42, name, parameters, args)) \
+    ONEDAL_IF_CPU_DISPATCH_AVX(                                                           \
+        DEFINE_DLL_FUNCTION_PROXY_ISA(ReturnType, prefix, avx, name, parameters, args))   \
+    ONEDAL_IF_CPU_DISPATCH_AVX2(                                                          \
+        DEFINE_DLL_FUNCTION_PROXY_ISA(ReturnType, prefix, avx2, name, parameters, args))  \
+    ONEDAL_IF_CPU_DISPATCH_AVX512(                                                        \
         DEFINE_DLL_FUNCTION_PROXY_ISA(ReturnType, prefix, avx512, name, parameters, args))
 
-#define GEMM_PARAMETERS(Float)                                                             \
-    (const char *transa, const char *transb, const std::int64_t *m, const std::int64_t *n, \
-     const std::int64_t *k, const Float *alpha, const Float *a, const std::int64_t *lda,   \
-     const Float *b, const std::int64_t *ldb, const Float *beta, const Float *c,           \
+#define GEMM_PARAMETERS(Float) \
+    (const char *transa,       \
+     const char *transb,       \
+     const std::int64_t *m,    \
+     const std::int64_t *n,    \
+     const std::int64_t *k,    \
+     const Float *alpha,       \
+     const Float *a,           \
+     const std::int64_t *lda,  \
+     const Float *b,           \
+     const std::int64_t *ldb,  \
+     const Float *beta,        \
+     const Float *c,           \
      const std::int64_t *ldc)
 
 #define GEMM_ARGS(Float) (transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc)

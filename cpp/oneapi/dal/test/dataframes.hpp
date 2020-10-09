@@ -34,7 +34,9 @@ public:
     explicit dataframe_impl(const array<float>& data,
                             std::int64_t row_count,
                             std::int64_t column_count)
-            : array_(data), row_count_(row_count), column_count_(column_count) {
+            : array_(data),
+              row_count_(row_count),
+              column_count_(column_count) {
         array_.need_mutable_data();
     }
 
@@ -72,7 +74,7 @@ public:
         for (std::int64_t i = 0; i < array_.get_count(); i++) {
             array_copy_data[i] = array_data[i];
         }
-        return new dataframe_impl{array_copy, row_count_, column_count_};
+        return new dataframe_impl{ array_copy, row_count_, column_count_ };
     }
 
     const array<double>& get_cached_column_means() const {
@@ -104,8 +106,7 @@ public:
     explicit dataframe(const array<float>& data, std::int64_t row_count, std::int64_t column_count)
             : dataframe(new dataframe_impl{ data, row_count, column_count }) {}
 
-    explicit dataframe(dataframe_impl* impl)
-            : impl_(impl) {}
+    explicit dataframe(dataframe_impl* impl) : impl_(impl) {}
 
     template <typename Float>
     table get_table(const std::string& table_type) const;
@@ -157,7 +158,7 @@ private:
     dataframe mutate_impl(Op&& op) const {
         auto impl_copy = impl_->copy();
         op(*impl_copy);
-        return dataframe{impl_copy};
+        return dataframe{ impl_copy };
     }
 
     dal::detail::pimpl<dataframe_impl> impl_;
@@ -177,8 +178,8 @@ public:
     dataframe_builder_program& operator=(const dataframe_builder_program&) = delete;
 
     template <typename Action, typename... Args>
-    void add(Args&& ...args) {
-        actions_.emplace_back(new Action{std::forward<Args>(args)...});
+    void add(Args&&... args) {
+        actions_.emplace_back(new Action{ std::forward<Args>(args)... });
         code_ += actions_.back()->get_opcode();
     }
 
@@ -210,9 +211,9 @@ private:
 class dataframe_builder {
 public:
     explicit dataframe_builder(std::int64_t row_count, std::int64_t column_count)
-        : impl_(new dataframe_builder_impl{ row_count, column_count }) {}
+            : impl_(new dataframe_builder_impl{ row_count, column_count }) {}
 
-    dataframe_builder& fill_uniform(double a, double b, std::int64_t seed=7777);
+    dataframe_builder& fill_uniform(double a, double b, std::int64_t seed = 7777);
 
     dataframe build() const;
 

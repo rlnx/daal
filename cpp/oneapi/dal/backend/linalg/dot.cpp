@@ -33,37 +33,37 @@ void dot_op<Float>::operator()(const context_cpu &ctx,
         const bool is_a_trans = (a.get_layout() == layout::column_major);
         const bool is_b_trans = (b.get_layout() == layout::column_major);
         mkl::gemm<Float>(ctx,
-                      is_b_trans,
-                      is_a_trans,
-                      c.get_column_count(),
-                      c.get_row_count(),
-                      a.get_column_count(),
-                      alpha,
-                      b.get_data(),
-                      b.get_stride(),
-                      a.get_data(),
-                      a.get_stride(),
-                      beta,
-                      c.get_mutable_data(),
-                      c.get_stride());
+                         is_b_trans,
+                         is_a_trans,
+                         c.get_column_count(),
+                         c.get_row_count(),
+                         a.get_column_count(),
+                         alpha,
+                         b.get_data(),
+                         b.get_stride(),
+                         a.get_data(),
+                         a.get_stride(),
+                         beta,
+                         c.get_mutable_data(),
+                         c.get_stride());
     }
     else {
         const bool is_a_trans = (a.get_layout() == layout::row_major);
         const bool is_b_trans = (b.get_layout() == layout::row_major);
         mkl::gemm<Float>(ctx,
-                      is_a_trans,
-                      is_b_trans,
-                      c.get_row_count(),
-                      c.get_column_count(),
-                      a.get_column_count(),
-                      alpha,
-                      a.get_data(),
-                      a.get_stride(),
-                      b.get_data(),
-                      b.get_stride(),
-                      beta,
-                      c.get_mutable_data(),
-                      c.get_stride());
+                         is_a_trans,
+                         is_b_trans,
+                         c.get_row_count(),
+                         c.get_column_count(),
+                         a.get_column_count(),
+                         alpha,
+                         a.get_data(),
+                         a.get_stride(),
+                         b.get_data(),
+                         b.get_stride(),
+                         beta,
+                         c.get_mutable_data(),
+                         c.get_stride());
     }
 }
 

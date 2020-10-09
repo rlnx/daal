@@ -73,15 +73,16 @@ public:
               element_count_(expected.get_count()) {}
 
     explicit array_like_matcher(const table& expected)
-            : expected_(row_accessor<const ComparisonType>{expected}.pull()),
+            : expected_(row_accessor<const ComparisonType>{ expected }.pull()),
               row_count_(expected.get_row_count()),
               column_count_(expected.get_column_count()),
               element_count_(expected.get_row_count() * expected.get_column_count()) {}
 
-
     bool match(const table& actual) const override {
-        const auto actual_array = row_accessor<const ComparisonType>{actual}.pull();
-        return match_tabular(actual_array.get_data(), actual.get_row_count(), actual.get_column_count());
+        const auto actual_array = row_accessor<const ComparisonType>{ actual }.pull();
+        return match_tabular(actual_array.get_data(),
+                             actual.get_row_count(),
+                             actual.get_column_count());
     }
 
     bool match(const dal::backend::linalg::matrix<float>& actual) const override {
@@ -95,7 +96,9 @@ public:
     template <typename T>
     bool match_matrix(const dal::backend::linalg::matrix<T>& actual) const {
         const auto actual_array = convert_array(actual.get_array());
-        return match_tabular(actual_array.get_data(), actual.get_row_count(), actual.get_column_count());
+        return match_tabular(actual_array.get_data(),
+                             actual.get_row_count(),
+                             actual.get_column_count());
     }
 
 private:
@@ -105,13 +108,16 @@ private:
         if (expected_is_tabular()) {
             if (actual_row_count != row_count_) {
                 UNSCOPED_INFO(fmt::format("Unexpected row count in LHS expression: {}, expected {}",
-                              actual_row_count, row_count_));
+                                          actual_row_count,
+                                          row_count_));
                 return false;
             }
 
             if (actual_column_count != column_count_) {
-                UNSCOPED_INFO(fmt::format("Unexpected column count in LHS expression: {}, expected {}",
-                              actual_column_count, column_count_));
+                UNSCOPED_INFO(
+                    fmt::format("Unexpected column count in LHS expression: {}, expected {}",
+                                actual_column_count,
+                                column_count_));
                 return false;
             }
 
@@ -120,8 +126,10 @@ private:
         else {
             const std::int64_t actual_element_count = actual_row_count * actual_column_count;
             if (actual_element_count != element_count_) {
-                UNSCOPED_INFO(fmt::format("Unexpected element count in LHS expression: {}, expected {}",
-                              actual_element_count, element_count_));
+                UNSCOPED_INFO(
+                    fmt::format("Unexpected element count in LHS expression: {}, expected {}",
+                                actual_element_count,
+                                element_count_));
                 return false;
             }
         }
@@ -171,7 +179,10 @@ struct exact_element_matcher {
         const bool is_match = (actual == expected);
         if (!is_match) {
             UNSCOPED_INFO(fmt::format("Mismatch detected at [{}, {}]: got {}, but expected {}",
-                          i, j, actual, expected));
+                                      i,
+                                      j,
+                                      actual,
+                                      expected));
         }
         return is_match;
     }
@@ -179,15 +190,19 @@ struct exact_element_matcher {
 
 template <typename Float>
 struct approx_element_matcher {
-    explicit approx_element_matcher(double epsilon = 1e-10)
-            : epsilon_(epsilon) {}
+    explicit approx_element_matcher(double epsilon = 1e-10) : epsilon_(epsilon) {}
 
     bool operator()(std::int64_t i, std::int64_t j, Float actual, Float expected) const {
         const double diff = std::abs(double(actual) - double(expected));
         const bool is_match = diff < epsilon_;
         if (!is_match) {
             UNSCOPED_INFO(fmt::format("Mismatch detected at [{}, {}]: |{} - {}| = {} > {}",
-                          i, j, actual, expected, diff, epsilon_));
+                                      i,
+                                      j,
+                                      actual,
+                                      expected,
+                                      diff,
+                                      epsilon_));
         }
         return is_match;
     }
@@ -196,10 +211,12 @@ struct approx_element_matcher {
 };
 
 template <typename ComparisonType>
-using array_like_exact_matcher = array_like_matcher<ComparisonType, exact_element_matcher<ComparisonType>>;
+using array_like_exact_matcher =
+    array_like_matcher<ComparisonType, exact_element_matcher<ComparisonType>>;
 
 template <typename ComparionType>
-class array_like_approx_matcher : public array_like_matcher<ComparionType, approx_element_matcher<ComparionType>> {
+class array_like_approx_matcher
+        : public array_like_matcher<ComparionType, approx_element_matcher<ComparionType>> {
 private:
     using super = array_like_matcher<ComparionType, approx_element_matcher<ComparionType>>;
 

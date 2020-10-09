@@ -37,9 +37,10 @@ ALGO_TEST_CASE("PCA general flow", (float, double), (method::cov)) {
     const std::int64_t component_count = GENERATE(2, 3, 5);
 
     const table x = data.get_table<Float>(policy, table_type);
-    const auto pca_desc = descriptor<Float, Method>{}
-                                .set_component_count(component_count)
-                                .set_deterministic(false);
+
+    const auto pca_desc = descriptor<Float, Method>{} //
+                              .set_component_count(component_count) //
+                              .set_deterministic(false);
 
     train_result result;
     SECTION("training") {
@@ -56,12 +57,12 @@ ALGO_TEST_CASE("PCA general flow", (float, double), (method::cov)) {
         CHECK_TABLE(Float, eigenvectors, (component_count, x.get_column_count()));
 
         SECTION("ensure model and result eigenvectors are the same") {
-            REQUIRE(mdl.get_eigenvectors() == ts::all_exact<Float>{eigenvectors});
+            REQUIRE(mdl.get_eigenvectors() == ts::all_exact<Float>{ eigenvectors });
         }
 
         SECTION("ensure means are correct") {
             const auto expected_means = data.column_means();
-            REQUIRE(means == ts::all_close<Float>{expected_means, ts::eps<Float>(1e-4, 1e-10)});
+            REQUIRE(means == ts::all_close<Float>{ expected_means, ts::eps<Float>(1e-4, 1e-10) });
         }
 
         SECTION("ensure eigenvalues order is descending") {
@@ -77,7 +78,7 @@ ALGO_TEST_CASE("PCA general flow", (float, double), (method::cov)) {
             const auto V = la::matrix<double>::wrap(eigenvectors);
             const auto E = la::matrix<double>::eye(V.get_row_count());
             const auto VxVT = la::dot(V, V.T());
-            CHECK(VxVT == ts::all_close<double>{E, ts::eps<Float>(1e-4, 1e-10)});
+            CHECK(VxVT == ts::all_close<double>{ E, ts::eps<Float>(1e-4, 1e-10) });
         }
     }
 

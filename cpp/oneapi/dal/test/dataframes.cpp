@@ -29,9 +29,9 @@ namespace oneapi::dal::test {
 
 class dataframe_builder_cache_entry {
 public:
-    dataframe_builder_cache_entry(const dataframe& df,
-                                  std::size_t generation)
-            : df_(df), generation_(generation) {}
+    dataframe_builder_cache_entry(const dataframe& df, std::size_t generation)
+            : df_(df),
+              generation_(generation) {}
 
     const dataframe& get_df() const {
         return df_;
@@ -65,9 +65,9 @@ public:
         if (it == map_.end()) {
             const auto df = program.execute();
             store(program.get_code(), df);
-            return {df, false};
+            return { df, false };
         }
-        return {it->second.get_df(), true};
+        return { it->second.get_df(), true };
     }
 
     double get_occupied_size_mb() const {
@@ -82,7 +82,7 @@ private:
 
         // We store new entry even if its size does not fit the cache
         // until new entry comes
-        map_.emplace(key, cache_entry{df, size_stack.size()});
+        map_.emplace(key, cache_entry{ df, size_stack.size() });
         size_stack.push_back(df.get_size());
         cache_size_ += df.get_size();
 
@@ -199,12 +199,14 @@ static std::mt19937& get_random_engine() {
 class dataframe_builder_action_allocate : public dataframe_builder_action {
 public:
     explicit dataframe_builder_action_allocate(std::int64_t row_count, std::int64_t column_count)
-            : row_count_(row_count), column_count_(column_count) {
+            : row_count_(row_count),
+              column_count_(column_count) {
         if (row_count == 0 || column_count == 0) {
-            throw invalid_argument{
-                fmt::format("Invalid dataframe shape, row and column count must be positive, "
-                            "but got row_count = {}, column_count = {}", row_count, column_count)
-            };
+            throw invalid_argument{ fmt::format(
+                "Invalid dataframe shape, row and column count must be positive, "
+                "but got row_count = {}, column_count = {}",
+                row_count,
+                column_count) };
         }
     }
 
@@ -215,7 +217,7 @@ public:
     dataframe_impl* execute(dataframe_impl* df) const override {
         delete df;
         const auto arr = array<float>::empty(row_count_ * column_count_);
-        return new dataframe_impl{arr, row_count_, column_count_};
+        return new dataframe_impl{ arr, row_count_, column_count_ };
     }
 
 private:
@@ -226,12 +228,14 @@ private:
 class dataframe_builder_action_fill_uniform : public dataframe_builder_action {
 public:
     explicit dataframe_builder_action_fill_uniform(double a, double b, std::int64_t seed)
-            : a_(a), b_(b), seed_(seed) {
+            : a_(a),
+              b_(b),
+              seed_(seed) {
         if (a >= b) {
-            throw invalid_argument{
-                fmt::format("Invalid uniform distribution interval, "
-                            "expected b > a, but got a = {}, b = {}", a, b)
-            };
+            throw invalid_argument{ fmt::format("Invalid uniform distribution interval, "
+                                                "expected b > a, but got a = {}, b = {}",
+                                                a,
+                                                b) };
         }
     }
 
@@ -241,7 +245,7 @@ public:
 
     dataframe_impl* execute(dataframe_impl* df) const override {
         if (!df) {
-            throw invalid_argument{"Action fill_uniform got null dataframe"};
+            throw invalid_argument{ "Action fill_uniform got null dataframe" };
         }
 
         auto& engine = get_random_engine();
@@ -266,7 +270,7 @@ dataframe dataframe_builder_program::execute() const {
     for (const auto& action : actions_) {
         impl = action->execute(impl);
     }
-    return dataframe{impl};
+    return dataframe{ impl };
 }
 
 dataframe_builder_impl::dataframe_builder_impl(std::int64_t row_count, std::int64_t column_count) {
@@ -283,8 +287,10 @@ dataframe dataframe_builder::build() const {
     const auto [df, hit] = get_dataframe_builder_cache().lookup(program);
 #ifdef ONEDAL_DEBUG_DATAFRAMES_CACHE
     const std::string hit_or_miss = hit ? "hit" : "miss";
-    fmt::print("{}\t{}\t{:.2f}Mb\n", hit_or_miss, program.get_code(),
-                get_dataframe_builder_cache().get_occupied_size_mb());
+    fmt::print("{}\t{}\t{:.2f}Mb\n",
+               hit_or_miss,
+               program.get_code(),
+               get_dataframe_builder_cache().get_occupied_size_mb());
 #endif
     return df;
 }
@@ -389,8 +395,7 @@ table dataframe::get_table(device_test_policy& policy, const std::string& table_
 }
 #endif
 
-#define INSTANTIATE(Float) \
-    template table dataframe::get_table<Float>(const std::string&) const;
+#define INSTANTIATE(Float) template table dataframe::get_table<Float>(const std::string&) const;
 
 INSTANTIATE(float)
 INSTANTIATE(double)

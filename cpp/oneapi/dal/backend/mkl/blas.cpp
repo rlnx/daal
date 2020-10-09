@@ -19,16 +19,16 @@
 
 namespace oneapi::dal::backend::mkl {
 
-#define GEMM_PARAMETERS_FORTRAN(Float)                                                    \
-    const char *transa, const char *transb, const std::int64_t *m, const std::int64_t *n, \
-    const std::int64_t *k, const Float *alpha, const Float *a, const std::int64_t *lda,   \
-    const Float *b, const std::int64_t *ldb, const Float *beta, const Float *c,           \
-    const std::int64_t *ldc
+#define GEMM_PARAMETERS_FORTRAN(Float)                                                      \
+    const char *transa, const char *transb, const std::int64_t *m, const std::int64_t *n,   \
+        const std::int64_t *k, const Float *alpha, const Float *a, const std::int64_t *lda, \
+        const Float *b, const std::int64_t *ldb, const Float *beta, const Float *c,         \
+        const std::int64_t *ldc
 
-#define GEMM_PARAMETERS_C(Float)                                                     \
-    bool transa, bool transb, std::int64_t m, std::int64_t n, std::int64_t k,        \
-    Float alpha, const Float *a, std::int64_t lda, const Float *b, std::int64_t ldb, \
-    Float beta, Float *c, std::int64_t ldc
+#define GEMM_PARAMETERS_C(Float)                                                                  \
+    bool transa, bool transb, std::int64_t m, std::int64_t n, std::int64_t k, Float alpha,        \
+        const Float *a, std::int64_t lda, const Float *b, std::int64_t ldb, Float beta, Float *c, \
+        std::int64_t ldc
 
 #define GEMM_ARGS(Float) transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc
 
@@ -45,7 +45,7 @@ inline void gemm_cpu(GEMM_PARAMETERS_C(Float)) {
 }
 
 template <typename Float>
-inline void gemm_ctx(const context_cpu& ctx, GEMM_PARAMETERS_C(Float)) {
+inline void gemm_ctx(const context_cpu &ctx, GEMM_PARAMETERS_C(Float)) {
     dispatch_by_cpu(ctx, [&](auto cpu) {
         gemm_cpu<Float, decltype(cpu)>(GEMM_ARGS(Float));
     });
@@ -62,24 +62,23 @@ void gemm(GEMM_PARAMETERS_C(Float)) {
 }
 
 template <typename Float>
-void gemm(const context_cpu& ctx, GEMM_PARAMETERS_C(Float)) {
+void gemm(const context_cpu &ctx, GEMM_PARAMETERS_C(Float)) {
     gemm_ctx<Float>(ctx, GEMM_ARGS(Float));
 }
 
-#define INSTANTIATE_GEMM_CPU(Float, Cpu)                      \
-    template void gemm<Float, Cpu>(GEMM_PARAMETERS_C(Float)); \
+#define INSTANTIATE_GEMM_CPU(Float, Cpu) template void gemm<Float, Cpu>(GEMM_PARAMETERS_C(Float));
 
-#define INSTANTIATE_GEMM_CTX(Float)                                          \
-    template void gemm<Float>(const context_cpu&, GEMM_PARAMETERS_C(Float)); \
+#define INSTANTIATE_GEMM_CTX(Float) \
+    template void gemm<Float>(const context_cpu &, GEMM_PARAMETERS_C(Float));
 
-#define INSTANTIATE_GEMM(Float)                                                     \
-    INSTANTIATE_GEMM_CTX(Float)                                                     \
-    INSTANTIATE_GEMM_CPU(Float, void)                                               \
-    INSTANTIATE_GEMM_CPU(Float, cpu_dispatch_default)                               \
-    ONEDAL_IF_CPU_DISPATCH_SSSE3(INSTANTIATE_GEMM_CPU(Float, cpu_dispatch_ssse3))   \
-    ONEDAL_IF_CPU_DISPATCH_SSE42(INSTANTIATE_GEMM_CPU(Float, cpu_dispatch_sse42))   \
-    ONEDAL_IF_CPU_DISPATCH_AVX(INSTANTIATE_GEMM_CPU(Float, cpu_dispatch_avx))       \
-    ONEDAL_IF_CPU_DISPATCH_AVX2(INSTANTIATE_GEMM_CPU(Float, cpu_dispatch_avx2))     \
+#define INSTANTIATE_GEMM(Float)                                                   \
+    INSTANTIATE_GEMM_CTX(Float)                                                   \
+    INSTANTIATE_GEMM_CPU(Float, void)                                             \
+    INSTANTIATE_GEMM_CPU(Float, cpu_dispatch_default)                             \
+    ONEDAL_IF_CPU_DISPATCH_SSSE3(INSTANTIATE_GEMM_CPU(Float, cpu_dispatch_ssse3)) \
+    ONEDAL_IF_CPU_DISPATCH_SSE42(INSTANTIATE_GEMM_CPU(Float, cpu_dispatch_sse42)) \
+    ONEDAL_IF_CPU_DISPATCH_AVX(INSTANTIATE_GEMM_CPU(Float, cpu_dispatch_avx))     \
+    ONEDAL_IF_CPU_DISPATCH_AVX2(INSTANTIATE_GEMM_CPU(Float, cpu_dispatch_avx2))   \
     ONEDAL_IF_CPU_DISPATCH_AVX512(INSTANTIATE_GEMM_CPU(Float, cpu_dispatch_avx512))
 
 INSTANTIATE_GEMM(float)

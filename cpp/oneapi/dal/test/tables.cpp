@@ -43,8 +43,7 @@ index_2d find_inf(const table& t) {
     });
 }
 
-#define INSTANTIATE(Data)                                 \
-    template index_2d find<Data>(const table& x, Data v); \
+#define INSTANTIATE(Data) template index_2d find<Data>(const table& x, Data v);
 
 #define INSTANTIATE_FLOAT(Float)                       \
     template index_2d find_nan<Float>(const table& x); \

@@ -22,8 +22,8 @@
 #include "oneapi/dal/table/row_accessor.hpp"
 #include "oneapi/dal/table/detail/table_builder.hpp"
 
-#define CHECK_TABLE_SHAPE(t, shape)                      \
-    SECTION("ensure " #t "'s shape") {                   \
+#define CHECK_TABLE_SHAPE(t, shape)                        \
+    SECTION("ensure " #t "'s shape") {                     \
         REQUIRE(t.get_row_count() == _TS_GET_0(shape));    \
         REQUIRE(t.get_column_count() == _TS_GET_1(shape)); \
     }
@@ -58,7 +58,7 @@ inline index_2d find_if(const table& x, Predicate&& predicate) {
     const std::int64_t row_count = x.get_row_count();
     const std::int64_t column_count = x.get_column_count();
 
-    const auto arr_x = row_accessor<const Data>{x}.pull();
+    const auto arr_x = row_accessor<const Data>{ x }.pull();
     for (std::int64_t i = 0; i < row_count; i++) {
         for (std::int64_t j = 0; j < column_count; j++) {
             if (predicate(arr_x[i * column_count + j])) {
