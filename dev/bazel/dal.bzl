@@ -141,7 +141,7 @@ def dal_dynamic_lib(name, lib_name, dal_deps=[], host_deps=[],
     )
 
 def dal_test(name, hdrs=[], srcs=[],
-             dal_deps=[], extra_deps=[],
+             dal_deps=[], dal_test_deps=[], extra_deps=[],
              host_hdrs=[], host_srcs=[], host_deps=[],
              dpc_hdrs=[], dpc_srcs=[], dpc_deps=[],
              host=True, dpc=True, framework="gtest",
@@ -182,7 +182,8 @@ def dal_test(name, hdrs=[], srcs=[],
             ],
         }) + ([
             "@onedal//cpp/oneapi/dal/test:common",
-        ] if catch2 else []),
+        ] if catch2 else []) +
+        dal_test_deps,
         extra_deps = _select({
             "@config//:dev_test_link_mode": [
                 "@onedal//cpp/daal:threading_static",

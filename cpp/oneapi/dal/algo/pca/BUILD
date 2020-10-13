@@ -27,4 +27,7 @@ dal_test_suite(
         "@onedal//cpp/oneapi/dal/test:dataframes",
         "@onedal//cpp/oneapi/dal/backend/linalg",
     ],
+    extra_deps = [
+        "@xtensor//:xtensor",
+    ],
 )

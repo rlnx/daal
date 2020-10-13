@@ -15,7 +15,6 @@
 *******************************************************************************/
 
 #include "oneapi/dal/algo/pca/train.hpp"
-
 #include "oneapi/dal/test/tables.hpp"
 #include "oneapi/dal/test/matchers.hpp"
 #include "oneapi/dal/test/dataframes.hpp"
@@ -27,7 +26,7 @@ namespace oneapi::dal::pca::test {
 namespace ts = dal::test;
 namespace la = dal::backend::linalg;
 
-ALGO_TEST_CASE("PCA general flow", (float, double), (method::cov)) {
+ALGO_TEST_CASE("pca general flow", (float, double), (method::cov)) {
     DECLARE_TEST_POLICY(policy);
 
     const ts::dataframe data =

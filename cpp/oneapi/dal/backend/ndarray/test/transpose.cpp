@@ -14,7 +14,16 @@
 * limitations under the License.
 *******************************************************************************/
 
-#pragma once
+#include "oneapi/dal/test/common.hpp"
+#include "oneapi/dal/backend/ndarray/test/fixtures.hpp"
 
-#include "oneapi/dal/backend/linalg/matrix.hpp"
-#include "oneapi/dal/backend/linalg/dot.hpp"
+namespace oneapi::dal::backend::ndarray::test {
+
+namespace nd = oneapi::dal::backend::ndarray;
+
+TEST_CASE_METHOD(array2d_fixture<nd::order::c>, "can transpose 2d array", "[ndarray][transpose]") {
+    // nd::transpose(arr_);
+
+}
+
+} // namespace oneapi::dal::backend::ndarray::test
