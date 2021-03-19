@@ -82,7 +82,8 @@ inline double measure_bandwidth(std::size_t traffic_in_bytes, Op op, std::size_t
     return bandwidth_bytes_per_second;
 }
 
-inline void measure_global_memory_bandwidth_peak(sycl::queue& q, size_t mem_size) {
+template <typename T>
+inline void check_memory_size(sycl::queue& q, std::size_t mem_size) {
     const std::size_t max_mem_alloc_size =
         q.get_device().get_info<sycl::info::device::max_mem_alloc_size>();
     if (mem_size > max_mem_alloc_size) {
@@ -91,10 +92,14 @@ inline void measure_global_memory_bandwidth_peak(sycl::queue& q, size_t mem_size
                                      format_memory(max_mem_alloc_size) };
     }
 
-    if (mem_size % sizeof(float) > 0) {
+    if (mem_size % sizeof(T) > 0) {
         throw std::invalid_argument{ "mem_size must be a multiple of " +
-                                     std::to_string(sizeof(float)) };
+                                     std::to_string(sizeof(T)) };
     }
+}
+
+inline void measure_global_memory_bandwidth_peak(sycl::queue& q, std::size_t mem_size) {
+    check_memory_size<float>(q, mem_size);
 
     const std::size_t count = mem_size / sizeof(float);
     const auto data = be::make_unique_usm_device<float>(q, std::int64_t(count));
@@ -107,6 +112,7 @@ inline void measure_global_memory_bandwidth_peak(sycl::queue& q, size_t mem_size
         });
     });
     fmt::print("Read bandwidth: {}/s \n", format_memory(read_bandwidth));
+    std::cout.flush();
 
     const double write_bandwidth = measure_bandwidth(mem_size, [&]() {
         return q.parallel_for(sycl::nd_range<1>(count, 256), [=](sycl::nd_item<1> item) {
@@ -115,6 +121,7 @@ inline void measure_global_memory_bandwidth_peak(sycl::queue& q, size_t mem_size
         });
     });
     fmt::print("Write bandwidth: {}/s \n", format_memory(write_bandwidth));
+    std::cout.flush();
 
     const double rw_bandwidth = measure_bandwidth(2 * mem_size, [&]() {
         return q.parallel_for(sycl::nd_range<1>(count, 256), [=](sycl::nd_item<1> item) {
@@ -122,12 +129,38 @@ inline void measure_global_memory_bandwidth_peak(sycl::queue& q, size_t mem_size
             data_ptr[i] = data_ptr[i] + 1;
         });
     });
-    fmt::print("Read/Write bandwidth: {}/s \n", format_memory(rw_bandwidth));
+    fmt::print("Read/write bandwidth: {}/s \n", format_memory(rw_bandwidth));
+    std::cout.flush();
+}
+
+inline void measure_strided_global_memory_access(sycl::queue& q, std::size_t mem_size) {
+    check_memory_size<float>(q, mem_size);
+
+    const std::size_t count = mem_size / sizeof(float);
+    const auto data = be::make_unique_usm_device<float>(q, std::int64_t(count));
+    float* data_ptr = data.get();
+
+    for (std::uint32_t stride = 1; stride <= 4096; stride <<= 1) {
+        const double bandwidth = measure_bandwidth(mem_size, [&]() {
+            const auto range = sycl::nd_range<1>{ count / stride, 256 };
+            return q.parallel_for(range, [=](sycl::nd_item<1> item) {
+                const auto i = item.get_global_id();
+                for (std::uint32_t j = 0; j < stride; j++) {
+                    [[maybe_unused]] volatile float f = data_ptr[i * stride + j];
+                }
+            });
+        });
+        fmt::print("Strided read bandwidth [stride = {}]: {}/s \n",
+                   stride,
+                   format_memory(bandwidth));
+        std::cout.flush();
+    }
 }
 
 int main(int argc, char const* argv[]) {
     auto queue = sycl::queue{ sycl::gpu_selector{}, { sycl::property::queue::enable_profiling{} } };
     const std::size_t allocation_size = 1 * (1ul << (10 * 3)); // 1Gb
     measure_global_memory_bandwidth_peak(queue, allocation_size);
+    measure_strided_global_memory_access(queue, allocation_size);
     return 0;
 }
