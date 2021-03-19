@@ -47,9 +47,29 @@ dal_test_suite(
         "test/*.cpp",
     ], exclude=[
         "test/*_dpc.cpp",
+        "test/perf*.cpp",
     ]),
     dal_deps = [
         ":common",
+    ],
+)
+
+dal_test_suite(
+    name = "perf_tests",
+    framework = "none",
+    compile_as = [ "dpc++" ],
+    private = True,
+    srcs = glob([
+        "test/perf*_dpc.cpp",
+    ]),
+    dal_deps = [
+        "@onedal//cpp/oneapi/dal:common",
+    ],
+    extra_deps = [
+        "@fmt//:fmt",
+    ],
+    tags = [
+        "exclusive",
     ],
 )
 
