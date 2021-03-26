@@ -20,115 +20,101 @@
 
 namespace oneapi::dal::detail {
 
-struct serialize_accessor {
+/// Archive interface for deserialization
+class input_archive_iface {
+public:
+    virtual ~input_archive_iface() = default;
+    virtual void process_scalar(void* data, data_type dtype) = 0;
+    virtual void process_vector(void* data, std::int64_t count, data_type dtype) = 0;
+};
+
+/// Archive interface for serialization
+class output_archive_iface {
+public:
+    virtual ~output_archive_iface() = default;
+    virtual void process_scalar(const void* data, data_type dtype) = 0;
+    virtual void process_vector(const void* data, std::int64_t count, data_type dtype) = 0;
+};
+
+struct serialization_accessor {
     template <typename Object, typename... Args>
-    static auto call(Object&& object, Args&&... args) {
-        return std::forward<Object>(object).serialize(std::forward<Args>(args)...);
+    static auto serialize(const Object& object, Args&&... args) {
+        return object.serialize(std::forward<Args>(args)...);
+    }
+
+    template <typename Object, typename... Args>
+    static auto deserialize(Object& object, Args&&... args) {
+        return object.deserialize(std::forward<Args>(args)...);
     }
 };
 
-class archive_iface {
-public:
-    virtual ~archive_iface() = default;
-    virtual void process_scalar(void* data, data_type dtype) = 0;
-    virtual void process_vector(void* data, std::int64_t& count, data_type dtype) = 0;
-};
-
-struct archive_span_tag {};
+template <typename T>
+using enable_if_trivially_serializable_t = std::enable_if_t<std::is_arithmetic_v<T>>;
 
 template <typename T>
-struct archive_span {
-public:
-    using tag_t = archive_span_tag;
+using enable_if_user_serializable_t = std::enable_if_t<!std::is_arithmetic_v<T>>;
 
-    explicit span(const T* data, const std::int64_t& count)
-            : data_(const_cast<T*>(data)),
-              count_(const_cast<std::int64_t&>(count)) {}
+template <typename Iface>
+class archive_base {
+protected:
+    explicit archive_base(Iface* impl) : impl_(impl) {}
 
-    T* data;
-    std::int64_t& get_count_ref;
+    template <typename DerivedIface = Iface>
+    DerivedIface& get_impl() {
+        return static_cast<DerivedIface&>(*impl_);
+    }
+
+    template <typename DerivedIface = Iface>
+    const DerivedIface& get_impl() const {
+        return static_cast<const DerivedIface&>(*impl_);
+    }
 
 private:
-    T* data;
-    std::int64_t& count_ref_;
-    bool is_mutable_;
+    pimpl<Iface> impl_;
 };
 
-template <typename T>
-inline constexpr bool is_archive_span_v = is_tag_one_of_v<T, archive_span_tag>;
-
-class archive {
+class output_archive : public archive_base<output_archive_iface> {
 public:
     template <typename... Args>
     void operator()(Args&&... args) {
         (process(std::forward<Args>(args)), ...);
     }
 
-    bool is_load() const {
-        return is_load_;
-    }
-
-    bool is_save() const {
-        return !is_load_;
+    template <typename T>
+    void vector(const T* data, std::int64_t count) {
+        ONEDAL_ASSERT(data);
+        process(data, count);
     }
 
 protected:
-    explicit archive(archive_iface* impl, bool is_load) : impl_(impl), is_load_(is_load) {}
-
-    template <typename Derived>
-    Derived& get_impl() {
-        return static_cast<Derived&>(*impl_);
-    }
-
-    template <typename Derived>
-    const Derived& get_impl() const {
-        return static_cast<const Derived&>(*impl_);
-    }
+    explicit output_archive(output_archive_iface* impl)
+            : archive_base<output_archive_iface>(impl) {}
 
 private:
-    template <typename T>
-    using enable_if_primitive_t = std::enable_if_t<std::is_arithmetic_v<T>>;
-
-    template <typename T>
-    using enable_if_generic_object =
-        std::enable_if_t<!std::is_arithmetic_v<T> && !is_archive_span_v<T>>;
-
-    template <typename T, enable_if_primitive_t<T>* = nullptr>
+    template <typename T, enable_if_trivially_serializable_t<T>* = nullptr>
     void process(const T& value) {
-        T& mutable_value = const_cast<T&>(value);
-        impl_->process_scalar(&mutable_value, make_data_type<T>());
+        get_impl().process_scalar(&value, make_data_type<T>());
     }
 
-    template <typename T, enable_if_generic_object<T>* = nullptr>
+    template <typename T, enable_if_user_serializable_t<T>* = nullptr>
     void process(const T& value) {
-        T& mutable_value = const_cast<T&>(value);
-        serialize_accessor::call(mutable_value, *this);
+        serialization_accessor::serialize(value, *this);
     }
 
     template <typename T>
-    void process(const archive_span<T>& value) {
-        archive_span<T>& mutable_value = const_cast<T&>(value);
-        impl_->process_vector(mutable_value.data, mutable_value.count, make_data_type<T>());
+    void process(const T* data, std::int64_t count) {
+        get_impl().process_vector(data, count, make_data_type<T>());
     }
-
-    pimpl<archive_iface> impl_;
-    bool is_load_;
 };
 
-class binary_output_archive_impl : public archive_iface {};
-
-class binary_output_archive : public archive {};
-
 template <typename T>
-inline void serialize(const T& value, archive& ar) {
-    ONEDAL_ASSERT(ar.is_load());
+inline void serialize(const T& value, output_archive& ar) {
     ar(value);
 }
 
-template <typename T>
-inline void deserialize(T& value, archive& ar) {
-    ONEDAL_ASSERT(ar.is_save());
-    ar(value);
-}
+// template <typename T>
+// inline void deserialize(T& value, input_archive& ar) {
+//     ar(value);
+// }
 
 } // namespace oneapi::dal::detail

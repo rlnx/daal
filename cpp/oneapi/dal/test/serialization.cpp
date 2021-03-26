@@ -43,13 +43,15 @@ private:
     data_type dtype_;
 };
 
-class mock_output_archive_impl : public detail::archive_iface {
+class mock_output_archive_impl : public detail::output_archive_iface {
 public:
-    void process(void* data, data_type dtype) override {
+    void process_scalar(const void* data, data_type dtype) override {
         entries_.emplace_back(data, dtype);
     }
 
-    void process(void*& data, std::int64_t count, data_type dtype) override {}
+    void process_vector(const void* data, std::int64_t count, data_type dtype) override {
+        // TODO
+    }
 
     template <typename T>
     T get(std::int64_t index) const {
@@ -61,9 +63,9 @@ private:
     std::vector<output_data_entry> entries_;
 };
 
-class mock_output_archive : public detail::archive {
+class mock_output_archive : public detail::output_archive {
 public:
-    mock_output_archive() : archive(new mock_output_archive_impl{}, false) {}
+    mock_output_archive() : detail::output_archive(new mock_output_archive_impl{}) {}
 
     template <typename T>
     T get(std::int64_t index) const {
@@ -79,7 +81,7 @@ struct pod_type {
     float x5;
     double x6;
 
-    void serialize(detail::archive& ar) {
+    void serialize(detail::output_archive& ar) const {
         ar(x1, x2, x3, x4, x5, x6);
     }
 };
@@ -95,7 +97,7 @@ TEST("save POD type") {
     pod.x5 = 32.5;
     pod.x6 = 64.6;
 
-    detail::save(pod, ar);
+    detail::serialize(pod, ar);
 
     REQUIRE(ar.get<std::int8_t>(0) == pod.x1);
     REQUIRE(ar.get<std::int16_t>(1) == pod.x2);
