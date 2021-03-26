@@ -30,9 +30,32 @@ struct serialize_accessor {
 class archive_iface {
 public:
     virtual ~archive_iface() = default;
-    virtual void process(void* data, data_type dtype) = 0;
-    virtual void process(void*& data, std::int64_t count, data_type dtype) = 0;
+    virtual void process_scalar(void* data, data_type dtype) = 0;
+    virtual void process_vector(void* data, std::int64_t& count, data_type dtype) = 0;
 };
+
+struct archive_span_tag {};
+
+template <typename T>
+struct archive_span {
+public:
+    using tag_t = archive_span_tag;
+
+    explicit span(const T* data, const std::int64_t& count)
+            : data_(const_cast<T*>(data)),
+              count_(const_cast<std::int64_t&>(count)) {}
+
+    T* data;
+    std::int64_t& get_count_ref;
+
+private:
+    T* data;
+    std::int64_t& count_ref_;
+    bool is_mutable_;
+};
+
+template <typename T>
+inline constexpr bool is_archive_span_v = is_tag_one_of_v<T, archive_span_tag>;
 
 class archive {
 public:
@@ -67,18 +90,25 @@ private:
     using enable_if_primitive_t = std::enable_if_t<std::is_arithmetic_v<T>>;
 
     template <typename T>
-    using enable_if_not_primitive_t = std::enable_if_t<!std::is_arithmetic_v<T>>;
+    using enable_if_generic_object =
+        std::enable_if_t<!std::is_arithmetic_v<T> && !is_archive_span_v<T>>;
 
     template <typename T, enable_if_primitive_t<T>* = nullptr>
     void process(const T& value) {
         T& mutable_value = const_cast<T&>(value);
-        impl_->process(&mutable_value, make_data_type<T>());
+        impl_->process_scalar(&mutable_value, make_data_type<T>());
     }
 
-    template <typename T, enable_if_not_primitive_t<T>* = nullptr>
+    template <typename T, enable_if_generic_object<T>* = nullptr>
     void process(const T& value) {
         T& mutable_value = const_cast<T&>(value);
         serialize_accessor::call(mutable_value, *this);
+    }
+
+    template <typename T>
+    void process(const archive_span<T>& value) {
+        archive_span<T>& mutable_value = const_cast<T&>(value);
+        impl_->process_vector(mutable_value.data, mutable_value.count, make_data_type<T>());
     }
 
     pimpl<archive_iface> impl_;
@@ -90,13 +120,13 @@ class binary_output_archive_impl : public archive_iface {};
 class binary_output_archive : public archive {};
 
 template <typename T>
-void load(T& value, archive& ar) {
+inline void serialize(const T& value, archive& ar) {
     ONEDAL_ASSERT(ar.is_load());
     ar(value);
 }
 
 template <typename T>
-void save(T& value, archive& ar) {
+inline void deserialize(T& value, archive& ar) {
     ONEDAL_ASSERT(ar.is_save());
     ar(value);
 }
