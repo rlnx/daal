@@ -16,21 +16,21 @@
 
 #include <type_traits>
 
-#include "oneapi/dal/backend/primitives/reduction/reduction.hpp"
-#include "oneapi/dal/backend/primitives/reduction/reduction_rm_rw.hpp"
-#include "oneapi/dal/backend/primitives/reduction/reduction_rm_cw.hpp"
+#include "oneapi/dal/backend/primitives/reduction/reduction_dpc.hpp"
+#include "oneapi/dal/backend/primitives/reduction/reduction_rm_rw_dpc.hpp"
+#include "oneapi/dal/backend/primitives/reduction/reduction_rm_cw_dpc.hpp"
 
 namespace oneapi::dal::backend::primitives {
 
 #ifdef ONEDAL_DATA_PARALLEL
 
-template <class Float, ndorder Layout, class BinaryOp, class UnaryOp>
-sycl::event reduce_rm_rw(sycl::queue& q,
-                         ndview<Float, 2, Layout>& input,
-                         ndview<Float, 1>& output,
-                         const BinaryOp binary,
-                         const UnaryOp unary,
-                         const event_vector& deps) {
+template <typename Float, typename BinaryOp, typename UnaryOp>
+inline sycl::event reduce_rm_rw(sycl::queue& q,
+                                const ndview<Float, 2, ndorder::c>& input,
+                                ndview<Float, 1>& output,
+                                const BinaryOp& binary,
+                                const UnaryOp& unary,
+                                const event_vector& deps) {
     using kernel_t = reduction_rm_rw<Float, BinaryOp, UnaryOp>;
     const auto width = input.get_dimension(1);
     const auto height = input.get_dimension(0);
@@ -41,13 +41,13 @@ sycl::event reduce_rm_rw(sycl::queue& q,
     return kernel(inp_ptr, out_ptr, width, height, stride, binary, unary, deps);
 }
 
-template <class Float, ndorder Layout, class BinaryOp, class UnaryOp>
-sycl::event reduce_rm_cw(sycl::queue& q,
-                         ndview<Float, 2, Layout>& input,
-                         ndview<Float, 1>& output,
-                         const BinaryOp binary,
-                         const UnaryOp unary,
-                         const event_vector& deps) {
+template <typename Float, typename BinaryOp, typename UnaryOp>
+inline sycl::event reduce_rm_cw(sycl::queue& q,
+                                const ndview<Float, 2, ndorder::c>& input,
+                                ndview<Float, 1>& output,
+                                const BinaryOp& binary,
+                                const UnaryOp& unary,
+                                const event_vector& deps) {
     using kernel_t = reduction_rm_cw<Float, BinaryOp, UnaryOp>;
     const auto width = input.get_dimension(1);
     const auto height = input.get_dimension(0);
@@ -58,15 +58,15 @@ sycl::event reduce_rm_cw(sycl::queue& q,
     return kernel(inp_ptr, out_ptr, width, height, stride, binary, unary, deps);
 }
 
-template <class Float, ndorder Layout, class BinaryOp, class UnaryOp>
+template <typename Float, ndorder order, typename BinaryOp, typename UnaryOp>
 sycl::event reduce_rows(sycl::queue& q,
-                        ndview<Float, 2, Layout>& input,
+                        const ndview<Float, 2, order>& input,
                         ndview<Float, 1>& output,
-                        const BinaryOp binary,
-                        const UnaryOp unary,
+                        const BinaryOp& binary,
+                        const UnaryOp& unary,
                         const event_vector& deps) {
     ONEDAL_ASSERT(input.get_dimension(0) <= output.get_dimension(0));
-    if constexpr (Layout == ndorder::c) {
+    if constexpr (order == ndorder::c) {
         return reduce_rm_rw(q, input, output, binary, unary, deps);
     }
     else {
@@ -74,20 +74,18 @@ sycl::event reduce_rows(sycl::queue& q,
         return reduce_rm_cw(q, input_tr, output, binary, unary, deps);
     }
     ONEDAL_ASSERT(false);
-    return q.submit([&](sycl::handler& h) {
-        h.depends_on(deps);
-    });
+    return sycl::event{};
 }
 
-template <class Float, ndorder Layout, class BinaryOp, class UnaryOp>
+template <typename Float, ndorder order, typename BinaryOp, typename UnaryOp>
 sycl::event reduce_cols(sycl::queue& q,
-                        ndview<Float, 2, Layout>& input,
+                        const ndview<Float, 2, order>& input,
                         ndview<Float, 1>& output,
-                        const BinaryOp binary,
-                        const UnaryOp unary,
+                        const BinaryOp& binary,
+                        const UnaryOp& unary,
                         const event_vector& deps) {
     ONEDAL_ASSERT(input.get_dimension(1) <= output.get_dimension(0));
-    if constexpr (Layout == ndorder::c) {
+    if constexpr (order == ndorder::c) {
         return reduce_rm_cw(q, input, output, binary, unary, deps);
     }
     else {
@@ -95,23 +93,21 @@ sycl::event reduce_cols(sycl::queue& q,
         return reduce_rm_rw(q, input_tr, output, binary, unary, deps);
     }
     ONEDAL_ASSERT(false);
-    return q.submit([&](sycl::handler& h) {
-        h.depends_on(deps);
-    });
+    return sycl::event{};
 }
 
-#define INSTANTIATE(F, L, B, U)                                        \
-    template sycl::event reduce_rows<F, L, B, U>(sycl::queue&,         \
-                                                 ndview<F, 2, L>&,     \
-                                                 ndview<F, 1>&,        \
-                                                 const B,              \
-                                                 const U,              \
-                                                 const event_vector&); \
-    template sycl::event reduce_cols<F, L, B, U>(sycl::queue&,         \
-                                                 ndview<F, 2, L>&,     \
-                                                 ndview<F, 1>&,        \
-                                                 const B,              \
-                                                 const U,              \
+#define INSTANTIATE(F, L, B, U)                                          \
+    template sycl::event reduce_rows<F, L, B, U>(sycl::queue&,           \
+                                                 const ndview<F, 2, L>&, \
+                                                 ndview<F, 1>&,          \
+                                                 const B&,               \
+                                                 const U&,               \
+                                                 const event_vector&);   \
+    template sycl::event reduce_cols<F, L, B, U>(sycl::queue&,           \
+                                                 const ndview<F, 2, L>&, \
+                                                 ndview<F, 1>&,          \
+                                                 const B&,               \
+                                                 const U&,               \
                                                  const event_vector&);
 
 #define INSTANTIATE_LAYOUT(F, B, U)  \
