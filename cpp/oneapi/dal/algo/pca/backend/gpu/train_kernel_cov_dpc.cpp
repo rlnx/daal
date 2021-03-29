@@ -24,8 +24,14 @@
 #include "oneapi/dal/backend/interop/error_converter.hpp"
 #include "oneapi/dal/backend/interop/table_conversion.hpp"
 
+#include "oneapi/dal/backend/primitives/blas.hpp"
+#include "oneapi/dal/backend/primitives/stat.hpp"
+#include "oneapi/dal/backend/primitives/loops.hpp"
+#include "oneapi/dal/backend/primitives/reduction.hpp"
+
 namespace oneapi::dal::pca::backend {
 
+namespace pr = dal::backend::primitives;
 namespace interop = dal::backend::interop;
 namespace daal_pca = daal::algorithms::pca;
 namespace daal_cov = daal::algorithms::covariance;
@@ -138,6 +144,49 @@ static result_t call_daal_kernel(const context_gpu& ctx,
 
 template <typename Float>
 static result_t train(const context_gpu& ctx, const descriptor_t& desc, const input_t& input) {
+    auto& q = ctx.get_queue();
+    const auto data = input.get_data();
+
+    const std::int64_t row_count = data.get_row_count();
+    const std::int64_t column_count = data.get_column_count();
+    dal::detail::check_mul_overflow(row_count, column_count);
+
+    row_accessor<const Float> data_acc{ data };
+    const auto data_arr = data_acc.pull(q, { 0, -1 }, sycl::usm::alloc::device);
+
+    const auto data_nd =
+        pr::ndview<Float, 2>::wrap(data_arr.get_data(), { row_count, column_count });
+    auto row_sums = pr::ndarray<Float, 1>::empty(q, { column_count }, sycl::usm::alloc::device);
+
+    auto reduce_event =
+        pr::reduce_rows(q, data_nd, row_sums, pr::sum<Float>{}, pr::identity<Float>{});
+
+    auto corr =
+        pr::ndarray<Float, 2>::empty(q, { column_count, column_count }, sycl::usm::alloc::device);
+    auto means = pr::ndarray<Float, 1>::empty(q, { column_count }, sycl::usm::alloc::device);
+    auto vars = pr::ndarray<Float, 1>::empty(q, { column_count }, sycl::usm::alloc::device);
+    auto tmp = pr::ndarray<Float, 1>::empty(q, { column_count }, sycl::usm::alloc::device);
+
+    auto cor_event = pr::correlation(q, data, row_sums, corr, means, vars, tmp, { reduce_event });
+
+    cor_event.wait_and_throw();
+
+    // model_t{}.
+
+    // array<Float>
+
+    // data_block_arr;
+    // // const std::int64_t max_block_row_count = 2048;
+
+    // pr::for_each_block(data, max_block_row_count, [&](const pr::row_block_info& bi) {
+    //     data_acc.pull(queue, data_block_arr, bi.get_row_range(), sycl::usm::alloc::device);
+    //     auto data_block = pr::ndview<Float, 2>::wrap(data_block_arr.get_data(), bi.get_shape());
+
+    //     pr::gemm(queue, data_block.t(), data_block, );
+
+    //     // bi.get_row_range();
+    // });
+
     return call_daal_kernel<Float>(ctx, desc, input.get_data());
 }
 

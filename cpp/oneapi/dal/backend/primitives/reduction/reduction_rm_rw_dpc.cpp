@@ -78,9 +78,9 @@ template <typename Float, typename BinaryOp, typename UnaryOp>
 reduction_rm_rw_wide<Float, BinaryOp, UnaryOp>::reduction_rm_rw_wide(sycl::queue& q_,
                                                                      const std::int64_t wg_)
         : q(q_),
-          wg(wg_) {
-    ONEDAL_ASSERT(wg <= max_wg(q));
-};
+          wg(wg_){
+              // ONEDAL_ASSERT(wg <= max_wg(q));
+          };
 
 template <typename Float, typename BinaryOp, typename UnaryOp>
 reduction_rm_rw_wide<Float, BinaryOp, UnaryOp>::reduction_rm_rw_wide(sycl::queue& q_)
@@ -207,9 +207,9 @@ template <typename Float, typename BinaryOp, typename UnaryOp>
 reduction_rm_rw_narrow<Float, BinaryOp, UnaryOp>::reduction_rm_rw_narrow(sycl::queue& q_,
                                                                          const std::int64_t wg_)
         : q(q_),
-          wg(wg_) {
-    ONEDAL_ASSERT(wg <= max_wg(q));
-};
+          wg(wg_){
+              // ONEDAL_ASSERT(wg <= max_wg(q));
+          };
 
 template <typename Float, typename BinaryOp, typename UnaryOp>
 reduction_rm_rw_narrow<Float, BinaryOp, UnaryOp>::reduction_rm_rw_narrow(sycl::queue& q_)

@@ -22,6 +22,7 @@ dal_collect_modules(
         "blas",
         "reduction",
         "sort",
+        "stat",
     ],
     dal_deps = [
         ":common",
@@ -60,8 +61,8 @@ dal_collect_test_suites(
     modules = [
         "blas",
         "reduction",
-        "stat",
         "sort",
+        "stat",
     ],
     tests = [
         ":common_tests",

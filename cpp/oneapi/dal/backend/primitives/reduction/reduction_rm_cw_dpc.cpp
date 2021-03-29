@@ -225,8 +225,8 @@ reduction_rm_cw_inplace_local<Float, BinaryOp, UnaryOp>::reduction_rm_cw_inplace
         : q(q_),
           wg(wg_),
           lm(lm_) {
-    ONEDAL_ASSERT(wg <= max_wg(q));
-    ONEDAL_ASSERT(lm * sizeof(Float) <= local_mem_size(q));
+    // ONEDAL_ASSERT(wg <= max_wg(q));
+    // ONEDAL_ASSERT(lm * sizeof(Float) <= local_mem_size(q));
 };
 
 template <typename Float, typename BinaryOp, typename UnaryOp>
