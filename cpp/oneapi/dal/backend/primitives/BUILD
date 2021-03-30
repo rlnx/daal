@@ -20,6 +20,7 @@ dal_collect_modules(
     root = "@onedal//cpp/oneapi/dal/backend/primitives",
     modules = [
         "blas",
+        "lapack",
         "reduction",
         "sort",
         "stat",
@@ -60,6 +61,7 @@ dal_collect_test_suites(
     root = "@onedal//cpp/oneapi/dal/backend/primitives",
     modules = [
         "blas",
+        "lapack",
         "reduction",
         "sort",
         "stat",

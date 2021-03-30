@@ -517,6 +517,9 @@ public:
     }
 
     matrix copy() const {
+        if (!is_host_accessible()) {
+            throw std::runtime_error{ "Transpose is implemented only for host-accessible data" };
+        }
         const Float* data_ptr = this->get_data();
         return full(this->get_shape(), [&](std::int64_t i) {
             return data_ptr[i];
@@ -581,7 +584,9 @@ inline matrix<T, lyt> astype(const matrix<Float, lyt>& m) {
 
 template <typename Float, layout lyt>
 inline matrix<Float, lyt> transpose(const matrix<Float, lyt>& m) {
-    ONEDAL_ASSERT(m.is_host_accessible(), "Transpose is implemented only for host-accessible data");
+    if (!m.is_host_accessible()) {
+        throw std::runtime_error{ "Transpose is implemented only for host-accessible data" };
+    }
 
     auto m_trans = matrix<Float, lyt>::empty(m.get_shape().t());
 
