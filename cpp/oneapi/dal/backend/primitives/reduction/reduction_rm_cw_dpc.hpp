@@ -34,8 +34,8 @@ public:
     using kernel_t = kernel_reduction_rm_cw_inplace<Float, BinaryOp, UnaryOp>;
 
 public:
-    reduction_rm_cw_inplace(sycl::queue& q_, const std::int64_t wg_);
-    reduction_rm_cw_inplace(sycl::queue& q_);
+    reduction_rm_cw_inplace(sycl::queue& q, const std::int64_t wg);
+    reduction_rm_cw_inplace(sycl::queue& q);
     sycl::event operator()(inp_t input,
                            out_t output,
                            const std::int64_t width,
@@ -62,10 +62,10 @@ private:
                                const UnaryOp& unary);
 
 private:
-    sycl::queue& q;
+    sycl::queue& q_;
 
-public:
-    const std::int64_t wg;
+private:
+    const std::int64_t wg_;
 };
 
 template <typename Float, typename BinaryOp, typename UnaryOp>
@@ -79,8 +79,8 @@ public:
     using kernel_t = kernel_reduction_rm_cw_inplace_local<Float, BinaryOp, UnaryOp>;
 
 public:
-    reduction_rm_cw_inplace_local(sycl::queue& q_, const std::int64_t wg_, const std::int64_t lm_);
-    reduction_rm_cw_inplace_local(sycl::queue& q_);
+    reduction_rm_cw_inplace_local(sycl::queue& q, const std::int64_t wg, const std::int64_t lm);
+    reduction_rm_cw_inplace_local(sycl::queue& q);
     sycl::event operator()(inp_t input,
                            out_t output,
                            const std::int64_t width,
@@ -109,11 +109,11 @@ private:
                                const UnaryOp& unary);
 
 private:
-    sycl::queue& q;
+    sycl::queue& q_;
 
-public:
-    const std::int64_t wg;
-    const std::int64_t lm;
+private:
+    const std::int64_t wg_;
+    const std::int64_t lm_;
 };
 
 template <typename Float, typename BinaryOp, typename UnaryOp>
@@ -125,7 +125,7 @@ public:
     using inplace_local_t = reduction_rm_cw_inplace_local<Float, BinaryOp, UnaryOp>;
 
 public:
-    reduction_rm_cw(sycl::queue& q_);
+    reduction_rm_cw(sycl::queue& q);
     enum reduction_method { inplace, inplace_local };
     reduction_method propose_method(std::int64_t width, std::int64_t height) const;
     sycl::event operator()(const reduction_method method,
@@ -162,7 +162,7 @@ public:
                            const event_vector& deps = {}) const;
 
 private:
-    sycl::queue& q;
+    sycl::queue& q_;
 };
 
 #endif
