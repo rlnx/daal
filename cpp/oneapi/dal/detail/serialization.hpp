@@ -81,9 +81,11 @@ public:
     }
 
     template <typename T>
-    void vector(const T* data, std::int64_t count) {
-        ONEDAL_ASSERT(data);
-        process(data, count);
+    void range(const T* begin, const T* end) {
+        ONEDAL_ASSERT(begin);
+        ONEDAL_ASSERT(end);
+        ONEDAL_ASSERT(begin <= end);
+        process(begin, end);
     }
 
 protected:
@@ -102,8 +104,52 @@ private:
     }
 
     template <typename T>
-    void process(const T* data, std::int64_t count) {
-        get_impl().process_vector(data, count, make_data_type<T>());
+    void process(const T* begin, const T* end) {
+        const std::int64_t count = end - begin;
+        get_impl().process_vector(begin, count, make_data_type<T>());
+    }
+};
+
+class input_archive : public archive_base<input_archive_iface> {
+public:
+    template <typename... Args>
+    void operator()(Args&&... args) {
+        (process(std::forward<Args>(args)), ...);
+    }
+
+    template <typename T>
+    void range(T* begin, T* end) {
+        ONEDAL_ASSERT(begin);
+        ONEDAL_ASSERT(end);
+        ONEDAL_ASSERT(begin <= end);
+        process(begin, end);
+    }
+
+    template <typename T>
+    T pop() {
+        T value;
+        (*this)(value);
+        return value;
+    }
+
+protected:
+    explicit input_archive(input_archive_iface* impl) : archive_base<input_archive_iface>(impl) {}
+
+private:
+    template <typename T, enable_if_trivially_serializable_t<T>* = nullptr>
+    void process(T& value) {
+        get_impl().process_scalar(&value, make_data_type<T>());
+    }
+
+    template <typename T, enable_if_user_serializable_t<T>* = nullptr>
+    void process(T& value) {
+        serialization_accessor::deserialize(value, *this);
+    }
+
+    template <typename T>
+    void process(T* begin, T* end) {
+        std::int64_t count = end - begin;
+        get_impl().process_vector(begin, count, make_data_type<T>());
     }
 };
 
@@ -112,9 +158,9 @@ inline void serialize(const T& value, output_archive& ar) {
     ar(value);
 }
 
-// template <typename T>
-// inline void deserialize(T& value, input_archive& ar) {
-//     ar(value);
-// }
+template <typename T>
+inline void deserialize(T& value, input_archive& ar) {
+    ar(value);
+}
 
 } // namespace oneapi::dal::detail
